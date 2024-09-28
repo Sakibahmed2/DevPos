@@ -106,7 +106,7 @@ const Sidebar = () => {
             }}
           >
             <Typography
-              sx={{ fontWeight: "bold", color: "#888888", marginTop: 2, mb: 1 }}
+              sx={{ fontWeight: "500", color: "#888888", marginTop: 2, mb: 1 }}
             >
               {item.section}
             </Typography>
@@ -118,7 +118,7 @@ const Sidebar = () => {
                 title={item.title}
               />
             ))}
-            <Divider sx={{ marginY: 1 }} />
+            <Divider sx={{ marginY: 3 }} />
           </Box>
         ))}
       </List>
