@@ -78,11 +78,11 @@ const LoginPage = () => {
 
             <Typography
               component="p"
-              variant="subtitle1"
               sx={{
                 textAlign: "right",
                 marginTop: "16px",
                 cursor: "pointer",
+                color: "text.secondary",
               }}
             >
               Forgot password?

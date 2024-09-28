@@ -8,6 +8,10 @@ export const theme = createTheme({
     secondary: {
       main: "#232424",
     },
+    text: {
+      primary: "#464255",
+      secondary: "#00000080",
+    },
   },
 
   components: {
@@ -56,6 +60,7 @@ export const theme = createTheme({
     },
     subtitle1: {
       color: "#00000080",
+      fontSize: "18px",
     },
   },
 });

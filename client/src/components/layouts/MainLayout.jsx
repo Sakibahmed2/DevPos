@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
-const drawerWidth = 240;
+const drawerWidth = 290;
 
 export default function MainLayout() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -37,17 +37,19 @@ export default function MainLayout() {
       />
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{
+          width: { sm: drawerWidth },
+          flexShrink: { sm: 0 },
+        }}
         aria-label="mailbox folders"
       >
-        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onTransitionEnd={handleDrawerTransitionEnd}
           onClose={handleDrawerClose}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },
@@ -82,7 +84,13 @@ export default function MainLayout() {
         }}
       >
         <Toolbar />
-        <Outlet />
+        <Box
+          sx={{
+            mt: 5,
+          }}
+        >
+          <Outlet />
+        </Box>
       </Box>
     </Box>
   );

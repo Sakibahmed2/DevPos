@@ -1,12 +1,13 @@
+/* eslint-disable react/prop-types */
 import {
   ListItem,
   ListItemButton,
   ListItemIcon,
-  ListItemText,
+  Typography,
 } from "@mui/material";
 import { NavLink, useLocation } from "react-router-dom";
 
-const ItemsLink = ({ title, path, icon: IconComponent }) => {
+const ItemsLink = ({ title, path, icon }) => {
   const { pathname } = useLocation();
 
   return (
@@ -14,22 +15,43 @@ const ItemsLink = ({ title, path, icon: IconComponent }) => {
       <ListItem
         disablePadding
         sx={{
-          ...(pathname === path
+          ...(pathname === `/admin/${path}`
             ? {
-                borderRight: "5px solid #1B9C85",
-                bgcolor: "#F4F7FE",
-                "& button": {
-                  color: "#1B9C85",
-                },
+                bgcolor: "rgba(0, 176, 117, 0.09)",
+                color: "primary.main",
+                borderRadius: 2,
+                fontWeight: "700",
               }
             : {}),
-          mb: 1,
-          p: 0,
         }}
       >
         <ListItemButton>
-          <ListItemIcon>{IconComponent && <IconComponent />}</ListItemIcon>
-          <ListItemText primary={title} />
+          <ListItemIcon sx={{ color: "#9C9C9C" }}>
+            <img
+              src={icon}
+              alt="icon"
+              style={{
+                width: "24px",
+                height: "24px",
+                filter:
+                  pathname === `/admin/${path}`
+                    ? "brightness(0) saturate(100%) invert(48%) sepia(73%) saturate(328%) hue-rotate(115deg) brightness(93%) contrast(94%)"
+                    : "none",
+                transition: "filter 0.3s",
+              }}
+            />
+          </ListItemIcon>
+          <Typography
+            sx={{
+              ...(pathname === `/admin/${path}`
+                ? {
+                    fontWeight: "700",
+                  }
+                : {}),
+            }}
+          >
+            {title}
+          </Typography>
         </ListItemButton>
       </ListItem>
     </NavLink>
