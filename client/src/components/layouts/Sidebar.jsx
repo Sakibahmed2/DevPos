@@ -47,11 +47,11 @@ const Sidebar = () => {
       </Stack>
 
       <List>
-        <NavLink to={`/admin/dashboard`}>
+        <NavLink to={`/`}>
           <ListItem
             disablePadding
             sx={{
-              ...(pathname === `/admin/dashboard`
+              ...(pathname === `/`
                 ? {
                     bgcolor: "rgba(0, 176, 117, 0.09)",
                     color: "primary.main",

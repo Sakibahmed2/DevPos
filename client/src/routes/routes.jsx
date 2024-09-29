@@ -5,7 +5,7 @@ import adminPath from "./adminRoutes";
 
 const router = createBrowserRouter([
   {
-    path: "/admin",
+    path: "/",
     element: <App />,
     children: adminPath,
   },

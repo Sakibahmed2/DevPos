@@ -15,7 +15,7 @@ const ItemsLink = ({ title, path, icon }) => {
       <ListItem
         disablePadding
         sx={{
-          ...(pathname === `/admin/${path}`
+          ...(pathname === `/${path}`
             ? {
                 bgcolor: "rgba(0, 176, 117, 0.09)",
                 color: "primary.main",
@@ -34,7 +34,7 @@ const ItemsLink = ({ title, path, icon }) => {
                 width: "24px",
                 height: "24px",
                 filter:
-                  pathname === `/admin/${path}`
+                  pathname === `/${path}`
                     ? "brightness(0) saturate(100%) invert(48%) sepia(73%) saturate(328%) hue-rotate(115deg) brightness(93%) contrast(94%)"
                     : "none",
                 transition: "filter 0.3s",
@@ -43,7 +43,7 @@ const ItemsLink = ({ title, path, icon }) => {
           </ListItemIcon>
           <Typography
             sx={{
-              ...(pathname === `/admin/${path}`
+              ...(pathname === `/${path}`
                 ? {
                     fontWeight: "700",
                   }
