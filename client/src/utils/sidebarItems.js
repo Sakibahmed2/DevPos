@@ -3,6 +3,7 @@ import { USER_ROLE } from "../constants/role";
 // icons
 import productIcon from "../assets/dashboard icons/admin/inventory/products.svg";
 import createProductIcon from "../assets/dashboard icons/admin/inventory/create-product.svg";
+import expiredProduct from "../assets/dashboard icons/admin/inventory/expired-products.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -21,6 +22,11 @@ export const sidebarItems = (role) => {
             title: "Create product",
             path: `dashboard/create-product`,
             icon: createProductIcon,
+          },
+          {
+            title: "Expired products",
+            path: `dashboard/expired-products`,
+            icon: expiredProduct,
           },
         ],
       });

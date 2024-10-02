@@ -20,6 +20,7 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import visibilityIcon from "../../../../assets/dashboard icons/visibility-icon.svg";
+import { NavLink } from "react-router-dom";
 
 // table data
 const tableData = [
@@ -196,7 +197,7 @@ const ProductsPage = () => {
       field: "id",
       headerName: "Action",
       flex: 1,
-      renderCell: () => {
+      renderCell: ({ row }) => {
         return (
           <Stack
             direction={"row"}
@@ -214,10 +215,12 @@ const ProductsPage = () => {
                 borderRadius: 1,
                 p: "5px 3px",
               }}
-              component={"button"}
+              component={NavLink}
+              to={`/dashboard/products/${row.id}`}
             >
               <img src={visibilityIcon} alt="" className="h-5 w-5" />
             </Box>
+
             <Box
               component={"button"}
               sx={{
@@ -228,6 +231,7 @@ const ProductsPage = () => {
             >
               <img src={editIcons} alt="" className="w-5 h-5" />
             </Box>
+
             <Box
               component={"button"}
               sx={{

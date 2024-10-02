@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import {
+  Box,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -11,7 +12,13 @@ const ItemsLink = ({ title, path, icon }) => {
   const { pathname } = useLocation();
 
   return (
-    <NavLink to={path}>
+    <Box
+      component={NavLink}
+      to={path}
+      sx={{
+        pt: 5,
+      }}
+    >
       <ListItem
         disablePadding
         sx={{
@@ -41,20 +48,10 @@ const ItemsLink = ({ title, path, icon }) => {
               }}
             />
           </ListItemIcon>
-          <Typography
-            sx={{
-              ...(pathname === `/${path}`
-                ? {
-                    fontWeight: "700",
-                  }
-                : {}),
-            }}
-          >
-            {title}
-          </Typography>
+          <Typography>{title}</Typography>
         </ListItemButton>
       </ListItem>
-    </NavLink>
+    </Box>
   );
 };
 

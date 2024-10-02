@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Checkbox,
   Container,
   Divider,
@@ -14,19 +15,51 @@ import DPSelect from "../../../../components/form/DPSelect";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 import DPFileUploader from "../../../../components/form/DPFileUploader";
 
+// const defaultValues = {
+//   // productName: "",
+//   // slug: "",
+//   // stockKeepingUnit: "",
+//   // quantity: "",
+//   // category: "",
+//   // subCategory: "",
+//   // brand: "",
+//   // unit: "",
+//   // sellingType: "",
+//   // barcodeSymbology: "",
+//   // itemCode: "",
+//   // description: "",
+//   // price: "",
+//   // taxType: "",
+//   // discountType: "",
+//   // discountValue: "",
+//   // quantityAlert: "",
+//   // productImg: "",
+// };
+
 const defaultValues = {
-  productName: "",
-  slug: "",
-  stockKeepingUnit: "",
-  quantity: "",
-  category: "",
-  subCategory: "",
-  brand: "",
-  unit: "",
-  sellingType: "",
-  barcodeSymbology: "",
-  itemCode: "",
-  description: "",
+  productName: "Apple Macbook Pro",
+  productImg: "https://source.unsplash.com/random",
+  productInfo: {
+    slug: "apple-macbook-pro",
+    sku: "MBP-123456",
+    category: "laptop",
+    subCategory: "tablet",
+    brand: "Apple",
+    unit: "piece",
+    sellingType: "retail",
+    barcodeSymbology: "code128",
+    itemCode: "123456",
+    description: "Latest model of Apple MacBook Pro with M1 chip.",
+  },
+  pricingAndStock: {
+    price: 2500,
+    quantity: 10,
+    taxType: "VAT",
+    taxRate: 15, // percentage
+    discountType: "percentage",
+    discountValue: "10%", // percentage
+    quantityAlert: 5,
+  },
 };
 
 const CreateProduct = () => {
@@ -98,7 +131,7 @@ const CreateProduct = () => {
                     item
                   >
                     <DPInput
-                      name={"slug"}
+                      name={"productInfo.slug"}
                       label={"Slug"}
                       required
                       fullWidth
@@ -115,7 +148,7 @@ const CreateProduct = () => {
                     item
                   >
                     <DPInput
-                      name={"stockKeepingUnit"}
+                      name={"productInfo.sku"}
                       label={"Stock keeping unit"}
                       required
                       fullWidth
@@ -141,7 +174,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"category"}
+                      name={"productInfo.category"}
                       label={"Category"}
                       items={["laptop", "mobile"]}
                       size="medium"
@@ -157,7 +190,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"subCategory"}
+                      name={"productInfo.subCategory"}
                       label={"Sub category"}
                       items={["tablet", "accessories"]}
                       size="medium"
@@ -173,7 +206,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"brand"}
+                      name={"productInfo.brand"}
                       label={"Brand"}
                       items={["Apple", "Samsung"]}
                       size="medium"
@@ -198,7 +231,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"unit"}
+                      name={"productInfo.unit"}
                       label={"Unit"}
                       items={["piece", "kg"]}
                       size="medium"
@@ -214,7 +247,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"sellingType"}
+                      name={"productInfo.sellingType"}
                       label={"Seeling type"}
                       items={["retail", "wholesale"]}
                       size="medium"
@@ -230,7 +263,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"barcodeSymbology"}
+                      name={"productInfo.barcodeSymbology"}
                       label={"Barcode symbology"}
                       items={["code128", "code39"]}
                       size="medium"
@@ -246,7 +279,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"itemCode"}
+                      name={"productInfo.itemCode"}
                       label={"Item code"}
                       items={["123456", "789123"]}
                       size="medium"
@@ -264,7 +297,7 @@ const CreateProduct = () => {
                 >
                   <Grid2 item size={12}>
                     <DPInput
-                      name={"description"}
+                      name={"productInfo.description"}
                       label={"Description"}
                       fullWidth
                       size="medium"
@@ -334,7 +367,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPInput
-                      name={"quantity"}
+                      name={"pricingAndStock.quantity"}
                       label={"Quantity"}
                       required
                       fullWidth
@@ -351,7 +384,7 @@ const CreateProduct = () => {
                     item
                   >
                     <DPInput
-                      name={"price"}
+                      name={"pricingAndStock.price"}
                       label={"Price"}
                       required
                       fullWidth
@@ -368,7 +401,7 @@ const CreateProduct = () => {
                     item
                   >
                     <DPSelect
-                      name={"taxType"}
+                      name={"pricingAndStock.taxType"}
                       label={"Tax type"}
                       items={["VAT", "GST"]}
                       fullWidth
@@ -394,7 +427,7 @@ const CreateProduct = () => {
                     }}
                   >
                     <DPSelect
-                      name={"discountType"}
+                      name={"pricingAndStock.discountType"}
                       label={"Discount type"}
                       items={["percentage", "fixed"]}
                       fullWidth
@@ -411,7 +444,7 @@ const CreateProduct = () => {
                     item
                   >
                     <DPSelect
-                      name={"discountValue"}
+                      name={"pricingAndStock.discountValue"}
                       label={"Discount value"}
                       items={["10%", "20%"]}
                       required
@@ -429,7 +462,7 @@ const CreateProduct = () => {
                     item
                   >
                     <DPInput
-                      name={"quantityAlert"}
+                      name={"pricingAndStock.quantityAlert"}
                       label={"Quantity alert"}
                       fullWidth
                       required
@@ -465,6 +498,14 @@ const CreateProduct = () => {
                 >
                   <DPFileUploader name={"productImg"} label={"Upload image"} />
                 </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  mt: 3,
+                }}
+              >
+                <Button type="submit">Create product</Button>
               </Box>
             </DPForm>
           </Box>
