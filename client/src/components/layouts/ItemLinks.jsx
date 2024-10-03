@@ -12,13 +12,7 @@ const ItemsLink = ({ title, path, icon }) => {
   const { pathname } = useLocation();
 
   return (
-    <Box
-      component={NavLink}
-      to={path}
-      sx={{
-        pt: 5,
-      }}
-    >
+    <Box component={NavLink} to={path}>
       <ListItem
         disablePadding
         sx={{

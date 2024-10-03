@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
-"use client";
 
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { Input, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Controller, useFormContext } from "react-hook-form";
+import plusIcon from "../../assets/dashboard icons/plusIcon.svg";
 
 export default function DPFileUploader({ name, label, sx }) {
   const { control } = useFormContext();
@@ -31,7 +30,13 @@ export default function DPFileUploader({ name, label, sx }) {
               cursor: "pointer",
               ...sx,
             }}
-            startIcon={<AddCircleOutlineIcon />}
+            startIcon={
+              <img
+                src={plusIcon}
+                alt="plus icon"
+                style={{ width: 30, height: 30, filter: "invert(1)" }}
+              />
+            }
             variant="text"
           >
             {label || "Upload file"}

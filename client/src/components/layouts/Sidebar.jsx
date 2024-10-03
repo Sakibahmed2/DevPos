@@ -113,14 +113,16 @@ const Sidebar = () => {
             >
               {item.section}
             </Typography>
-            {item.items.map((item, idx) => (
-              <ItemsLink
-                key={idx}
-                icon={item.icon}
-                path={item.path}
-                title={item.title}
-              />
-            ))}
+            <Stack direction={"column"} gap={1.5}>
+              {item.items.map((item, idx) => (
+                <ItemsLink
+                  key={idx}
+                  icon={item.icon}
+                  path={item.path}
+                  title={item.title}
+                />
+              ))}
+            </Stack>
             <Divider sx={{ marginY: 3 }} />
           </Box>
         ))}
