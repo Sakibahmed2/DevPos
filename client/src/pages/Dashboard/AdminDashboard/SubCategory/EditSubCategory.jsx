@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack, Switch, Typography } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
-import DPModal from "../../../../components/modal/DPModal";
 import DPInput from "../../../../components/form/DPInput";
+import DPModal from "../../../../components/modal/DPModal";
 
 const defaultValues = {
   category: "",
@@ -10,7 +10,7 @@ const defaultValues = {
   status: "",
 };
 
-const EditCategoriesModal = ({ open, setOpen, id }) => {
+const EditSubCategory = ({ open, setOpen, id }) => {
   console.log(id);
 
   const onSubmit = (data) => {
@@ -18,7 +18,7 @@ const EditCategoriesModal = ({ open, setOpen, id }) => {
   };
 
   return (
-    <DPModal title="Edit category" open={open} setOpen={setOpen}>
+    <DPModal title="Edit sub category" open={open} setOpen={setOpen}>
       <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
         <Stack
           direction={"column"}
@@ -28,15 +28,32 @@ const EditCategoriesModal = ({ open, setOpen, id }) => {
           }}
         >
           <DPInput
-            name={"category"}
-            label={"Category"}
+            name={"parentCategory"}
+            label={"Parent category"}
             fullWidth
             size="medium"
           />
+
           <DPInput
-            name={"categorySlug"}
-            label={"Category slug"}
+            name={"category"}
+            label={"Category name"}
             fullWidth
+            size="medium"
+          />
+
+          <DPInput
+            name={"categoryCode"}
+            label={"Category code"}
+            fullWidth
+            size="medium"
+          />
+
+          <DPInput
+            name={"description"}
+            label={"Description"}
+            fullWidth
+            multiline
+            rows={3}
             size="medium"
           />
 
@@ -74,4 +91,4 @@ const EditCategoriesModal = ({ open, setOpen, id }) => {
   );
 };
 
-export default EditCategoriesModal;
+export default EditSubCategory;

@@ -24,7 +24,6 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
             gap={3}
             sx={{
               width: "500px",
-              overflow: "hidden",
             }}
           >
             <DPInput

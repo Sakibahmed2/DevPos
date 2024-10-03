@@ -4,6 +4,7 @@ import ExpiredProduct from "../pages/Dashboard/AdminDashboard/ExpiredProduct/Exp
 import LowStocks from "../pages/Dashboard/AdminDashboard/LowStocks/LowStocks";
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
+import SubCategory from "../pages/Dashboard/AdminDashboard/SubCategory/SubCategory";
 import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
 
 const adminPath = [
@@ -34,6 +35,10 @@ const adminPath = [
   {
     path: "/dashboard/categories",
     element: <Categories />,
+  },
+  {
+    path: "dashboard/sub-category",
+    element: <SubCategory />,
   },
 ];
 

@@ -6,6 +6,7 @@ import createProductIcon from "../assets/dashboard icons/admin/inventory/create-
 import expiredProduct from "../assets/dashboard icons/admin/inventory/expired-products.svg";
 import lowStocks from "../assets/dashboard icons/admin/inventory/low-stocks.svg";
 import categories from "../assets/dashboard icons/admin/inventory/categories.svg";
+import subCategory from "../assets/dashboard icons/admin/inventory/sub-category.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -39,6 +40,11 @@ export const sidebarItems = (role) => {
             title: "Categories",
             path: `dashboard/categories`,
             icon: categories,
+          },
+          {
+            title: "Sub categories",
+            path: `dashboard/sub-category`,
+            icon: subCategory,
           },
         ],
       });
