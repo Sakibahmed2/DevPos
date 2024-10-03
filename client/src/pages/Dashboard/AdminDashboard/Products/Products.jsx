@@ -21,6 +21,7 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import visibilityIcon from "../../../../assets/dashboard icons/visibility-icon.svg";
 import { NavLink } from "react-router-dom";
+import PaginationUi from "../../../../components/ui/PaginationUi";
 
 // table data
 const tableData = [
@@ -73,6 +74,13 @@ const tableData = [
 
 const ProductsPage = () => {
   const [sortBy, setSortBy] = useState("");
+  const [page, setPage] = useState(0);
+
+  // const itemsPerPage = 3 ;
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   const columns = [
     {
@@ -338,6 +346,14 @@ const ProductsPage = () => {
             disableRowSelectionOnClick
           />
         </Box>
+      </Box>
+
+      <Box>
+        <PaginationUi
+          totalItems={tableData.length}
+          currentPage={page}
+          onPageChange={handlePageChange}
+        />
       </Box>
     </Container>
   );

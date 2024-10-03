@@ -19,6 +19,7 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
+import EditLowStockModal from "./EditLowStockModal";
 
 // table data
 const tableData = [
@@ -27,35 +28,51 @@ const tableData = [
     productImg: laptopImg,
     name: "Walton 8rd Generation",
     stockKeepingUnit: "PT07",
-    manufactureDate: "29 Mar 2024",
-    expiryDate: "29 Mar 2025",
+    category: "Laptop",
+    quantity: 20,
+    quantityAlert: 10,
+    warehouse: "Lobar handy",
+    store: "Selosy",
   },
   {
     id: 2,
     productImg: laptopImg,
     name: "Walton 8rd Generation",
     stockKeepingUnit: "PT07",
-    manufactureDate: "29 Mar 2024",
-    expiryDate: "29 Mar 2025",
+    category: "Laptop",
+    quantity: 20,
+    quantityAlert: 10,
+    warehouse: "Lobar handy",
+    store: "Selosy",
   },
   {
     id: 3,
     productImg: laptopImg,
     name: "Walton 8rd Generation",
     stockKeepingUnit: "PT07",
-    manufactureDate: "29 Mar 2024",
-    expiryDate: "29 Mar 2025",
+    category: "Laptop",
+    quantity: 20,
+    quantityAlert: 10,
+    warehouse: "Lobar handy",
+    store: "Selosy",
   },
 ];
 
-const ExpiredProduct = () => {
+const LowStocks = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [productId, setProductId] = useState(null);
 
   // const itemsPerPage = 3 ;
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleModal = (productId) => {
+    setOpen(true);
+    setProductId(productId);
   };
 
   const columns = [
@@ -90,9 +107,41 @@ const ExpiredProduct = () => {
       },
     },
     {
+      field: "wareHouse",
+      headerName: "Warehouse",
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.warehouse}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "store",
+      headerName: "Store",
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.store}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "category",
+      headerName: "Category",
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.category}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
       field: "stockKeepingUnit",
       headerName: "SKU",
-      flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
@@ -102,25 +151,23 @@ const ExpiredProduct = () => {
       },
     },
     {
-      field: "manufactureDate",
-      headerName: "Manufacture Date",
-      flex: 1,
+      field: "quantity",
+      headerName: "Qty",
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.manufactureDate}</Typography>
+            <Typography variant="p">{row.quantity}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "expiryDate",
-      headerName: "Expired date",
-      flex: 1,
+      field: "quantityAlert",
+      headerName: "Qty alert",
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.expiryDate}</Typography>
+            <Typography variant="p">{row.quantityAlert}</Typography>
           </Box>
         );
       },
@@ -128,8 +175,7 @@ const ExpiredProduct = () => {
     {
       field: "id",
       headerName: "Action",
-
-      renderCell: () => {
+      renderCell: ({ row }) => {
         return (
           <Stack
             direction={"row"}
@@ -142,6 +188,7 @@ const ExpiredProduct = () => {
             }}
           >
             <Box
+              onClick={() => handleModal(row.id)}
               component={"button"}
               sx={{
                 border: "1px solid gray",
@@ -174,17 +221,17 @@ const ExpiredProduct = () => {
       name: data.name,
       productImg: data.productImg,
       stockKeepingUnit: data.stockKeepingUnit,
-      manufactureDate: data.manufactureDate,
-      expiryDate: data.expiryDate,
+      category: data.category,
+      warehouse: data.warehouse,
+      store: data.store,
+      quantity: data.quantity,
+      quantityAlert: data.quantityAlert,
     };
   });
 
   return (
     <Container>
-      <SectionTitle
-        title="Product list"
-        description="Mange your products here"
-      />
+      <SectionTitle title="Low stocks" description="Mange your low stocks" />
 
       <Box
         sx={{
@@ -249,12 +296,13 @@ const ExpiredProduct = () => {
             rows={rows}
             columns={columns}
             rowHeight={80}
+            hideFooter
             checkboxSelection
             disableRowSelectionOnClick
-            hideFooter
           />
         </Box>
       </Box>
+
       <Box>
         <PaginationUi
           totalItems={tableData.length}
@@ -262,8 +310,10 @@ const ExpiredProduct = () => {
           onPageChange={handlePageChange}
         />
       </Box>
+
+      <EditLowStockModal open={open} setOpen={setOpen} id={productId} />
     </Container>
   );
 };
 
-export default ExpiredProduct;
+export default LowStocks;

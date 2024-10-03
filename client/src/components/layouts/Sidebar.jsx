@@ -34,6 +34,9 @@ const Sidebar = () => {
         mt={1}
         component={NavLink}
         to={"/"}
+        sx={{
+          mb: 2,
+        }}
       >
         <Typography
           variant="h4"
@@ -42,7 +45,7 @@ const Sidebar = () => {
             fontWeight: "700",
           }}
         >
-          <img src={devPosLogo} alt="company logo" className="w-40" />
+          <img src={devPosLogo} alt="company logo" className="w-56" />
         </Typography>
       </Stack>
 

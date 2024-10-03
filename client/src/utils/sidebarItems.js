@@ -4,6 +4,7 @@ import { USER_ROLE } from "../constants/role";
 import productIcon from "../assets/dashboard icons/admin/inventory/products.svg";
 import createProductIcon from "../assets/dashboard icons/admin/inventory/create-product.svg";
 import expiredProduct from "../assets/dashboard icons/admin/inventory/expired-products.svg";
+import lowStocks from "../assets/dashboard icons/admin/inventory/low-stocks.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -27,6 +28,11 @@ export const sidebarItems = (role) => {
             title: "Expired products",
             path: `dashboard/expired-products`,
             icon: expiredProduct,
+          },
+          {
+            title: "Low stocks",
+            path: `dashboard/low-stocks`,
+            icon: lowStocks,
           },
         ],
       });

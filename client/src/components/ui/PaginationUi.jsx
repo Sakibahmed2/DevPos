@@ -66,7 +66,6 @@ const PaginationUi = ({ totalItems, itemsPerPage = 5, onPageChange }) => {
             color: "white",
             p: "10px 8px",
             borderRadius: "5px",
-            mx: 1,
           }}
         >
           {page}

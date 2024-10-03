@@ -1,5 +1,6 @@
 import CreateProduct from "../pages/Dashboard/AdminDashboard/CreateProduct/CreateProduct";
 import ExpiredProduct from "../pages/Dashboard/AdminDashboard/ExpiredProduct/ExpiredProduct";
+import LowStocks from "../pages/Dashboard/AdminDashboard/LowStocks/LowStocks";
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
 import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
@@ -24,6 +25,10 @@ const adminPath = [
   {
     path: "dashboard/expired-products",
     element: <ExpiredProduct />,
+  },
+  {
+    path: "/dashboard/low-stocks",
+    element: <LowStocks />,
   },
 ];
 
