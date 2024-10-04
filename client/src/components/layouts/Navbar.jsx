@@ -53,94 +53,106 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
         </IconButton>
         <Container>
           <Stack
-            direction={"row"}
+            direction={{
+              xs: "column",
+              lg: "row",
+            }}
             gap={2}
             alignItems={"center"}
             justifyContent={"space-between"}
           >
-            <Box
-              sx={{
-                width: "600px",
-              }}
-            >
-              <TextField
-                label="Search here"
-                fullWidth
-                slotProps={{
-                  input: {
-                    endAdornment: <img src={searchIcon} />,
+            {/* search and sort */}
+            <Stack direction={"row"} gap={2}>
+              <Box
+                sx={{
+                  width: "600px",
+                }}
+              >
+                <TextField
+                  label="Search here"
+                  fullWidth
+                  slotProps={{
+                    input: {
+                      endAdornment: <img src={searchIcon} />,
+                    },
+                  }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  width: {
+                    xs: "100%",
+                    lg: "170px",
                   },
                 }}
-              />
-            </Box>
-
-            <Box
-              sx={{
-                width: "170px",
-              }}
-            >
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">
-                  Select store
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={store}
-                  label="Select store"
-                  onChange={handleChange}
-                >
-                  <MenuItem value={"store"}>Store</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Stack direction={"row"}>
-              <IconButton>
-                <Badge color="info" badgeContent={"21"}>
-                  <img
-                    src={bellIcon}
-                    alt="bell"
-                    className="p-2 bg-sky-500/20 rounded-2xl"
-                  />
-                </Badge>
-              </IconButton>
-
-              <IconButton>
-                <Badge color="info" badgeContent={"53"}>
-                  <img
-                    src={messageIcon}
-                    alt="message"
-                    className="p-2 bg-sky-500/20 rounded-2xl"
-                  />
-                </Badge>
-              </IconButton>
-
-              <IconButton>
-                <Badge color="error" badgeContent={"19"}>
-                  <img
-                    src={settingIcon}
-                    alt="setting"
-                    className="p-2 bg-red-500/10 rounded-2xl"
-                  />
-                </Badge>
-              </IconButton>
+              >
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">
+                    Select store
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={store}
+                    label="Select store"
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={"store"}>Store</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </Stack>
 
-            <Box
-              sx={{
-                borderLeft: "2px solid gray",
-                pl: 2,
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <Typography component={"p"} color="text.secondary">
-                Hello, Sir
-              </Typography>
-              <Avatar alt="User img" src="/static/images/avatar/1.jpg" />
-            </Box>
+            {/* message and user info */}
+            <Stack direction={"row"} gap={2}>
+              <Stack direction={"row"}>
+                <IconButton>
+                  <Badge color="info" badgeContent={"21"}>
+                    <img
+                      src={bellIcon}
+                      alt="bell"
+                      className="p-2 bg-sky-500/20 rounded-2xl"
+                    />
+                  </Badge>
+                </IconButton>
+
+                <IconButton>
+                  <Badge color="info" badgeContent={"53"}>
+                    <img
+                      src={messageIcon}
+                      alt="message"
+                      className="p-2 bg-sky-500/20 rounded-2xl"
+                    />
+                  </Badge>
+                </IconButton>
+
+                <IconButton>
+                  <Badge color="error" badgeContent={"19"}>
+                    <img
+                      src={settingIcon}
+                      alt="setting"
+                      className="p-2 bg-red-500/10 rounded-2xl"
+                    />
+                  </Badge>
+                </IconButton>
+              </Stack>
+
+              <Box
+                sx={{
+                  borderLeft: "2px solid gray",
+                  pl: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                <Typography component={"p"} color="text.secondary">
+                  Hello, Sir
+                </Typography>
+                <Avatar alt="User img" src="/static/images/avatar/1.jpg" />
+              </Box>
+            </Stack>
           </Stack>
         </Container>
       </Toolbar>

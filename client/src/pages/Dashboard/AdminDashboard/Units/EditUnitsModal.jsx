@@ -5,16 +5,12 @@ import DPModal from "../../../../components/modal/DPModal";
 import DPForm from "../../../../components/form/DPForm";
 
 const defaultValues = {
-  productName: "",
-  warehouse: "",
-  category: "",
-  stockKeepingUnit: "",
-  quantity: "",
-  quantityAlert: "",
+  units: "",
+  short: "",
   status: "",
 };
 
-const EditLowStockModal = ({ open, setOpen, id = "" }) => {
+const EditUnitsModal = ({ open, setOpen, id }) => {
   console.log(id);
 
   const onSubmit = (data) => {
@@ -23,7 +19,7 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
 
   return (
     <Box>
-      <DPModal open={open} setOpen={setOpen} title="Edit low stocks">
+      <DPModal open={open} setOpen={setOpen} title="Edit unit">
         <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
           <Stack
             direction={"column"}
@@ -33,37 +29,19 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
             }}
           >
             <DPInput
-              name={"productName"}
-              label={"Product"}
+              name={"units"}
+              label={"Units name"}
               fullWidth
               size="medium"
             />
             <DPInput
-              name={"warehouse"}
-              label={"Warehouse"}
-              fullWidth
-              size="medium"
-            />
-            <DPInput
-              name={"category"}
-              label={"Category"}
-              fullWidth
-              size="medium"
-            />
-            <DPInput
-              name={"stockKeepingUnit"}
-              label={"SKU"}
-              fullWidth
-              size="medium"
-            />
-            <DPInput name={"quantity"} label={"Qty"} fullWidth size="medium" />
-            <DPInput
-              name={"quantityAlert"}
-              label={"Qty alert"}
+              name={"short"}
+              label={"Short name"}
               fullWidth
               size="medium"
             />
 
+            {/* Status toggle */}
             <Box
               sx={{
                 display: "flex",
@@ -99,4 +77,4 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
   );
 };
 
-export default EditLowStockModal;
+export default EditUnitsModal;

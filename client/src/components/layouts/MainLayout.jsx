@@ -86,7 +86,10 @@ export default function MainLayout() {
         <Toolbar />
         <Box
           sx={{
-            mt: 5,
+            mt: {
+              xs: 20,
+              lg: 5,
+            },
           }}
         >
           <Outlet />

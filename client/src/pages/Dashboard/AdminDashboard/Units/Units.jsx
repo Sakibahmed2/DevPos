@@ -1,68 +1,72 @@
-import { Button, Container, Stack } from "@mui/material";
-import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
-import PaginationUi from "../../../../components/ui/PaginationUi";
-import SectionTitle from "../../../../components/ui/SectionTitle";
-
 import {
   Box,
+  Button,
+  Chip,
+  Container,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
+import PaginationUi from "../../../../components/ui/PaginationUi";
+import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
+import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import laptopImg from "../../../../assets/laptopPng.png";
-import EditSubCategory from "./EditSubCategory";
+import EditUnitsModal from "./EditUnitsModal";
 
-// table data
 const tableData = [
   {
     id: 1,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
+    units: "Kilogram",
+    short: "kg",
+    noOfProducts: 10,
+    createdAt: "09 Sep 2024",
+    status: "Active",
   },
   {
     id: 2,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
+    units: "Kilogram",
+    short: "kg",
+    noOfProducts: 10,
+    createdAt: "09 Sep 2024",
+    status: "Active",
   },
   {
     id: 3,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
+    units: "Kilogram",
+    short: "kg",
+    noOfProducts: 10,
+    createdAt: "09 Sep 2024",
+    status: "Inactive",
   },
   {
     id: 4,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
+    units: "Kilogram",
+    short: "kg",
+    noOfProducts: 10,
+    createdAt: "09 Sep 2024",
+    status: "Active",
+  },
+  {
+    id: 5,
+    units: "Kilogram",
+    short: "kg",
+    noOfProducts: 10,
+    createdAt: "09 Sep 2024",
+    status: "Active",
   },
 ];
 
-const SubCategory = () => {
+const Units = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
@@ -81,80 +85,58 @@ const SubCategory = () => {
 
   const columns = [
     {
-      field: "categoryImg",
-      headerName: "Img",
+      field: "units",
+      headerName: "Units",
       flex: 1,
       renderCell: ({ row }) => {
         return (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            <img src={row.categoryImg} alt="laptop" className="h-8 w-12" />
+          <Box>
+            <Typography variant="p">{row.units}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "category",
-      headerName: "Category ",
+      field: "short",
+      headerName: "Short",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.category}</Typography>
+            <Typography variant="p">{row.short}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "parentCategory",
-      headerName: "Parent category",
+      field: "createdAt",
+      headerName: "Created on",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.parentCategory}</Typography>
+            <Typography variant="p">{row.createdAt}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "categoryCode",
-      headerName: "Category code",
+      field: "status",
+      headerName: "Status",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.categoryCode}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "description",
-      headerName: "Description",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.description}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "createdBy",
-      headerName: "Created by",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.createdBy}</Typography>
+            {
+              <Chip
+                variant="outlined"
+                size="small"
+                sx={{
+                  color: row.status === "Active" ? "green" : "red",
+                }}
+                label={row.status}
+              ></Chip>
+            }
           </Box>
         );
       },
@@ -205,26 +187,22 @@ const SubCategory = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      categoryImg: data.categoryImg,
-      category: data.category,
-      parentCategory: data.parentCategory,
-      categoryCode: data.categoryCode,
-      description: data.description,
-      createdBy: data.createdBy,
+      units: data.units,
+      short: data.short,
+      noOfProducts: data.noOfProducts,
+      createdAt: data.createdAt,
+      status: data.status,
     };
   });
+
   return (
     <Container>
-      {/* section title */}
       <Stack
         direction={"row"}
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <SectionTitle
-          title={"Sub categories list"}
-          description={"Manage your sub categories"}
-        />
+        <SectionTitle title={"Units"} description={"Manage your units"} />
 
         <Button
           startIcon={
@@ -235,17 +213,17 @@ const SubCategory = () => {
             />
           }
         >
-          Add new sub category
+          Add new unit
         </Button>
       </Stack>
 
-      {/* data table */}
       <Box
         sx={{
           mt: 5,
           border: "1px solid lightgray",
         }}
       >
+        {/* search fields */}
         <Stack
           direction={"row"}
           justifyContent={"space-between"}
@@ -318,10 +296,9 @@ const SubCategory = () => {
         />
       </Box>
 
-      {/* Edit category modal */}
-      <EditSubCategory open={open} setOpen={setOpen} id={productId} />
+      <EditUnitsModal open={open} setOpen={setOpen} id={productId} />
     </Container>
   );
 };
 
-export default SubCategory;
+export default Units;

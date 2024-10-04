@@ -17,7 +17,7 @@ export const theme = createTheme({
   components: {
     MuiContainer: {
       defaultProps: {
-        maxWidth: "lg",
+        maxWidth: "xl",
       },
     },
 
@@ -30,8 +30,8 @@ export const theme = createTheme({
           padding: "10px 52px",
           color: "white",
           borderRadius: "5px",
-          fontSize: "14px",
-          fontWeight: "700",
+          fontSize: "16px",
+          fontWeight: "500",
         },
       },
     },

@@ -1,3 +1,4 @@
+import Brands from "../pages/Dashboard/AdminDashboard/Brands/Brands";
 import Categories from "../pages/Dashboard/AdminDashboard/Categories/Categories";
 import CreateProduct from "../pages/Dashboard/AdminDashboard/CreateProduct/CreateProduct";
 import ExpiredProduct from "../pages/Dashboard/AdminDashboard/ExpiredProduct/ExpiredProduct";
@@ -5,6 +6,8 @@ import LowStocks from "../pages/Dashboard/AdminDashboard/LowStocks/LowStocks";
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
 import SubCategory from "../pages/Dashboard/AdminDashboard/SubCategory/SubCategory";
+import Units from "../pages/Dashboard/AdminDashboard/Units/Units";
+import VariantAttributes from "../pages/Dashboard/AdminDashboard/VariantAttributes/VariantAttributes";
 import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
 
 const adminPath = [
@@ -39,6 +42,18 @@ const adminPath = [
   {
     path: "dashboard/sub-category",
     element: <SubCategory />,
+  },
+  {
+    path: "dashboard/brands",
+    element: <Brands />,
+  },
+  {
+    path: "dashboard/units",
+    element: <Units />,
+  },
+  {
+    path: "dashboard/variant-attributes",
+    element: <VariantAttributes />,
   },
 ];
 

@@ -34,7 +34,13 @@ export default function DPFileUploader({ name, label, sx }) {
               <img
                 src={plusIcon}
                 alt="plus icon"
-                style={{ width: 30, height: 30, filter: "invert(1)" }}
+                style={{
+                  width: 30,
+                  height: 30,
+                  filter: "invert(1)",
+                  display: "flex",
+                  marginLeft: "10px",
+                }}
               />
             }
             variant="text"

@@ -7,6 +7,9 @@ import expiredProduct from "../assets/dashboard icons/admin/inventory/expired-pr
 import lowStocks from "../assets/dashboard icons/admin/inventory/low-stocks.svg";
 import categories from "../assets/dashboard icons/admin/inventory/categories.svg";
 import subCategory from "../assets/dashboard icons/admin/inventory/sub-category.svg";
+import brandsIcon from "../assets/dashboard icons/admin/inventory/brands.svg";
+import unitsIcon from "../assets/dashboard icons/admin/inventory/units.svg";
+import variantsAttributesIcon from "../assets/dashboard icons/admin/inventory/varient-attributes.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -45,6 +48,21 @@ export const sidebarItems = (role) => {
             title: "Sub categories",
             path: `dashboard/sub-category`,
             icon: subCategory,
+          },
+          {
+            title: "Brands",
+            path: `dashboard/brands`,
+            icon: brandsIcon,
+          },
+          {
+            title: "Units",
+            path: "dashboard/units",
+            icon: unitsIcon,
+          },
+          {
+            title: "Variant attributes",
+            path: `dashboard/variant-attributes`,
+            icon: variantsAttributesIcon,
           },
         ],
       });

@@ -1,20 +1,16 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack, Switch, Typography } from "@mui/material";
-import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
 import DPForm from "../../../../components/form/DPForm";
+import DPInput from "../../../../components/form/DPInput";
 
 const defaultValues = {
-  productName: "",
-  warehouse: "",
-  category: "",
-  stockKeepingUnit: "",
-  quantity: "",
-  quantityAlert: "",
+  variants: "",
+  value: "",
   status: "",
 };
 
-const EditLowStockModal = ({ open, setOpen, id = "" }) => {
+const EditVariantAttributesModal = ({ open, setOpen, id }) => {
   console.log(id);
 
   const onSubmit = (data) => {
@@ -23,7 +19,7 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
 
   return (
     <Box>
-      <DPModal open={open} setOpen={setOpen} title="Edit low stocks">
+      <DPModal open={open} setOpen={setOpen} title="Edit attributes">
         <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
           <Stack
             direction={"column"}
@@ -33,37 +29,14 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
             }}
           >
             <DPInput
-              name={"productName"}
-              label={"Product"}
+              name={"variants"}
+              label={"Variant name"}
               fullWidth
               size="medium"
             />
-            <DPInput
-              name={"warehouse"}
-              label={"Warehouse"}
-              fullWidth
-              size="medium"
-            />
-            <DPInput
-              name={"category"}
-              label={"Category"}
-              fullWidth
-              size="medium"
-            />
-            <DPInput
-              name={"stockKeepingUnit"}
-              label={"SKU"}
-              fullWidth
-              size="medium"
-            />
-            <DPInput name={"quantity"} label={"Qty"} fullWidth size="medium" />
-            <DPInput
-              name={"quantityAlert"}
-              label={"Qty alert"}
-              fullWidth
-              size="medium"
-            />
+            <DPInput name={"value"} label={"Value"} fullWidth size="medium" />
 
+            {/* Status toggle */}
             <Box
               sx={{
                 display: "flex",
@@ -83,7 +56,7 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
               marginTop: 5,
             }}
           >
-            <Button>Save</Button>
+            <Button type="submit">Save</Button>
             <Button
               sx={{
                 backgroundColor: "black",
@@ -99,4 +72,4 @@ const EditLowStockModal = ({ open, setOpen, id = "" }) => {
   );
 };
 
-export default EditLowStockModal;
+export default EditVariantAttributesModal;
