@@ -10,6 +10,7 @@ import subCategory from "../assets/dashboard icons/admin/inventory/sub-category.
 import brandsIcon from "../assets/dashboard icons/admin/inventory/brands.svg";
 import unitsIcon from "../assets/dashboard icons/admin/inventory/units.svg";
 import variantsAttributesIcon from "../assets/dashboard icons/admin/inventory/varient-attributes.svg";
+import warranties from "../assets/dashboard icons/admin/inventory/warranties.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -63,6 +64,11 @@ export const sidebarItems = (role) => {
             title: "Variant attributes",
             path: `dashboard/variant-attributes`,
             icon: variantsAttributesIcon,
+          },
+          {
+            title: "Warranties",
+            path: "dashboard/warranties",
+            icon: warranties,
           },
         ],
       });

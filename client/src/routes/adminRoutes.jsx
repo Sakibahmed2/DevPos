@@ -8,6 +8,7 @@ import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
 import SubCategory from "../pages/Dashboard/AdminDashboard/SubCategory/SubCategory";
 import Units from "../pages/Dashboard/AdminDashboard/Units/Units";
 import VariantAttributes from "../pages/Dashboard/AdminDashboard/VariantAttributes/VariantAttributes";
+import Warranties from "../pages/Dashboard/AdminDashboard/Warranties/Warranties";
 import DashboardHome from "../pages/Dashboard/DashboardHome/DashboardHome";
 
 const adminPath = [
@@ -54,6 +55,10 @@ const adminPath = [
   {
     path: "dashboard/variant-attributes",
     element: <VariantAttributes />,
+  },
+  {
+    path: "dashboard/warranties",
+    element: <Warranties />,
   },
 ];
 
