@@ -75,24 +75,14 @@ const Sidebar = () => {
                     width: "24px",
                     height: "24px",
                     filter:
-                      pathname === `/admin/dashboard`
+                      pathname === `/`
                         ? "brightness(0) saturate(100%) invert(48%) sepia(73%) saturate(328%) hue-rotate(115deg) brightness(93%) contrast(94%)"
                         : "none",
                     transition: "filter 0.3s",
                   }}
                 />
               </ListItemIcon>
-              <Typography
-                sx={{
-                  ...(pathname === `/admin/dashboard`
-                    ? {
-                        fontWeight: "700",
-                      }
-                    : {}),
-                }}
-              >
-                Dashboard
-              </Typography>
+              <Typography>Dashboard</Typography>
             </ListItemButton>
           </ListItem>
         </NavLink>

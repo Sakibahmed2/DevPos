@@ -3,6 +3,8 @@ import Categories from "../pages/Dashboard/AdminDashboard/Categories/Categories"
 import CreateProduct from "../pages/Dashboard/AdminDashboard/CreateProduct/CreateProduct";
 import ExpiredProduct from "../pages/Dashboard/AdminDashboard/ExpiredProduct/ExpiredProduct";
 import LowStocks from "../pages/Dashboard/AdminDashboard/LowStocks/LowStocks";
+import PrintBarcode from "../pages/Dashboard/AdminDashboard/PrintBarcode/PrintBarcode";
+import PrintQRCode from "../pages/Dashboard/AdminDashboard/PrintQRCode/PrintQRCode";
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
 import SubCategory from "../pages/Dashboard/AdminDashboard/SubCategory/SubCategory";
@@ -59,6 +61,14 @@ const adminPath = [
   {
     path: "dashboard/warranties",
     element: <Warranties />,
+  },
+  {
+    path: "dashboard/print-barcode",
+    element: <PrintBarcode />,
+  },
+  {
+    path: "dashboard/print-qrcode",
+    element: <PrintQRCode />,
   },
 ];
 

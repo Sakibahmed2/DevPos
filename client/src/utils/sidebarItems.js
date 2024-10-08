@@ -11,6 +11,8 @@ import brandsIcon from "../assets/dashboard icons/admin/inventory/brands.svg";
 import unitsIcon from "../assets/dashboard icons/admin/inventory/units.svg";
 import variantsAttributesIcon from "../assets/dashboard icons/admin/inventory/varient-attributes.svg";
 import warranties from "../assets/dashboard icons/admin/inventory/warranties.svg";
+import printBarcode from "../assets/dashboard icons/admin/inventory/print-barcode.svg";
+import printQRCode from "../assets/dashboard icons/admin/inventory/print-qrcode.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -69,6 +71,16 @@ export const sidebarItems = (role) => {
             title: "Warranties",
             path: "dashboard/warranties",
             icon: warranties,
+          },
+          {
+            title: "Print barcode",
+            path: "dashboard/print-barcode",
+            icon: printBarcode,
+          },
+          {
+            title: "Print QR code",
+            path: "dashboard/print-qrcode",
+            icon: printQRCode,
           },
         ],
       });
