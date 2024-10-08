@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -21,58 +20,46 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import EditUnitsModal from "./EditUnitsModal";
-import CreateUnitsModal from "./CreateUnitsModal";
+
+import CreateStockTransferModal from "./CreateStockTransferModal";
+import EditStockTransferModal from "./EditStockTransferModal";
 
 const tableData = [
   {
     id: 1,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
+    from: "Warehouse 1",
+    to: "Warehouse 2",
+    NoOfProduct: 9,
+    quantityTransferred: 23,
+    refNo: "ST-001",
+    date: "09 Sep 2024",
   },
   {
     id: 2,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
+    from: "Warehouse 1",
+    to: "Warehouse 2",
+    NoOfProduct: 9,
+    quantityTransferred: 23,
+    refNo: "ST-001",
+    date: "09 Sep 2024",
   },
   {
     id: 3,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 5,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
+    from: "Warehouse 1",
+    to: "Warehouse 2",
+    NoOfProduct: 9,
+    quantityTransferred: 23,
+    refNo: "ST-001",
+    date: "09 Sep 2024",
   },
 ];
 
-const Units = () => {
+const StockTransfer = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
-  const [createUnitsModal, setCreateUnitsModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [createStockModal, setCreateStockModal] = useState(false);
 
   // const itemsPerPage = 3 ;
 
@@ -87,62 +74,67 @@ const Units = () => {
 
   const columns = [
     {
-      field: "units",
-      headerName: "Units",
+      field: "from",
+      headerName: "From warehouse",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.units}</Typography>
+            <Typography variant="p">{row.from}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "short",
-      headerName: "Short",
+      field: "to",
+      headerName: "To warehouse",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.short}</Typography>
+            <Typography variant="p">{row.to}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "createdAt",
-      headerName: "Created on",
+      field: "NoOfProduct",
+      headerName: "No of product",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.createdAt}</Typography>
+            <Typography variant="p">{row.NoOfProduct}</Typography>
+          </Box>
+        );
+      },
+    },
+
+    {
+      field: "refNo",
+      headerName: "Ref no",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.refNo}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "status",
-      headerName: "Status",
+      field: "date",
+      headerName: "Date",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            {
-              <Chip
-                variant="outlined"
-                size="small"
-                sx={{
-                  color: row.status === "Active" ? "green" : "red",
-                }}
-                label={row.status}
-              ></Chip>
-            }
+            <Typography variant="p">{row.date}</Typography>
           </Box>
         );
       },
     },
+
     {
       field: "id",
       headerName: "Action",
@@ -189,11 +181,12 @@ const Units = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      units: data.units,
-      short: data.short,
-      noOfProducts: data.noOfProducts,
-      createdAt: data.createdAt,
-      status: data.status,
+      from: data.from,
+      to: data.to,
+      NoOfProduct: data.NoOfProduct,
+      quantityTransferred: data.quantityTransferred,
+      refNo: data.refNo,
+      date: data.date,
     };
   });
 
@@ -204,10 +197,13 @@ const Units = () => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <SectionTitle title={"Units"} description={"Manage your units"} />
+        <SectionTitle
+          title={"Stock transfer"}
+          description={"Mange stock transfer"}
+        />
 
         <Button
-          onClick={() => setCreateUnitsModal(true)}
+          onClick={() => setCreateStockModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -216,7 +212,7 @@ const Units = () => {
             />
           }
         >
-          Add new unit
+          Add new
         </Button>
       </Stack>
 
@@ -299,13 +295,16 @@ const Units = () => {
         />
       </Box>
 
-      {/* Edit units modal */}
-      <EditUnitsModal open={open} setOpen={setOpen} id={productId} />
+      {/* Edit warranty modal */}
+      <EditStockTransferModal open={open} setOpen={setOpen} id={productId} />
 
-      {/* Create units modal */}
-      <CreateUnitsModal open={createUnitsModal} setOpen={setCreateUnitsModal} />
+      {/* Add warranty modal */}
+      <CreateStockTransferModal
+        open={createStockModal}
+        setOpen={setCreateStockModal}
+      />
     </Container>
   );
 };
 
-export default Units;
+export default StockTransfer;

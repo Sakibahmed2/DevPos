@@ -22,6 +22,7 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import EditVariantAttributesModal from "./EditVariantAttributesModal";
+import CreateVariantAttributesModal from "./CreateVariantAttributesModal";
 
 const tableData = [
   {
@@ -58,6 +59,8 @@ const VariantAttributes = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
+  const [createVariantAttributesModal, setCreateVariantAttributesModal] =
+    useState(false);
   const [productId, setProductId] = useState(null);
 
   // const itemsPerPage = 3 ;
@@ -195,6 +198,7 @@ const VariantAttributes = () => {
         />
 
         <Button
+          onClick={() => setCreateVariantAttributesModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -286,10 +290,17 @@ const VariantAttributes = () => {
         />
       </Box>
 
+      {/* Edit variant attributes modal */}
       <EditVariantAttributesModal
         open={open}
         setOpen={setOpen}
         id={productId}
+      />
+
+      {/* Create variant attributes modal */}
+      <CreateVariantAttributesModal
+        open={createVariantAttributesModal}
+        setOpen={setCreateVariantAttributesModal}
       />
     </Container>
   );

@@ -21,6 +21,7 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import laptopImg from "../../../../assets/laptopPng.png";
 import EditSubCategory from "./EditSubCategory";
+import CreateSubCategoryModal from "./CreateSubCategoryModal";
 
 // table data
 const tableData = [
@@ -66,6 +67,7 @@ const SubCategory = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
+  const [createCategoriesModal, setCreateCategoriesModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
   // const itemsPerPage = 3 ;
@@ -227,6 +229,7 @@ const SubCategory = () => {
         />
 
         <Button
+          onClick={() => setCreateCategoriesModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -320,6 +323,12 @@ const SubCategory = () => {
 
       {/* Edit category modal */}
       <EditSubCategory open={open} setOpen={setOpen} id={productId} />
+
+      {/* Create category modal */}
+      <CreateSubCategoryModal
+        open={createCategoriesModal}
+        setOpen={setCreateCategoriesModal}
+      />
     </Container>
   );
 };

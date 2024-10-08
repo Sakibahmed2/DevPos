@@ -24,6 +24,7 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
+import CreateBrandModal from "./CreateBrandModal";
 
 // table data
 const tableData = [
@@ -61,6 +62,7 @@ const Brands = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
+  const [createBrandModal, setCreateBrandModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
   // const itemsPerPage = 3 ;
@@ -202,6 +204,7 @@ const Brands = () => {
         <SectionTitle title={"Brand"} description={"Manage your brand"} />
 
         <Button
+          onClick={() => setCreateBrandModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -292,7 +295,11 @@ const Brands = () => {
         />
       </Box>
 
+      {/* Edit brand modal */}
       <EditBrandModal open={open} setOpen={setOpen} id={productId} />
+
+      {/* create brand modal */}
+      <CreateBrandModal open={createBrandModal} setOpen={setCreateBrandModal} />
     </Container>
   );
 };

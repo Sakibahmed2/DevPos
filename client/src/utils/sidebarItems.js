@@ -1,6 +1,6 @@
 import { USER_ROLE } from "../constants/role";
 
-// icons
+// admin icons
 import productIcon from "../assets/dashboard icons/admin/inventory/products.svg";
 import createProductIcon from "../assets/dashboard icons/admin/inventory/create-product.svg";
 import expiredProduct from "../assets/dashboard icons/admin/inventory/expired-products.svg";
@@ -14,76 +14,104 @@ import warranties from "../assets/dashboard icons/admin/inventory/warranties.svg
 import printBarcode from "../assets/dashboard icons/admin/inventory/print-barcode.svg";
 import printQRCode from "../assets/dashboard icons/admin/inventory/print-qrcode.svg";
 
+import manageStocks from "../assets/dashboard icons/admin/stock/manage-stock.svg";
+import stockAdjustment from "../assets/dashboard icons/admin/stock/stock-adjustment.svg";
+import stockTransfer from "../assets/dashboard icons/admin/stock/stock-transfer.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
   switch (role) {
     case USER_ROLE.SUPER_ADMIN:
-      menus.push({
-        section: "Inventory",
-        items: [
-          {
-            title: "Products",
-            path: `dashboard/products`,
-            icon: productIcon,
-          },
-          {
-            title: "Create product",
-            path: `dashboard/create-product`,
-            icon: createProductIcon,
-          },
-          {
-            title: "Expired products",
-            path: `dashboard/expired-products`,
-            icon: expiredProduct,
-          },
-          {
-            title: "Low stocks",
-            path: `dashboard/low-stocks`,
-            icon: lowStocks,
-          },
-          {
-            title: "Categories",
-            path: `dashboard/categories`,
-            icon: categories,
-          },
-          {
-            title: "Sub categories",
-            path: `dashboard/sub-category`,
-            icon: subCategory,
-          },
-          {
-            title: "Brands",
-            path: `dashboard/brands`,
-            icon: brandsIcon,
-          },
-          {
-            title: "Units",
-            path: "dashboard/units",
-            icon: unitsIcon,
-          },
-          {
-            title: "Variant attributes",
-            path: `dashboard/variant-attributes`,
-            icon: variantsAttributesIcon,
-          },
-          {
-            title: "Warranties",
-            path: "dashboard/warranties",
-            icon: warranties,
-          },
-          {
-            title: "Print barcode",
-            path: "dashboard/print-barcode",
-            icon: printBarcode,
-          },
-          {
-            title: "Print QR code",
-            path: "dashboard/print-qrcode",
-            icon: printQRCode,
-          },
-        ],
-      });
+      menus.push(
+        {
+          // **** Inventory sidebar section **** //
+          section: "Inventory",
+          items: [
+            {
+              title: "Products",
+              path: `dashboard/products`,
+              icon: productIcon,
+            },
+            {
+              title: "Create product",
+              path: `dashboard/create-product`,
+              icon: createProductIcon,
+            },
+            {
+              title: "Expired products",
+              path: `dashboard/expired-products`,
+              icon: expiredProduct,
+            },
+            {
+              title: "Low stocks",
+              path: `dashboard/low-stocks`,
+              icon: lowStocks,
+            },
+            {
+              title: "Categories",
+              path: `dashboard/categories`,
+              icon: categories,
+            },
+            {
+              title: "Sub categories",
+              path: `dashboard/sub-category`,
+              icon: subCategory,
+            },
+            {
+              title: "Brands",
+              path: `dashboard/brands`,
+              icon: brandsIcon,
+            },
+            {
+              title: "Units",
+              path: "dashboard/units",
+              icon: unitsIcon,
+            },
+            {
+              title: "Variant attributes",
+              path: `dashboard/variant-attributes`,
+              icon: variantsAttributesIcon,
+            },
+            {
+              title: "Warranties",
+              path: "dashboard/warranties",
+              icon: warranties,
+            },
+            {
+              title: "Print barcode",
+              path: "dashboard/print-barcode",
+              icon: printBarcode,
+            },
+            {
+              title: "Print QR code",
+              path: "dashboard/print-qrcode",
+              icon: printQRCode,
+            },
+          ],
+        },
+        {
+          // **** Stock sidebar section **** //
+          section: "Stock",
+          items: [
+            {
+              title: "Manage stock",
+              path: "dashboard/manage-stock",
+              icon: manageStocks,
+            },
+            {
+              title: "Stock adjustment",
+              path: "dashboard/stock-adjustment",
+              icon: stockAdjustment,
+            },
+            {
+              title: "Stock transfer",
+              path: "dashboard/stock-transfer",
+              icon: stockTransfer,
+            },
+          ],
+        }
+      );
       break;
 
     case USER_ROLE.FINANCE:

@@ -20,6 +20,7 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import EditCategoriesModal from "./EditCategoriesModal";
+import CreateCategoriesModal from "./CreateCategoriesModal";
 
 // table data
 const tableData = [
@@ -57,6 +58,7 @@ const Categories = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
+  const [createCategoriesModal, setCreateCategoriesModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
   // const itemsPerPage = 3 ;
@@ -195,6 +197,7 @@ const Categories = () => {
         />
 
         <Button
+          onClick={() => setCreateCategoriesModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -288,6 +291,12 @@ const Categories = () => {
 
       {/* Edit category modal */}
       <EditCategoriesModal open={open} setOpen={setOpen} id={productId} />
+
+      {/* Create category modal */}
+      <CreateCategoriesModal
+        open={createCategoriesModal}
+        setOpen={setCreateCategoriesModal}
+      />
     </Container>
   );
 };

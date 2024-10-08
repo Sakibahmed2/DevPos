@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -21,58 +20,50 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import EditUnitsModal from "./EditUnitsModal";
-import CreateUnitsModal from "./CreateUnitsModal";
+
+import mackbookImg from "../../../../assets/laptopPng.png";
+import EditStockModal from "../ManageStocks/EditStockModal";
+import CreateStockModal from "../ManageStocks/CreateStockModal";
 
 const tableData = [
   {
     id: 1,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
+    name: "Apple mackbook pro",
+    productImg: mackbookImg,
+    shop: "Apple",
+    warehouse: "Warehouse 1",
+    date: "09 Sep 2024",
+    quantity: 10,
+    note: "This is a note",
   },
   {
     id: 2,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
+    name: "Apple mackbook pro",
+    productImg: mackbookImg,
+    shop: "Apple",
+    warehouse: "Warehouse 1",
+    date: "09 Sep 2024",
+    quantity: 10,
+    note: "This is a note",
   },
   {
     id: 3,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 5,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
+    name: "Apple mackbook pro",
+    productImg: mackbookImg,
+    shop: "Apple",
+    warehouse: "Warehouse 1",
+    date: "09 Sep 2024",
+    quantity: 10,
+    note: "This is a note",
   },
 ];
 
-const Units = () => {
+const StockAdjustment = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
-  const [createUnitsModal, setCreateUnitsModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [createStockModal, setCreateStockModal] = useState(false);
 
   // const itemsPerPage = 3 ;
 
@@ -87,58 +78,91 @@ const Units = () => {
 
   const columns = [
     {
-      field: "units",
-      headerName: "Units",
+      field: "warehouse",
+      headerName: "Warehouse",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.units}</Typography>
+            <Typography variant="p">{row.warehouse}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "short",
-      headerName: "Short",
+      field: "shop",
+      headerName: "Shop",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.short}</Typography>
+            <Typography variant="p">{row.shop}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "createdAt",
-      headerName: "Created on",
-      flex: 1,
+      field: "productImg",
+      headerName: "Products",
+      width: 90,
       renderCell: ({ row }) => {
         return (
-          <Box>
-            <Typography variant="p">{row.createdAt}</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <img src={row.productImg} alt="laptop" className="h-8 w-12" />
           </Box>
         );
       },
     },
     {
-      field: "status",
-      headerName: "Status",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            {
-              <Chip
-                variant="outlined"
-                size="small"
-                sx={{
-                  color: row.status === "Active" ? "green" : "red",
-                }}
-                label={row.status}
-              ></Chip>
-            }
+            <Typography variant="p">{row.name}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.date}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.quantity}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "note",
+      headerName: "Note",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.note}</Typography>
           </Box>
         );
       },
@@ -189,11 +213,13 @@ const Units = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      units: data.units,
-      short: data.short,
-      noOfProducts: data.noOfProducts,
-      createdAt: data.createdAt,
-      status: data.status,
+      name: data.name,
+      productImg: data.productImg,
+      shop: data.shop,
+      warehouse: data.warehouse,
+      date: data.date,
+      quantity: data.quantity,
+      note: data.note,
     };
   });
 
@@ -204,10 +230,13 @@ const Units = () => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <SectionTitle title={"Units"} description={"Manage your units"} />
+        <SectionTitle
+          title={"Stock adjustment"}
+          description={"Manage your stock"}
+        />
 
         <Button
-          onClick={() => setCreateUnitsModal(true)}
+          onClick={() => setCreateStockModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -216,7 +245,7 @@ const Units = () => {
             />
           }
         >
-          Add new unit
+          Add new stock
         </Button>
       </Stack>
 
@@ -299,13 +328,13 @@ const Units = () => {
         />
       </Box>
 
-      {/* Edit units modal */}
-      <EditUnitsModal open={open} setOpen={setOpen} id={productId} />
+      {/* Edit warranty modal */}
+      <EditStockModal open={open} setOpen={setOpen} id={productId} />
 
-      {/* Create units modal */}
-      <CreateUnitsModal open={createUnitsModal} setOpen={setCreateUnitsModal} />
+      {/* Add warranty modal */}
+      <CreateStockModal open={createStockModal} setOpen={setCreateStockModal} />
     </Container>
   );
 };
 
-export default Units;
+export default StockAdjustment;
