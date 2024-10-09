@@ -2,12 +2,16 @@ import Brands from "../pages/Dashboard/AdminDashboard/Brands/Brands";
 import Categories from "../pages/Dashboard/AdminDashboard/Categories/Categories";
 import CreateProduct from "../pages/Dashboard/AdminDashboard/CreateProduct/CreateProduct";
 import ExpiredProduct from "../pages/Dashboard/AdminDashboard/ExpiredProduct/ExpiredProduct";
+import Invoices from "../pages/Dashboard/AdminDashboard/Invoices/Invoices";
 import LowStocks from "../pages/Dashboard/AdminDashboard/LowStocks/LowStocks";
 import ManageStocks from "../pages/Dashboard/AdminDashboard/ManageStocks/ManageStocks";
 import PrintBarcode from "../pages/Dashboard/AdminDashboard/PrintBarcode/PrintBarcode";
 import PrintQRCode from "../pages/Dashboard/AdminDashboard/PrintQRCode/PrintQRCode";
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
+import Quotation from "../pages/Dashboard/AdminDashboard/Quotation/Quotation";
+import Sales from "../pages/Dashboard/AdminDashboard/Sales/Sales";
+import SalesReturn from "../pages/Dashboard/AdminDashboard/SalesReturn/SalesReturn";
 import StockAdjustment from "../pages/Dashboard/AdminDashboard/StockAdjustment/StockAdjustment";
 import StockTransfer from "../pages/Dashboard/AdminDashboard/StockTransfer/StockTransfer";
 import SubCategory from "../pages/Dashboard/AdminDashboard/SubCategory/SubCategory";
@@ -75,6 +79,7 @@ const adminPath = [
     path: "dashboard/print-qrcode",
     element: <PrintQRCode />,
   },
+
   // **** Stock routes **** //
   {
     path: "dashboard/manage-stock",
@@ -87,6 +92,24 @@ const adminPath = [
   {
     path: "dashboard/stock-transfer",
     element: <StockTransfer />,
+  },
+
+  // **** Sales routes **** //
+  {
+    path: "dashboard/sales",
+    element: <Sales />,
+  },
+  {
+    path: "dashboard/invoices",
+    element: <Invoices />,
+  },
+  {
+    path: "dashboard/sales-return",
+    element: <SalesReturn />,
+  },
+  {
+    path: "dashboard/quotation",
+    element: <Quotation />,
   },
 ];
 

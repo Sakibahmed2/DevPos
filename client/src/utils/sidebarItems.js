@@ -18,14 +18,19 @@ import manageStocks from "../assets/dashboard icons/admin/stock/manage-stock.svg
 import stockAdjustment from "../assets/dashboard icons/admin/stock/stock-adjustment.svg";
 import stockTransfer from "../assets/dashboard icons/admin/stock/stock-transfer.svg";
 
+import salesIcon from "../assets/dashboard icons/admin/sales/sales-icon.svg";
+import invoicesIcon from "../assets/dashboard icons/admin/sales/invvoices.svg";
+import salesReturnIcon from "../assets/dashboard icons/admin/sales/sales-return.svg";
+import quotationIcon from "../assets/dashboard icons/admin/sales/quotation.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
   switch (role) {
     case USER_ROLE.SUPER_ADMIN:
       menus.push(
+        // **** Inventory sidebar section **** //
         {
-          // **** Inventory sidebar section **** //
           section: "Inventory",
           items: [
             {
@@ -90,8 +95,9 @@ export const sidebarItems = (role) => {
             },
           ],
         },
+
+        // **** Stock sidebar section **** //
         {
-          // **** Stock sidebar section **** //
           section: "Stock",
           items: [
             {
@@ -108,6 +114,33 @@ export const sidebarItems = (role) => {
               title: "Stock transfer",
               path: "dashboard/stock-transfer",
               icon: stockTransfer,
+            },
+          ],
+        },
+
+        // **** Sales sidebar section **** //
+        {
+          section: "Sales",
+          items: [
+            {
+              title: "Sales",
+              path: "dashboard/sales",
+              icon: salesIcon,
+            },
+            {
+              title: "Invoices",
+              path: "dashboard/invoices",
+              icon: invoicesIcon,
+            },
+            {
+              title: "Sales return",
+              path: "dashboard/sales-return",
+              icon: salesReturnIcon,
+            },
+            {
+              title: "Quotation",
+              path: "dashboard/quotation",
+              icon: quotationIcon,
             },
           ],
         }

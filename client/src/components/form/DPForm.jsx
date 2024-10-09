@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { FormProvider, useForm } from "react-hook-form";
 
-const DPForm = ({ onSubmit, children, defaultValue }) => {
+const DPForm = ({ onSubmit, children, defaultValue, className }) => {
   const formConfig = {};
 
   if (defaultValue) {
@@ -18,7 +18,9 @@ const DPForm = ({ onSubmit, children, defaultValue }) => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(submit)}>{children}</form>
+      <form onSubmit={handleSubmit(submit)} className={className}>
+        {children}
+      </form>
     </FormProvider>
   );
 };

@@ -17,118 +17,128 @@ const LoginPage = () => {
   };
 
   return (
-    <Stack
-      direction={{
-        md: "row",
-      }}
+    <Box
       sx={{
         height: "100vh",
-        justifyContent: "space-between",
+        display: "flex",
+        justifyContent: "center",
         alignItems: "center",
       }}
     >
-      <Box>
-        <img
-          className="w-full max-w-[734px] h-full max-h-[768px]"
-          src={loginImg}
-          alt=""
-        />
-      </Box>
-
-      <Box
+      <Stack
+        direction={{
+          md: "row",
+        }}
         sx={{
-          margin: " auto",
+          width: "100%",
+          height: "100%",
         }}
       >
-        <Typography
+        <Box
           sx={{
-            fontSize: "74px",
-            fontWeight: "600",
-            color: "primary.main",
-            textAlign: "center",
-            mb: "66px",
+            width: "50%",
           }}
         >
-          Welcome
-        </Typography>
+          <img className="w-full" src={loginImg} alt="" />
+        </Box>
 
-        <Box>
-          <DPForm onSubmit={onSubmit} defaultValue={defaultValue}>
-            <DPInput
-              name="email"
-              label="Email"
-              type="email"
-              size="medium"
-              fullWidth
-              required
-              icon={<MailOutlineIcon />}
-            />
-            <DPInput
-              name="password"
-              label="Password"
-              type="password"
-              size="medium"
-              fullWidth
-              required
-              icon={<LockIcon />}
-              sx={{
-                marginTop: "24px",
-              }}
-            />
+        <Box
+          sx={{
+            margin: " auto",
+            width: "50%",
+            maxWidth: "500px",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "74px",
+              fontWeight: "600",
+              color: "primary.main",
+              textAlign: "center",
+              mb: "66px",
+            }}
+          >
+            Welcome
+          </Typography>
 
-            <Typography
-              component="p"
-              sx={{
-                textAlign: "right",
-                marginTop: "16px",
-                cursor: "pointer",
-                color: "text.secondary",
-              }}
-            >
-              Forgot password?
-            </Typography>
-
-            <Box
-              sx={{
-                textAlign: "center",
-              }}
-            >
-              <Button
-                type="submit"
+          <Box>
+            <DPForm onSubmit={onSubmit} defaultValue={defaultValue}>
+              <DPInput
+                name="email"
+                label="Email"
+                type="email"
+                size="medium"
+                fullWidth
+                required
+                icon={<MailOutlineIcon />}
+              />
+              <DPInput
+                name="password"
+                label="Password"
+                type="password"
+                size="medium"
+                fullWidth
+                required
+                icon={<LockIcon />}
                 sx={{
-                  my: "24px",
-                  fontSize: "16px",
+                  marginTop: "24px",
+                }}
+              />
+
+              <Typography
+                component="p"
+                sx={{
+                  textAlign: "right",
+                  marginTop: "16px",
+                  cursor: "pointer",
+                  color: "text.secondary",
                 }}
               >
-                Login
+                Forgot password?
+              </Typography>
+
+              <Box
+                sx={{
+                  textAlign: "center",
+                }}
+              >
+                <Button
+                  type="submit"
+                  sx={{
+                    my: "24px",
+                    fontSize: "16px",
+                  }}
+                >
+                  Login
+                </Button>
+              </Box>
+
+              <Divider>Or</Divider>
+
+              <Button
+                variant="text"
+                startIcon={
+                  <img
+                    src={googleLogo}
+                    alt="google logo"
+                    className="size-8 mr-8"
+                  />
+                }
+                sx={{
+                  my: "24px",
+                  width: "100%",
+                  fontSize: "16px",
+                  color: "#00000080",
+                  bgcolor: "rgba(0, 176, 117, 0.09)",
+                }}
+              >
+                Continue with Google
               </Button>
-            </Box>
-
-            <Divider>Or</Divider>
-
-            <Button
-              variant="text"
-              startIcon={
-                <img
-                  src={googleLogo}
-                  alt="google logo"
-                  className="size-8 mr-8"
-                />
-              }
-              sx={{
-                my: "24px",
-                width: "100%",
-                fontSize: "16px",
-                color: "#00000080",
-                bgcolor: "rgba(0, 176, 117, 0.09)",
-              }}
-            >
-              Continue with Google
-            </Button>
-          </DPForm>
+            </DPForm>
+          </Box>
         </Box>
-      </Box>
-    </Stack>
+      </Stack>
+    </Box>
   );
 };
 

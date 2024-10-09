@@ -6,7 +6,7 @@ const DPSelect = ({
   items,
   name,
   label,
-  size = "small",
+  size = "medium",
   required,
   fullWidth = true,
   sx,

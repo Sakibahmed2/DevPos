@@ -10,7 +10,15 @@ import {
 } from "@mui/material";
 import React from "react";
 
-const DPModal = ({ open = false, setOpen, title = "", sx, children }) => {
+const DPModal = ({
+  open = false,
+  setOpen,
+  title = "",
+  sx,
+  children,
+  fullWidth,
+  maxWidth = "sm",
+}) => {
   const handleClose = () => {
     setOpen(false);
   };
@@ -21,6 +29,8 @@ const DPModal = ({ open = false, setOpen, title = "", sx, children }) => {
         onClose={handleClose}
         aria-labelledby="customized-dialog-title"
         open={open}
+        fullWidth={fullWidth}
+        maxWidth={maxWidth}
         sx={{
           ...sx,
         }}
