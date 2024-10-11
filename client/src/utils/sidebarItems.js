@@ -23,6 +23,8 @@ import invoicesIcon from "../assets/dashboard icons/admin/sales/invvoices.svg";
 import salesReturnIcon from "../assets/dashboard icons/admin/sales/sales-return.svg";
 import quotationIcon from "../assets/dashboard icons/admin/sales/quotation.svg";
 
+import promoIcon from "../assets/dashboard icons/admin/promo/promo.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
@@ -141,6 +143,18 @@ export const sidebarItems = (role) => {
               title: "Quotation",
               path: "dashboard/quotation",
               icon: quotationIcon,
+            },
+          ],
+        },
+
+        // **** Promo sidebar section **** //
+        {
+          section: "Promo",
+          items: [
+            {
+              title: "Promo",
+              path: "dashboard/promo",
+              icon: promoIcon,
             },
           ],
         }

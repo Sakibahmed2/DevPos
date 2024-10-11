@@ -9,6 +9,7 @@ import PrintBarcode from "../pages/Dashboard/AdminDashboard/PrintBarcode/PrintBa
 import PrintQRCode from "../pages/Dashboard/AdminDashboard/PrintQRCode/PrintQRCode";
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
+import Promo from "../pages/Dashboard/AdminDashboard/Promo/Promo";
 import Quotation from "../pages/Dashboard/AdminDashboard/Quotation/Quotation";
 import Sales from "../pages/Dashboard/AdminDashboard/Sales/Sales";
 import SalesReturn from "../pages/Dashboard/AdminDashboard/SalesReturn/SalesReturn";
@@ -110,6 +111,10 @@ const adminPath = [
   {
     path: "dashboard/quotation",
     element: <Quotation />,
+  },
+  {
+    path: "dashboard/promo",
+    element: <Promo />,
   },
 ];
 
