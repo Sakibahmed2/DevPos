@@ -21,9 +21,9 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import EditSalesModal from "../Sales/EditSalesModal";
-import CreateWarrantyModal from "../Warranties/CreateWarrantyModal";
 import laptopImg from "../../../../assets/laptopPng.png";
+import EditSalesModal from "../Sales/EditSalesModal";
+import CreateSaleReturnModal from "./CreateSaleReturnModal";
 
 const tableData = [
   {
@@ -43,6 +43,18 @@ const tableData = [
     productImg: laptopImg,
     productName: "Laptop",
     customerName: "John Doe",
+    status: "Ordered",
+    total: 1000,
+    paid: 1000,
+    due: 0,
+    payment: "Partial",
+    date: "09 Sep 2024",
+  },
+  {
+    id: 3,
+    productImg: laptopImg,
+    productName: "Laptop",
+    customerName: "John Doe",
     status: "Received",
     total: 1000,
     paid: 1000,
@@ -51,7 +63,7 @@ const tableData = [
     date: "09 Sep 2024",
   },
   {
-    id: 3,
+    id: 4,
     productImg: laptopImg,
     productName: "Laptop",
     customerName: "John Doe",
@@ -150,8 +162,14 @@ const SalesReturn = () => {
                 variant="outline"
                 size="small"
                 sx={{
-                  backgroundColor:
-                    row.status === "Received" ? "primary.main" : "red",
+                  bgcolor:
+                    row.status === "Received"
+                      ? "primary.main"
+                      : row.status === "Ordered"
+                      ? "orange"
+                      : row.status === "Pending"
+                      ? "red"
+                      : "",
                   color: "white",
                   borderRadius: 1,
                 }}
@@ -210,11 +228,18 @@ const SalesReturn = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  color: row.payment === "Paid" ? "primary.main" : "red",
+                  color:
+                    row.payment === "Paid"
+                      ? "green"
+                      : row.payment === "Partial"
+                      ? "orange"
+                      : "red",
                   borderRadius: 1,
                   border:
                     row.payment === "Paid"
                       ? "1px solid lightgreen"
+                      : row.payment === "Partial"
+                      ? "1px solid orange"
                       : "1px solid red",
                   px: 1,
                 }}
@@ -392,7 +417,7 @@ const SalesReturn = () => {
       <EditSalesModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add warranty modal */}
-      <CreateWarrantyModal open={createModal} setOpen={setCreateModal} />
+      <CreateSaleReturnModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
