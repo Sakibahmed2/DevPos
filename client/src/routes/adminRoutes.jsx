@@ -10,6 +10,9 @@ import PrintQRCode from "../pages/Dashboard/AdminDashboard/PrintQRCode/PrintQRCo
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
 import Promo from "../pages/Dashboard/AdminDashboard/Promo/Promo";
+import PurchaseOrder from "../pages/Dashboard/AdminDashboard/PurchaseOrder/PurchaseOrder";
+import PurchaseReturn from "../pages/Dashboard/AdminDashboard/PurchaseReturn/PurchaseReturn";
+import Purchases from "../pages/Dashboard/AdminDashboard/Purchases/Purchases";
 import Quotation from "../pages/Dashboard/AdminDashboard/Quotation/Quotation";
 import Sales from "../pages/Dashboard/AdminDashboard/Sales/Sales";
 import SalesReturn from "../pages/Dashboard/AdminDashboard/SalesReturn/SalesReturn";
@@ -112,9 +115,23 @@ const adminPath = [
     path: "dashboard/quotation",
     element: <Quotation />,
   },
+  // **** Promo routes **** //
   {
     path: "dashboard/promo",
     element: <Promo />,
+  },
+  // **** Purchases routes **** //
+  {
+    path: "dashboard/purchases",
+    element: <Purchases />,
+  },
+  {
+    path: "dashboard/purchase-order",
+    element: <PurchaseOrder />,
+  },
+  {
+    path: "dashboard/purchase-return",
+    element: <PurchaseReturn />,
   },
 ];
 

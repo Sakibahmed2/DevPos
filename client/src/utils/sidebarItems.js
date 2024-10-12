@@ -25,6 +25,10 @@ import quotationIcon from "../assets/dashboard icons/admin/sales/quotation.svg";
 
 import promoIcon from "../assets/dashboard icons/admin/promo/promo.svg";
 
+import purchaseIcon from "../assets/dashboard icons/admin/purchases/purchases.svg";
+import purchaseReturnIcon from "../assets/dashboard icons/admin/purchases/purchaseReturn.svg";
+import purchaseOrder from "../assets/dashboard icons/admin/purchases/purchaseOrder.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
@@ -155,6 +159,28 @@ export const sidebarItems = (role) => {
               title: "Promo",
               path: "dashboard/promo",
               icon: promoIcon,
+            },
+          ],
+        },
+
+        // **** Purchases sidebar section **** //
+        {
+          section: "Purchases",
+          items: [
+            {
+              title: "Purchases",
+              path: "dashboard/purchases",
+              icon: purchaseIcon,
+            },
+            {
+              title: "Purchase order",
+              path: "dashboard/purchase-order",
+              icon: purchaseOrder,
+            },
+            {
+              title: "Purchase return",
+              path: "dashboard/purchase-return",
+              icon: purchaseReturnIcon,
             },
           ],
         }
