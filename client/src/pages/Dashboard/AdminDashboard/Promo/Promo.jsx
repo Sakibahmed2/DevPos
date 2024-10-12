@@ -22,6 +22,7 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import EditPromoModal from "./EditPromoModal";
+import CreatePromoModal from "./CreatePromoModal";
 
 const tableData = [
   {
@@ -336,6 +337,9 @@ const Promo = () => {
 
       {/* Edit promo modal  */}
       <EditPromoModal open={open} setOpen={setOpen} productId={productId} />
+
+      {/* Create promo modal */}
+      <CreatePromoModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
