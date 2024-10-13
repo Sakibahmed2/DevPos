@@ -1,34 +1,36 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
 import DPForm from "../../../../components/form/DPForm";
-import DPInput from "../../../../components/form/DPInput";
+import DPDatePicker from "../../../../components/form/DPDatePicker";
 import { useState } from "react";
 
 const defaultValues = {
-  name: "",
+  categoryName: "",
+  date: "",
+  amount: "",
+  reference: "",
+  expenseFor: "",
   description: "",
-  duration: "",
-  periods: "",
   status: "",
 };
 
-const CreateWarrantyModal = ({ open, setOpen, id }) => {
+const CreateExpanseModal = ({ open, setOpen }) => {
   const [toggleStatus, setToggleStatus] = useState("Active");
 
   const handleToggle = (event) => {
     setToggleStatus(event.target.checked ? "Active" : "Inactive");
   };
 
-  console.log(id);
-
   const onSubmit = (data) => {
+    data.status = toggleStatus;
     console.log(data);
   };
 
   return (
     <Box>
-      <DPModal open={open} setOpen={setOpen} title="Add warranty">
+      <DPModal open={open} setOpen={setOpen} title="Add expenses">
         <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
           <Stack
             direction={"column"}
@@ -37,32 +39,25 @@ const CreateWarrantyModal = ({ open, setOpen, id }) => {
               width: "500px",
             }}
           >
-            <DPInput name={"name"} label={"Name"} fullWidth size="medium" />
+            <Stack direction={"row"} gap={3}>
+              <DPInput name={"categoryName"} label={"Expenses category"} />
+              <DPDatePicker name={"date"} label={"Date"} />
+            </Stack>
 
-            <DPInput
-              name={"duration"}
-              label={"Duration"}
-              fullWidth
-              size="medium"
-            />
+            <Stack direction={"row"} gap={3}>
+              <DPInput name={"amount"} label={"Amount"} />
+              <DPInput name={"reference"} label={"Reference"} />
+            </Stack>
 
-            <DPInput
-              name={"periods"}
-              label={"Periods"}
-              fullWidth
-              size="medium"
-            />
+            <DPInput name={"expenseFor"} label={"Expanse for"} />
 
             <DPInput
               name={"description"}
-              label={"description"}
-              fullWidth
-              size="medium"
+              label={"Description"}
               multiline
               rows={4}
             />
 
-            {/* Status toggle */}
             <Box
               sx={{
                 display: "flex",
@@ -102,4 +97,4 @@ const CreateWarrantyModal = ({ open, setOpen, id }) => {
   );
 };
 
-export default CreateWarrantyModal;
+export default CreateExpanseModal;

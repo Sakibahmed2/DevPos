@@ -1,33 +1,36 @@
 import { USER_ROLE } from "../constants/role";
 
-// admin icons
-import productIcon from "../assets/dashboard icons/admin/inventory/products.svg";
-import createProductIcon from "../assets/dashboard icons/admin/inventory/create-product.svg";
-import expiredProduct from "../assets/dashboard icons/admin/inventory/expired-products.svg";
-import lowStocks from "../assets/dashboard icons/admin/inventory/low-stocks.svg";
-import categories from "../assets/dashboard icons/admin/inventory/categories.svg";
-import subCategory from "../assets/dashboard icons/admin/inventory/sub-category.svg";
-import brandsIcon from "../assets/dashboard icons/admin/inventory/brands.svg";
-import unitsIcon from "../assets/dashboard icons/admin/inventory/units.svg";
-import variantsAttributesIcon from "../assets/dashboard icons/admin/inventory/varient-attributes.svg";
-import warranties from "../assets/dashboard icons/admin/inventory/warranties.svg";
-import printBarcode from "../assets/dashboard icons/admin/inventory/print-barcode.svg";
-import printQRCode from "../assets/dashboard icons/admin/inventory/print-qrcode.svg";
+// Admin icons
+import productIcon from "../assets/Dashboard icons/admin/inventory/products.svg";
+import createProductIcon from "../assets/Dashboard icons/admin/inventory/create-product.svg";
+import expiredProduct from "../assets/Dashboard icons/admin/inventory/expired-products.svg";
+import lowStocks from "../assets/Dashboard icons/admin/inventory/low-stocks.svg";
+import categories from "../assets/Dashboard icons/admin/inventory/categories.svg";
+import subCategory from "../assets/Dashboard icons/admin/inventory/sub-category.svg";
+import brandsIcon from "../assets/Dashboard icons/admin/inventory/brands.svg";
+import unitsIcon from "../assets/Dashboard icons/admin/inventory/units.svg";
+import variantsAttributesIcon from "../assets/Dashboard icons/admin/inventory/varient-attributes.svg";
+import warranties from "../assets/Dashboard icons/admin/inventory/warranties.svg";
+import printBarcode from "../assets/Dashboard icons/admin/inventory/print-barcode.svg";
+import printQRCode from "../assets/Dashboard icons/admin/inventory/print-qrcode.svg";
 
-import manageStocks from "../assets/dashboard icons/admin/stock/manage-stock.svg";
-import stockAdjustment from "../assets/dashboard icons/admin/stock/stock-adjustment.svg";
-import stockTransfer from "../assets/dashboard icons/admin/stock/stock-transfer.svg";
+import manageStocks from "../assets/Dashboard icons/admin/stock/manage-stock.svg";
+import stockAdjustment from "../assets/Dashboard icons/admin/stock/stock-adjustment.svg";
+import stockTransfer from "../assets/Dashboard icons/admin/stock/stock-transfer.svg";
 
-import salesIcon from "../assets/dashboard icons/admin/sales/sales-icon.svg";
-import invoicesIcon from "../assets/dashboard icons/admin/sales/invvoices.svg";
-import salesReturnIcon from "../assets/dashboard icons/admin/sales/sales-return.svg";
-import quotationIcon from "../assets/dashboard icons/admin/sales/quotation.svg";
+import salesIcon from "../assets/Dashboard icons/admin/sales/sales-icon.svg";
+import invoicesIcon from "../assets/Dashboard icons/admin/sales/invvoices.svg";
+import salesReturnIcon from "../assets/Dashboard icons/admin/sales/sales-return.svg";
+import quotationIcon from "../assets/Dashboard icons/admin/sales/quotation.svg";
 
-import promoIcon from "../assets/dashboard icons/admin/promo/promo.svg";
+import promoIcon from "../assets/Dashboard icons/admin/promo/promo.svg";
 
-import purchaseIcon from "../assets/dashboard icons/admin/purchases/purchases.svg";
-import purchaseReturnIcon from "../assets/dashboard icons/admin/purchases/purchaseReturn.svg";
-import purchaseOrder from "../assets/dashboard icons/admin/purchases/purchaseOrder.svg";
+import purchaseIcon from "../assets/Dashboard icons/admin/purchases/purchases.svg";
+import purchaseReturnIcon from "../assets/Dashboard icons/admin/purchases/purchaseReturn.svg";
+import purchaseOrder from "../assets/Dashboard icons/admin/purchases/purchaseOrder.svg";
+
+// Finance icons
+import expanses from "../assets/dashboard icons/finance/expenses.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -41,62 +44,62 @@ export const sidebarItems = (role) => {
           items: [
             {
               title: "Products",
-              path: `dashboard/products`,
+              path: `admin/products`,
               icon: productIcon,
             },
             {
               title: "Create product",
-              path: `dashboard/create-product`,
+              path: `admin/create-product`,
               icon: createProductIcon,
             },
             {
               title: "Expired products",
-              path: `dashboard/expired-products`,
+              path: `admin/expired-products`,
               icon: expiredProduct,
             },
             {
               title: "Low stocks",
-              path: `dashboard/low-stocks`,
+              path: `admin/low-stocks`,
               icon: lowStocks,
             },
             {
               title: "Categories",
-              path: `dashboard/categories`,
+              path: `admin/categories`,
               icon: categories,
             },
             {
               title: "Sub categories",
-              path: `dashboard/sub-category`,
+              path: `admin/sub-category`,
               icon: subCategory,
             },
             {
               title: "Brands",
-              path: `dashboard/brands`,
+              path: `admin/brands`,
               icon: brandsIcon,
             },
             {
               title: "Units",
-              path: "dashboard/units",
+              path: "admin/units",
               icon: unitsIcon,
             },
             {
               title: "Variant attributes",
-              path: `dashboard/variant-attributes`,
+              path: `admin/variant-attributes`,
               icon: variantsAttributesIcon,
             },
             {
               title: "Warranties",
-              path: "dashboard/warranties",
+              path: "admin/warranties",
               icon: warranties,
             },
             {
               title: "Print barcode",
-              path: "dashboard/print-barcode",
+              path: "admin/print-barcode",
               icon: printBarcode,
             },
             {
               title: "Print QR code",
-              path: "dashboard/print-qrcode",
+              path: "admin/print-qrcode",
               icon: printQRCode,
             },
           ],
@@ -108,17 +111,17 @@ export const sidebarItems = (role) => {
           items: [
             {
               title: "Manage stock",
-              path: "dashboard/manage-stock",
+              path: "admin/manage-stock",
               icon: manageStocks,
             },
             {
               title: "Stock adjustment",
-              path: "dashboard/stock-adjustment",
+              path: "admin/stock-adjustment",
               icon: stockAdjustment,
             },
             {
               title: "Stock transfer",
-              path: "dashboard/stock-transfer",
+              path: "admin/stock-transfer",
               icon: stockTransfer,
             },
           ],
@@ -130,22 +133,22 @@ export const sidebarItems = (role) => {
           items: [
             {
               title: "Sales",
-              path: "dashboard/sales",
+              path: "admin/sales",
               icon: salesIcon,
             },
             {
               title: "Invoices",
-              path: "dashboard/invoices",
+              path: "admin/invoices",
               icon: invoicesIcon,
             },
             {
               title: "Sales return",
-              path: "dashboard/sales-return",
+              path: "admin/sales-return",
               icon: salesReturnIcon,
             },
             {
               title: "Quotation",
-              path: "dashboard/quotation",
+              path: "admin/quotation",
               icon: quotationIcon,
             },
           ],
@@ -157,7 +160,7 @@ export const sidebarItems = (role) => {
           items: [
             {
               title: "Promo",
-              path: "dashboard/promo",
+              path: "admin/promo",
               icon: promoIcon,
             },
           ],
@@ -169,17 +172,17 @@ export const sidebarItems = (role) => {
           items: [
             {
               title: "Purchases",
-              path: "dashboard/purchases",
+              path: "admin/purchases",
               icon: purchaseIcon,
             },
             {
               title: "Purchase order",
-              path: "dashboard/purchase-order",
+              path: "admin/purchase-order",
               icon: purchaseOrder,
             },
             {
               title: "Purchase return",
-              path: "dashboard/purchase-return",
+              path: "admin/purchase-return",
               icon: purchaseReturnIcon,
             },
           ],
@@ -193,8 +196,8 @@ export const sidebarItems = (role) => {
         items: [
           {
             title: "Expanses",
-            path: "/expanses",
-            icon: "expanses",
+            path: "finance/expenses",
+            icon: expanses,
           },
         ],
       });

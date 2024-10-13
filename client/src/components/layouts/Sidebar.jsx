@@ -90,7 +90,7 @@ const Sidebar = () => {
 
       <Divider />
       <List>
-        {sidebarItems("admin").map((item, index) => (
+        {sidebarItems("finance").map((item, index) => (
           <Box
             key={index}
             sx={{

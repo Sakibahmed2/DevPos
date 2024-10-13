@@ -32,105 +32,105 @@ const adminPath = [
 
   // **** Inventory routes **** //
   {
-    path: "dashboard/products",
+    path: "/admin/products",
     element: <ProductsPage />,
   },
   {
-    path: "dashboard/products/:id",
+    path: "/admin/products/:id",
     element: <ProductDetail />,
   },
   {
-    path: "dashboard/create-product",
+    path: "/admin/create-product",
     element: <CreateProduct />,
   },
   {
-    path: "dashboard/expired-products",
+    path: "/admin/expired-products",
     element: <ExpiredProduct />,
   },
   {
-    path: "/dashboard/low-stocks",
+    path: "/admin/low-stocks",
     element: <LowStocks />,
   },
   {
-    path: "/dashboard/categories",
+    path: "/admin/categories",
     element: <Categories />,
   },
   {
-    path: "dashboard/sub-category",
+    path: "/admin/sub-category",
     element: <SubCategory />,
   },
   {
-    path: "dashboard/brands",
+    path: "/admin/brands",
     element: <Brands />,
   },
   {
-    path: "dashboard/units",
+    path: "/admin/units",
     element: <Units />,
   },
   {
-    path: "dashboard/variant-attributes",
+    path: "/admin/variant-attributes",
     element: <VariantAttributes />,
   },
   {
-    path: "dashboard/warranties",
+    path: "/admin/warranties",
     element: <Warranties />,
   },
   {
-    path: "dashboard/print-barcode",
+    path: "/admin/print-barcode",
     element: <PrintBarcode />,
   },
   {
-    path: "dashboard/print-qrcode",
+    path: "/admin/print-qrcode",
     element: <PrintQRCode />,
   },
 
   // **** Stock routes **** //
   {
-    path: "dashboard/manage-stock",
+    path: "/admin/manage-stock",
     element: <ManageStocks />,
   },
   {
-    path: "dashboard/stock-adjustment",
+    path: "/admin/stock-adjustment",
     element: <StockAdjustment />,
   },
   {
-    path: "dashboard/stock-transfer",
+    path: "/admin/stock-transfer",
     element: <StockTransfer />,
   },
 
   // **** Sales routes **** //
   {
-    path: "dashboard/sales",
+    path: "/admin/sales",
     element: <Sales />,
   },
   {
-    path: "dashboard/invoices",
+    path: "/admin/invoices",
     element: <Invoices />,
   },
   {
-    path: "dashboard/sales-return",
+    path: "/admin/sales-return",
     element: <SalesReturn />,
   },
   {
-    path: "dashboard/quotation",
+    path: "/admin/quotation",
     element: <Quotation />,
   },
   // **** Promo routes **** //
   {
-    path: "dashboard/promo",
+    path: "/admin/promo",
     element: <Promo />,
   },
   // **** Purchases routes **** //
   {
-    path: "dashboard/purchases",
+    path: "/admin/purchases",
     element: <Purchases />,
   },
   {
-    path: "dashboard/purchase-order",
+    path: "/admin/purchase-order",
     element: <PurchaseOrder />,
   },
   {
-    path: "dashboard/purchase-return",
+    path: "/admin/purchase-return",
     element: <PurchaseReturn />,
   },
 ];

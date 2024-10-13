@@ -1,64 +1,67 @@
-import { Button, Chip, Container, Stack } from "@mui/material";
-import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
-import PaginationUi from "../../../../components/ui/PaginationUi";
-import SectionTitle from "../../../../components/ui/SectionTitle";
-
+/* eslint-disable no-unused-vars */
 import {
   Box,
+  Button,
+  Chip,
+  Container,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
+import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import EditCategoriesModal from "./EditCategoriesModal";
-import CreateCategoriesModal from "./CreateCategoriesModal";
+import PaginationUi from "../../../../components/ui/PaginationUi";
+import EditLowStockModal from "../../AdminDashboard/LowStocks/EditLowStockModal";
+import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
+import EditExpensesModal from "./EditExpensesModal";
+import CreateExpanseModal from "./CreateExpensesModal";
 
 // table data
 const tableData = [
   {
     id: 1,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
+    categoryName: "Laptop",
+    date: "09 Sep 2024",
+    reference: "REF-123",
     status: "Active",
+    amount: 1000,
+    description: "This is a description",
   },
   {
     id: 2,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
-    status: "Active",
+    categoryName: "Laptop",
+    date: "09 Sep 2024",
+    reference: "REF-123",
+    status: "Inactive",
+    amount: 1000,
+    description: "This is a description",
   },
   {
     id: 3,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
+    categoryName: "Laptop",
+    date: "09 Sep 2024",
+    reference: "REF-123",
     status: "Active",
+    amount: 1000,
+    description: "This is a description",
   },
 ];
 
-const Categories = () => {
+const Expenses = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
-  const [createCategoriesModal, setCreateCategoriesModal] = useState(false);
+  const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
   // const itemsPerPage = 3 ;
@@ -74,37 +77,37 @@ const Categories = () => {
 
   const columns = [
     {
-      field: "category",
-      headerName: "Category",
+      field: "categoryName",
+      headerName: "Category name",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.category}</Typography>
+            <Typography variant="p">{row.categoryName}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "categorySlug",
-      headerName: "Category Slug",
+      field: "date",
+      headerName: "Date",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.categorySlug}</Typography>
+            <Typography variant="p">{row.date}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "createdAt",
-      headerName: "Created on",
+      field: "reference",
+      headerName: "Reference",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.createdAt}</Typography>
+            <Typography variant="p">{row.reference}</Typography>
           </Box>
         );
       },
@@ -133,14 +136,38 @@ const Categories = () => {
       },
     },
     {
+      field: "amount",
+      headerName: "Amount",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.amount}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.description}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
       field: "id",
       headerName: "Action",
-      flex: 1,
       renderCell: ({ row }) => {
         return (
           <Stack
             direction={"row"}
             gap={1}
+            justifyContent={"center"}
             alignItems={"center"}
             sx={{
               height: "100%",
@@ -178,28 +205,29 @@ const Categories = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      category: data.category,
-      categorySlug: data.categorySlug,
-      createdAt: data.createdAt,
+      categoryName: data.categoryName,
+      date: data.date,
+      reference: data.reference,
       status: data.status,
+      amount: data.amount,
+      description: data.description,
     };
   });
 
   return (
     <Container>
-      {/* section title */}
       <Stack
         direction={"row"}
         justifyContent={"space-between"}
         alignItems={"center"}
       >
         <SectionTitle
-          title={"Categories"}
-          description={"Manage your categories"}
+          title={"Expenses list"}
+          description={"Manage your expenses"}
         />
 
         <Button
-          onClick={() => setCreateCategoriesModal(true)}
+          onClick={() => setCreateModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -208,11 +236,10 @@ const Categories = () => {
             />
           }
         >
-          Add new category
+          Add new expenses
         </Button>
       </Stack>
 
-      {/* data table */}
       <Box
         sx={{
           mt: 5,
@@ -291,16 +318,13 @@ const Categories = () => {
         />
       </Box>
 
-      {/* Edit category modal */}
-      <EditCategoriesModal open={open} setOpen={setOpen} id={productId} />
+      {/* Edit expenses */}
+      <EditExpensesModal open={open} setOpen={setOpen} id={productId} />
 
-      {/* Create category modal */}
-      <CreateCategoriesModal
-        open={createCategoriesModal}
-        setOpen={setCreateCategoriesModal}
-      />
+      {/* Add expenses */}
+      <CreateExpanseModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
 
-export default Categories;
+export default Expenses;
