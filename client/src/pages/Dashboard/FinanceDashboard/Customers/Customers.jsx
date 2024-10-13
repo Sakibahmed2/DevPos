@@ -20,8 +20,8 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import CreateExpanseModal from "../Expenses/CreateExpensesModal";
-import EditExpensesModal from "../Expenses/EditExpensesModal";
+import CreateCustomerModal from "./CreateCustomerModal";
+import EditCustomerModal from "./EditCustomersModal";
 
 // table data
 const tableData = [
@@ -206,7 +206,7 @@ const Customers = () => {
             />
           }
         >
-          Add new expenses
+          Add new customer
         </Button>
       </Stack>
 
@@ -289,10 +289,10 @@ const Customers = () => {
       </Box>
 
       {/* Edit expenses */}
-      <EditExpensesModal open={open} setOpen={setOpen} id={productId} />
+      <EditCustomerModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add expenses */}
-      <CreateExpanseModal open={createModal} setOpen={setCreateModal} />
+      <CreateCustomerModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };

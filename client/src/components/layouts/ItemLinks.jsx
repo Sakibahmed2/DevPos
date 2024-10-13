@@ -11,8 +11,6 @@ import { NavLink, useLocation } from "react-router-dom";
 const ItemsLink = ({ title, path, icon }) => {
   const { pathname } = useLocation();
 
-  console.log({ pathname, path });
-
   return (
     <Box component={NavLink} to={path}>
       <ListItem

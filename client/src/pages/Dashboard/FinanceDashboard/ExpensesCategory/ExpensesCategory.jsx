@@ -20,7 +20,7 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import CreateExpanseModal from "../Expenses/CreateExpensesModal";
+import CreateExpensesCategoryModal from "./CreateExpensesCategoryModal";
 import EditExpensesCategoryModal from "./EditExpensesCategoryModal";
 
 // table data
@@ -244,7 +244,10 @@ const ExpensesCategory = () => {
       <EditExpensesCategoryModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add expenses */}
-      <CreateExpanseModal open={createModal} setOpen={setCreateModal} />
+      <CreateExpensesCategoryModal
+        open={createModal}
+        setOpen={setCreateModal}
+      />
     </Container>
   );
 };

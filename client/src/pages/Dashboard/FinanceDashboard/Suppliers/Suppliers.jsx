@@ -19,10 +19,10 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import PaginationUi from "../../../../components/ui/PaginationUi";
-import EditExpensesModal from "../Expenses/EditExpensesModal";
-import CreateExpanseModal from "../Expenses/CreateExpensesModal";
 import supplierImg from "../../../../assets/userImg.png";
+import PaginationUi from "../../../../components/ui/PaginationUi";
+import CreateSupplierModal from "./CreateSuppliersModal";
+import EditSupplierModal from "./EditSupplierModal";
 
 // table data
 const tableData = [
@@ -312,10 +312,10 @@ const Suppliers = () => {
       </Box>
 
       {/* Edit expenses */}
-      <EditExpensesModal open={open} setOpen={setOpen} id={productId} />
+      <EditSupplierModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add expenses */}
-      <CreateExpanseModal open={createModal} setOpen={setCreateModal} />
+      <CreateSupplierModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
