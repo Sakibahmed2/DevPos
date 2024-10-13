@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -21,41 +20,42 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import CreateExpanseModal from "./CreateExpensesModal";
-import EditExpensesModal from "./EditExpensesModal";
+import EditExpensesModal from "../Expenses/EditExpensesModal";
+import CreateExpanseModal from "../Expenses/CreateExpensesModal";
+import supplierImg from "../../../../assets/userImg.png";
 
 // table data
 const tableData = [
   {
     id: 1,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
-    description: "This is a description",
-  },
-  {
-    id: 2,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Inactive",
-    amount: 1000,
-    description: "This is a description",
+    supplierName: "John Doe",
+    supplierImg: supplierImg,
+    code: "C-123",
+    phone: "123456789",
+    email: "email@gmail.com",
+    country: "Bangladesh",
   },
   {
     id: 3,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
-    description: "This is a description",
+    supplierName: "John Doe",
+    supplierImg: supplierImg,
+    code: "C-123",
+    phone: "123456789",
+    email: "email@gmail.com",
+    country: "Bangladesh",
+  },
+  {
+    id: 2,
+    supplierName: "John Doe",
+    supplierImg: supplierImg,
+    code: "C-123",
+    phone: "123456789",
+    email: "email@gmail.com",
+    country: "Bangladesh",
   },
 ];
 
-const Expenses = () => {
+const Suppliers = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
@@ -75,84 +75,79 @@ const Expenses = () => {
 
   const columns = [
     {
-      field: "categoryName",
-      headerName: "Category name",
-      flex: 1,
+      field: "supplierImg",
+      headerName: "Supplier",
+      width: 90,
       renderCell: ({ row }) => {
         return (
-          <Box>
-            <Typography variant="p">{row.categoryName}</Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <img src={row.supplierImg} alt="laptop" />
           </Box>
         );
       },
     },
     {
-      field: "date",
-      headerName: "Date",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.date}</Typography>
+            <Typography variant="p">{row.supplierName}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "reference",
-      headerName: "Reference",
+      field: "code",
+      headerName: "Code",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.reference}</Typography>
+            <Typography variant="p">{row.code}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "status",
-      headerName: "Status",
+      field: "email",
+      headerName: "Email",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            {
-              <Chip
-                variant="outlined"
-                size="small"
-                sx={{
-                  color: row.status === "Active" ? "green" : "red",
-                  borderRadius: 1,
-                  borderColor: row.status === "Active" ? "green" : "red",
-                }}
-                label={row.status}
-              ></Chip>
-            }
+            <Typography variant="p">{row.email}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "amount",
-      headerName: "Amount",
+      field: "phone",
+      headerName: "Phone",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.amount}</Typography>
+            <Typography variant="p">{row.phone}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "description",
-      headerName: "Description",
+      field: "country",
+      headerName: "Country",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.description}</Typography>
+            <Typography variant="p">{row.country}</Typography>
           </Box>
         );
       },
@@ -203,12 +198,12 @@ const Expenses = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      categoryName: data.categoryName,
-      date: data.date,
-      reference: data.reference,
-      status: data.status,
-      amount: data.amount,
-      description: data.description,
+      supplierName: data.supplierName,
+      supplierImg: data.supplierImg,
+      code: data.code,
+      phone: data.phone,
+      email: data.email,
+      country: data.country,
     };
   });
 
@@ -220,8 +215,8 @@ const Expenses = () => {
         alignItems={"center"}
       >
         <SectionTitle
-          title={"Expenses list"}
-          description={"Manage your expenses"}
+          title={"Supplier list"}
+          description={"Manage your suppliers"}
         />
 
         <Button
@@ -234,7 +229,7 @@ const Expenses = () => {
             />
           }
         >
-          Add new expenses
+          Add new supplier
         </Button>
       </Stack>
 
@@ -325,4 +320,4 @@ const Expenses = () => {
   );
 };
 
-export default Expenses;
+export default Suppliers;

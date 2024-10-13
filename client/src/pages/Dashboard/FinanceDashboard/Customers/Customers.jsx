@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -21,41 +20,38 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import CreateExpanseModal from "./CreateExpensesModal";
-import EditExpensesModal from "./EditExpensesModal";
+import CreateExpanseModal from "../Expenses/CreateExpensesModal";
+import EditExpensesModal from "../Expenses/EditExpensesModal";
 
 // table data
 const tableData = [
   {
     id: 1,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
-    description: "This is a description",
+    customerName: "John Doe",
+    email: "jhon@gmail.com",
+    code: "C-123",
+    phone: "123456789",
+    country: "Bangladesh",
   },
   {
     id: 2,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Inactive",
-    amount: 1000,
-    description: "This is a description",
+    customerName: "John Doe",
+    email: "jhon@gmail.com",
+    code: "C-123",
+    phone: "123456789",
+    country: "Bangladesh",
   },
   {
     id: 3,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
-    description: "This is a description",
+    customerName: "John Doe",
+    email: "jhon@gmail.com",
+    code: "C-123",
+    phone: "123456789",
+    country: "Bangladesh",
   },
 ];
 
-const Expenses = () => {
+const Customers = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
@@ -75,84 +71,61 @@ const Expenses = () => {
 
   const columns = [
     {
-      field: "categoryName",
-      headerName: "Category name",
+      field: "customerName",
+      headerName: "Customer name",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.categoryName}</Typography>
+            <Typography variant="p">{row.customerName}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "date",
-      headerName: "Date",
+      field: "code",
+      headerName: "Code",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.date}</Typography>
+            <Typography variant="p">{row.code}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "reference",
-      headerName: "Reference",
+      field: "email",
+      headerName: "Email",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.reference}</Typography>
+            <Typography variant="p">{row.email}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "status",
-      headerName: "Status",
+      field: "phone",
+      headerName: "Phone",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            {
-              <Chip
-                variant="outlined"
-                size="small"
-                sx={{
-                  color: row.status === "Active" ? "green" : "red",
-                  borderRadius: 1,
-                  borderColor: row.status === "Active" ? "green" : "red",
-                }}
-                label={row.status}
-              ></Chip>
-            }
+            <Typography variant="p">{row.phone}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "amount",
-      headerName: "Amount",
+      field: "country",
+      headerName: "Country",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.amount}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "description",
-      headerName: "Description",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.description}</Typography>
+            <Typography variant="p">{row.country}</Typography>
           </Box>
         );
       },
@@ -203,12 +176,11 @@ const Expenses = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      categoryName: data.categoryName,
-      date: data.date,
-      reference: data.reference,
-      status: data.status,
-      amount: data.amount,
-      description: data.description,
+      customerName: data.customerName,
+      email: data.email,
+      code: data.code,
+      phone: data.phone,
+      country: data.country,
     };
   });
 
@@ -220,8 +192,8 @@ const Expenses = () => {
         alignItems={"center"}
       >
         <SectionTitle
-          title={"Expenses list"}
-          description={"Manage your expenses"}
+          title={"Customers list"}
+          description={"Manage your customers"}
         />
 
         <Button
@@ -325,4 +297,4 @@ const Expenses = () => {
   );
 };
 
-export default Expenses;
+export default Customers;

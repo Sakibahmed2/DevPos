@@ -31,6 +31,10 @@ import purchaseOrder from "../assets/Dashboard icons/admin/purchases/purchaseOrd
 
 // Finance icons
 import expanses from "../assets/dashboard icons/finance/expenses.svg";
+import customersIcon from "../assets/dashboard icons/finance/peoples/customers.svg";
+import storeIcon from "../assets/dashboard icons/finance/peoples/stores.svg";
+import suppliersIcon from "../assets/dashboard icons/finance/peoples/suppliers.svg";
+import warehousesIcon from "../assets/dashboard icons/finance/peoples/warehouses.svg";
 
 export const sidebarItems = (role) => {
   const menus = [];
@@ -191,16 +195,51 @@ export const sidebarItems = (role) => {
       break;
 
     case USER_ROLE.FINANCE:
-      menus.push({
-        section: "Finance & account",
-        items: [
-          {
-            title: "Expanses",
-            path: "finance/expenses",
-            icon: expanses,
-          },
-        ],
-      });
+      menus.push(
+        // **** Finance & account sidebar section **** //
+        {
+          section: "Finance & account",
+          items: [
+            {
+              title: "Expanses",
+              path: "finance/expenses",
+              icon: expanses,
+            },
+            {
+              title: "Expanses category",
+              path: "finance/expenses-category",
+              icon: categories,
+            },
+          ],
+        },
+
+        // **** Peoples sidebar section **** //
+        {
+          section: "Peoples",
+          items: [
+            {
+              title: "Customers",
+              path: "finance/customers",
+              icon: customersIcon,
+            },
+            {
+              title: "Suppliers",
+              path: "finance/suppliers",
+              icon: suppliersIcon,
+            },
+            {
+              title: "Stores",
+              path: "finance/stores",
+              icon: storeIcon,
+            },
+            {
+              title: "Warehouses",
+              path: "finance/warehouses",
+              icon: warehousesIcon,
+            },
+          ],
+        }
+      );
       break;
 
     default:

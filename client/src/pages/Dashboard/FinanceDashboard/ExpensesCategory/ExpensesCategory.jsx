@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -21,41 +20,29 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import CreateExpanseModal from "./CreateExpensesModal";
-import EditExpensesModal from "./EditExpensesModal";
+import CreateExpanseModal from "../Expenses/CreateExpensesModal";
+import EditExpensesCategoryModal from "./EditExpensesCategoryModal";
 
 // table data
 const tableData = [
   {
     id: 1,
     categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
     description: "This is a description",
   },
   {
     id: 2,
     categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Inactive",
-    amount: 1000,
     description: "This is a description",
   },
   {
     id: 3,
     categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
     description: "This is a description",
   },
 ];
 
-const Expenses = () => {
+const ExpensesCategory = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
@@ -82,65 +69,6 @@ const Expenses = () => {
         return (
           <Box>
             <Typography variant="p">{row.categoryName}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.date}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "reference",
-      headerName: "Reference",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.reference}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            {
-              <Chip
-                variant="outlined"
-                size="small"
-                sx={{
-                  color: row.status === "Active" ? "green" : "red",
-                  borderRadius: 1,
-                  borderColor: row.status === "Active" ? "green" : "red",
-                }}
-                label={row.status}
-              ></Chip>
-            }
-          </Box>
-        );
-      },
-    },
-    {
-      field: "amount",
-      headerName: "Amount",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.amount}</Typography>
           </Box>
         );
       },
@@ -204,10 +132,6 @@ const Expenses = () => {
     return {
       id: data.id,
       categoryName: data.categoryName,
-      date: data.date,
-      reference: data.reference,
-      status: data.status,
-      amount: data.amount,
       description: data.description,
     };
   });
@@ -220,8 +144,8 @@ const Expenses = () => {
         alignItems={"center"}
       >
         <SectionTitle
-          title={"Expenses list"}
-          description={"Manage your expenses"}
+          title={"Expenses category"}
+          description={"Manage your expenses category"}
         />
 
         <Button
@@ -234,7 +158,7 @@ const Expenses = () => {
             />
           }
         >
-          Add new expenses
+          Add new expenses category
         </Button>
       </Stack>
 
@@ -317,7 +241,7 @@ const Expenses = () => {
       </Box>
 
       {/* Edit expenses */}
-      <EditExpensesModal open={open} setOpen={setOpen} id={productId} />
+      <EditExpensesCategoryModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add expenses */}
       <CreateExpanseModal open={createModal} setOpen={setCreateModal} />
@@ -325,4 +249,4 @@ const Expenses = () => {
   );
 };
 
-export default Expenses;
+export default ExpensesCategory;
