@@ -12,14 +12,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import SectionTitle from "../../../../components/ui/SectionTitle";
+import { NavLink } from "react-router-dom";
+import totalEmployeesIcon from "../../../../assets/dashboard icons/finance/hrm/totalEmployees.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import totalEmployeesIcon from "../../../../assets/dashboard icons/finance/hrm/totalEmployees.svg";
 import employeeImg from "../../../../assets/employeesImg.png";
 import EmployeesCard from "../../../../components/dashboard/finance/Employees/EmployeesCard";
-import CreateEmployeeModal from "./CreateEmployeeModal";
-import { NavLink } from "react-router-dom";
+import SectionTitle from "../../../../components/ui/SectionTitle";
 
 const employees = [
   {
@@ -56,7 +55,6 @@ const employees = [
 
 const Employees = () => {
   const [sortBy, setSortBy] = useState("");
-  const [createEmployeeModal, setCreateEmployeeModal] = useState(false);
 
   return (
     <Container>
@@ -171,11 +169,6 @@ const Employees = () => {
           </Grid2>
         ))}
       </Grid2>
-      {/* Create employ modal */}
-      <CreateEmployeeModal
-        open={createEmployeeModal}
-        setOpen={setCreateEmployeeModal}
-      />
     </Container>
   );
 };
