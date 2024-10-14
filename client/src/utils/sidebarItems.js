@@ -275,8 +275,18 @@ export const sidebarItems = (role) => {
             },
             {
               title: "Attendance",
-              path: "finance/attendance",
+              path: "finance/attendance/employee",
               icon: attendanceIcon,
+              children: [
+                {
+                  title: "Employee",
+                  path: "finance/attendance/employee",
+                },
+                {
+                  title: "Admin",
+                  path: "finance/attendance/admin",
+                },
+              ],
             },
             {
               title: "Leaves",

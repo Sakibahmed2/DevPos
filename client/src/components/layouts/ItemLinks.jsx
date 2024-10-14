@@ -7,8 +7,11 @@ import {
   Typography,
 } from "@mui/material";
 import { NavLink, useLocation } from "react-router-dom";
+import ChildItemLinks from "./ChildItemLinks";
 
-const ItemsLink = ({ title, path, icon }) => {
+const ItemsLink = ({ item }) => {
+  const { path, title, icon, children } = item;
+
   const { pathname } = useLocation();
 
   return (
@@ -45,6 +48,14 @@ const ItemsLink = ({ title, path, icon }) => {
           <Typography>{title}</Typography>
         </ListItemButton>
       </ListItem>
+
+      {children && (
+        <Box>
+          {children.map((child, idx) => (
+            <ChildItemLinks key={idx} child={child} />
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };

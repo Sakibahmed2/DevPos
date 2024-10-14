@@ -105,12 +105,7 @@ const Sidebar = () => {
             </Typography>
             <Stack direction={"column"} gap={1.5}>
               {item.items.map((item, idx) => (
-                <ItemsLink
-                  key={idx}
-                  icon={item.icon}
-                  path={item.path}
-                  title={item.title}
-                />
+                <ItemsLink key={idx} item={item} />
               ))}
             </Stack>
             <Divider sx={{ marginY: 3 }} />

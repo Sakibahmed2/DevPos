@@ -1,3 +1,4 @@
+import AdminAttendance from "../pages/Dashboard/FinanceDashboard/AdminAttendance/AdminAttendance";
 import Attendance from "../pages/Dashboard/FinanceDashboard/Attendance/Attendance";
 import Customers from "../pages/Dashboard/FinanceDashboard/Customers/Customers";
 import Departments from "../pages/Dashboard/FinanceDashboard/Departments/Departments";
@@ -70,8 +71,12 @@ const financeRoutes = [
     element: <Shifts />,
   },
   {
-    path: "finance/attendance",
+    path: "finance/attendance/employee",
     element: <Attendance />,
+  },
+  {
+    path: "finance/attendance/admin",
+    element: <AdminAttendance />,
   },
   {
     path: "finance/leaves",
