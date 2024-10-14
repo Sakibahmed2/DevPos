@@ -36,6 +36,15 @@ import storeIcon from "../assets/dashboard icons/finance/peoples/stores.svg";
 import suppliersIcon from "../assets/dashboard icons/finance/peoples/suppliers.svg";
 import warehousesIcon from "../assets/dashboard icons/finance/peoples/warehouses.svg";
 
+import employeesIcon from "../assets/dashboard icons/finance/hrm/employees.svg";
+import departmentsIcon from "../assets/dashboard icons/finance/hrm/departments.svg";
+import designationsIcon from "../assets/dashboard icons/finance/hrm/designation.svg";
+import shiftsIcon from "../assets/dashboard icons/finance/hrm/shifts.svg";
+import attendanceIcon from "../assets/dashboard icons/finance/hrm/attendence.svg";
+import leavesIcon from "../assets/dashboard icons/finance/hrm/leaves.svg";
+import holidaysIcon from "../assets/dashboard icons/finance/hrm/holidays.svg";
+import payrollsIcon from "../assets/dashboard icons/finance/hrm/payrolls.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
@@ -236,6 +245,53 @@ export const sidebarItems = (role) => {
               title: "Warehouses",
               path: "finance/warehouses",
               icon: warehousesIcon,
+            },
+          ],
+        },
+
+        // **** HRM sidebar section **** //
+        {
+          section: "HRM",
+          items: [
+            {
+              title: "Employees",
+              path: "finance/employees",
+              icon: employeesIcon,
+            },
+            {
+              title: "Departments",
+              path: "finance/departments",
+              icon: departmentsIcon,
+            },
+            {
+              title: "Designations",
+              path: "finance/designations",
+              icon: designationsIcon,
+            },
+            {
+              title: "Shifts",
+              path: "finance/shifts",
+              icon: shiftsIcon,
+            },
+            {
+              title: "Attendance",
+              path: "finance/attendance",
+              icon: attendanceIcon,
+            },
+            {
+              title: "Leaves",
+              path: "finance/leaves",
+              icon: leavesIcon,
+            },
+            {
+              title: "Holidays",
+              path: "finance/holidays",
+              icon: holidaysIcon,
+            },
+            {
+              title: "Payrolls",
+              path: "finance/payroll",
+              icon: payrollsIcon,
             },
           ],
         }
