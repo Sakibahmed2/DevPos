@@ -13,7 +13,7 @@ const ChildItemLinks = ({ child }) => {
       direction={"row"}
       alignItems={"center"}
       sx={{
-        ml: 5,
+        ml: 2,
         ...(pathname === `/${path}`
           ? {
               color: "primary.main",
@@ -38,7 +38,7 @@ const ChildItemLinks = ({ child }) => {
           borderRadius: "50%",
         }}
       ></Box>
-      <Typography variant="body2" sx={{ pl: 4, py: 1, fontWeight: 600 }}>
+      <Typography variant="body2" sx={{ pl: 2, py: 1, fontWeight: 500 }}>
         {title}
       </Typography>
     </Stack>

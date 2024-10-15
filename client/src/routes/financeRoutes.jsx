@@ -11,6 +11,7 @@ import ExpensesCategory from "../pages/Dashboard/FinanceDashboard/ExpensesCatego
 import Holidays from "../pages/Dashboard/FinanceDashboard/Holidays/Holidays";
 import Leaves from "../pages/Dashboard/FinanceDashboard/Leaves/Leaves";
 import Payrolls from "../pages/Dashboard/FinanceDashboard/Payrolls/Payrolls";
+import Payslip from "../pages/Dashboard/FinanceDashboard/Payrolls/Payslip";
 import Shifts from "../pages/Dashboard/FinanceDashboard/Shifts/Shifts";
 import Stores from "../pages/Dashboard/FinanceDashboard/Stores/Stores";
 import Suppliers from "../pages/Dashboard/FinanceDashboard/Suppliers/Suppliers";
@@ -87,8 +88,12 @@ const financeRoutes = [
     element: <Holidays />,
   },
   {
-    path: "finance/payroll",
+    path: "finance/payroll/employee-salary",
     element: <Payrolls />,
+  },
+  {
+    path: "finance/payroll/payslip",
+    element: <Payslip />,
   },
 ];
 

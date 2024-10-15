@@ -300,8 +300,18 @@ export const sidebarItems = (role) => {
             },
             {
               title: "Payrolls",
-              path: "finance/payroll",
+              path: "finance/payroll/employee-salary",
               icon: payrollsIcon,
+              children: [
+                {
+                  title: "Employee salary",
+                  path: "finance/payroll/employee-salary",
+                },
+                {
+                  title: "Payslip",
+                  path: "finance/payroll/payslip",
+                },
+              ],
             },
           ],
         }
