@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Container,
-  Grid2,
   Paper,
   Stack,
   Table,

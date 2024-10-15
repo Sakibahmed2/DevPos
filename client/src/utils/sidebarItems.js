@@ -45,6 +45,17 @@ import leavesIcon from "../assets/dashboard icons/finance/hrm/leaves.svg";
 import holidaysIcon from "../assets/dashboard icons/finance/hrm/holidays.svg";
 import payrollsIcon from "../assets/dashboard icons/finance/hrm/payrolls.svg";
 
+import salesReportIcon from "../assets/dashboard icons/finance/reports/sales.svg";
+import purchaseReportIcon from "../assets/dashboard icons/finance/reports/purchase.svg";
+import inventoryReportIcon from "../assets/dashboard icons/finance/reports/inventory.svg";
+import invoiceReportIcon from "../assets/dashboard icons/finance/reports/invoice.svg";
+import supplierReportIcon from "../assets/dashboard icons/finance/reports/supplier.svg";
+import customerReportIcon from "../assets/dashboard icons/finance/reports/customer.svg";
+import expenseReportIcon from "../assets/dashboard icons/finance/reports/expense.svg";
+import incomeReportIcon from "../assets/dashboard icons/finance/reports/income.svg";
+import taxReportIcon from "../assets/dashboard icons/finance/reports/tax.svg";
+import profitLossReportIcon from "../assets/dashboard icons/finance/reports/profitLoss.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
@@ -312,6 +323,63 @@ export const sidebarItems = (role) => {
                   path: "finance/payroll/payslip",
                 },
               ],
+            },
+          ],
+        },
+
+        // **** Reports sidebar section **** //
+        {
+          section: "Reports",
+          items: [
+            {
+              title: "Sales report",
+              path: "finance/sales-report",
+              icon: salesReportIcon,
+            },
+            {
+              title: "Purchase report",
+              path: "finance/purchase-report",
+              icon: purchaseReportIcon,
+            },
+            {
+              title: "Inventory report",
+              path: "finance/inventory-report",
+              icon: inventoryReportIcon,
+            },
+            {
+              title: "Invoice report",
+              path: "finance/invoice-report",
+              icon: invoiceReportIcon,
+            },
+            {
+              title: "Supplier report",
+              path: "finance/supplier-report",
+              icon: supplierReportIcon,
+            },
+            {
+              title: "Customer report",
+              path: "finance/customer-report",
+              icon: customerReportIcon,
+            },
+            {
+              title: "Expense report",
+              path: "finance/expanse-report",
+              icon: expenseReportIcon,
+            },
+            {
+              title: "Income report",
+              path: "finance/income-report",
+              icon: incomeReportIcon,
+            },
+            {
+              title: "Tax report",
+              path: "finance/tax-report",
+              icon: taxReportIcon,
+            },
+            {
+              title: "Profit & loss report",
+              path: "finance/profit-loss-report",
+              icon: profitLossReportIcon,
             },
           ],
         }
