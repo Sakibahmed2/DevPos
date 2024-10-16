@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -21,28 +20,24 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import EditLeaveModal from "./EditLeaveModal";
-import CreateLeaveModal from "./CreateLeaveModal";
+import CreateRoleModal from "./CreateRoleModal";
+import EditRoleModal from "./EditRoleModal";
 
 // table data
 const tableData = [
   {
     id: 1,
-    name: "Sick Leave",
-    leaveQuota: 5,
-    status: "Active",
-    createdAt: "02 Aug 2023",
+    role: "Admin",
+    createdAt: "25 May 2023",
   },
   {
     id: 2,
-    name: "Sick Leave",
-    leaveQuota: 5,
-    status: "Active",
-    createdAt: "02 Aug 2023",
+    role: "Finance",
+    createdAt: "25 May 2023",
   },
 ];
 
-const Leaves = () => {
+const RolesAndPermissions = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
@@ -62,25 +57,13 @@ const Leaves = () => {
 
   const columns = [
     {
-      field: "name",
-      headerName: "Name",
+      field: "role",
+      headerName: "Role",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.name}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "leaveQuota",
-      headerName: "Leave Quota",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.leaveQuota}</Typography>
+            <Typography variant="p">{row.role}</Typography>
           </Box>
         );
       },
@@ -93,28 +76,6 @@ const Leaves = () => {
         return (
           <Box>
             <Typography variant="p">{row.createdAt}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Chip
-              variant="outlined"
-              label={row.status}
-              sx={{
-                borderColor: row.status === "Active" ? "primary.main" : "red",
-                color: row.status === "Active" ? "primary.main" : "red",
-                borderRadius: 1,
-                fontWeight: 500,
-                px: 2,
-              }}
-            />
           </Box>
         );
       },
@@ -165,9 +126,7 @@ const Leaves = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      name: data.name,
-      leaveQuota: data.leaveQuota,
-      status: data.status,
+      role: data.role,
       createdAt: data.createdAt,
     };
   });
@@ -180,8 +139,8 @@ const Leaves = () => {
         alignItems={"center"}
       >
         <SectionTitle
-          title={"Leaves"}
-          description={"Manage your leaves type"}
+          title={"Roles and permissions"}
+          description={"Manage your roles and permissions"}
         />
 
         <Button
@@ -194,7 +153,7 @@ const Leaves = () => {
             />
           }
         >
-          Add leave type
+          Add new role
         </Button>
       </Stack>
 
@@ -276,13 +235,13 @@ const Leaves = () => {
         />
       </Box>
 
-      {/* Edit leave */}
-      <EditLeaveModal open={open} setOpen={setOpen} id={productId} />
+      {/* Edit role */}
+      <EditRoleModal open={open} setOpen={setOpen} id={productId} />
 
-      {/* Add leave */}
-      <CreateLeaveModal open={createModal} setOpen={setCreateModal} />
+      {/* Add role */}
+      <CreateRoleModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
 
-export default Leaves;
+export default RolesAndPermissions;

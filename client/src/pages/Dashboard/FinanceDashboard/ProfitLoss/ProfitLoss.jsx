@@ -178,8 +178,8 @@ const ProfitLoss = () => {
                 <Typography variant="h6">Income</Typography>
               </TableCell>
             </TableRow>
-            {Object.keys(data[0].income).map((key) => (
-              <TableRow key={key}>
+            {Object.keys(data[0].income).map((key, idx) => (
+              <TableRow key={idx}>
                 <TableCell>
                   {key.charAt(0).toUpperCase() + key.slice(1)}
                 </TableCell>

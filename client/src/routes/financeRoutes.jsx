@@ -2,6 +2,7 @@ import AdminAttendance from "../pages/Dashboard/FinanceDashboard/AdminAttendance
 import Attendance from "../pages/Dashboard/FinanceDashboard/Attendance/Attendance";
 import CustomerReport from "../pages/Dashboard/FinanceDashboard/CustomerReport/CustomerReport";
 import Customers from "../pages/Dashboard/FinanceDashboard/Customers/Customers";
+import DeleteAccountRequest from "../pages/Dashboard/FinanceDashboard/DeleteAccountRequest/DeleteAccountRequest";
 import Departments from "../pages/Dashboard/FinanceDashboard/Departments/Departments";
 import Designation from "../pages/Dashboard/FinanceDashboard/Designation/Designation";
 import AddNewEmployee from "../pages/Dashboard/FinanceDashboard/Employees/AddNewEmployee";
@@ -19,12 +20,14 @@ import Payrolls from "../pages/Dashboard/FinanceDashboard/Payrolls/Payrolls";
 import Payslip from "../pages/Dashboard/FinanceDashboard/Payrolls/Payslip";
 import ProfitLoss from "../pages/Dashboard/FinanceDashboard/ProfitLoss/ProfitLoss";
 import PurchaseReport from "../pages/Dashboard/FinanceDashboard/PurchaseReport/PurchaseReport";
+import RolesAndPermissions from "../pages/Dashboard/FinanceDashboard/RolesAndPermissions/RolesAndPermissions";
 import SalesReport from "../pages/Dashboard/FinanceDashboard/SalesReport/SalesReport";
 import Shifts from "../pages/Dashboard/FinanceDashboard/Shifts/Shifts";
 import Stores from "../pages/Dashboard/FinanceDashboard/Stores/Stores";
 import SupplierReport from "../pages/Dashboard/FinanceDashboard/SupplierReport/SupplierReport";
 import Suppliers from "../pages/Dashboard/FinanceDashboard/Suppliers/Suppliers";
 import TaxReport from "../pages/Dashboard/FinanceDashboard/TaxReport/TaxReport";
+import Users from "../pages/Dashboard/FinanceDashboard/Users/Users";
 import Warehouses from "../pages/Dashboard/FinanceDashboard/Warehouses/Warehouses";
 
 const financeRoutes = [
@@ -146,6 +149,20 @@ const financeRoutes = [
   {
     path: "finance/profit-loss-report",
     element: <ProfitLoss />,
+  },
+
+  // ** User management routes ** //
+  {
+    path: "finance/users",
+    element: <Users />,
+  },
+  {
+    path: "finance/role-management",
+    element: <RolesAndPermissions />,
+  },
+  {
+    path: "finance/delete-account-request",
+    element: <DeleteAccountRequest />,
   },
 ];
 

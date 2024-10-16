@@ -56,6 +56,10 @@ import incomeReportIcon from "../assets/dashboard icons/finance/reports/income.s
 import taxReportIcon from "../assets/dashboard icons/finance/reports/tax.svg";
 import profitLossReportIcon from "../assets/dashboard icons/finance/reports/profitLoss.svg";
 
+import usersIcon from "../assets/dashboard icons/finance/userManagement/users.svg";
+import rolePermissionsIcon from "../assets/dashboard icons/finance/userManagement/rolePermissions.svg";
+import deleteAccountIcon from "../assets/dashboard icons/finance/userManagement/deleteAccount.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
@@ -380,6 +384,28 @@ export const sidebarItems = (role) => {
               title: "Profit & loss report",
               path: "finance/profit-loss-report",
               icon: profitLossReportIcon,
+            },
+          ],
+        },
+
+        // **** User management sidebar section **** //
+        {
+          section: "User management",
+          items: [
+            {
+              title: "Users",
+              path: "finance/users",
+              icon: usersIcon,
+            },
+            {
+              title: "Role & permissions",
+              path: "finance/role-management",
+              icon: rolePermissionsIcon,
+            },
+            {
+              title: "Delete account request",
+              path: "finance/delete-account-request",
+              icon: deleteAccountIcon,
             },
           ],
         }

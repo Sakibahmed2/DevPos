@@ -1,7 +1,5 @@
 import {
   Box,
-  Button,
-  Chip,
   Container,
   FormControl,
   InputLabel,
@@ -17,37 +15,31 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
-import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
-import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import userImg from "../../../../assets/userImg.png";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import EditLeaveModal from "./EditLeaveModal";
-import CreateLeaveModal from "./CreateLeaveModal";
 
 // table data
 const tableData = [
   {
     id: 1,
-    name: "Sick Leave",
-    leaveQuota: 5,
-    status: "Active",
-    createdAt: "02 Aug 2023",
+    img: userImg,
+    name: "John Doe",
+    requisitionDate: "25 May 2023",
+    requestDate: "25 May 2023",
   },
   {
     id: 2,
-    name: "Sick Leave",
-    leaveQuota: 5,
-    status: "Active",
-    createdAt: "02 Aug 2023",
+    img: userImg,
+    name: "John Doe",
+    requisitionDate: "25 May 2023",
+    requestDate: "25 May 2023",
   },
 ];
 
-const Leaves = () => {
+const Users = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [createModal, setCreateModal] = useState(false);
-  const [productId, setProductId] = useState(null);
 
   // const itemsPerPage = 3 ;
 
@@ -55,15 +47,28 @@ const Leaves = () => {
     setPage(newPage);
   };
 
-  const handleModal = (productId) => {
-    setOpen(true);
-    setProductId(productId);
-  };
-
   const columns = [
     {
-      field: "name",
-      headerName: "Name",
+      field: "img",
+      headerName: "User",
+      width: 90,
+      renderCell: ({ row }) => {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <img src={row.img} alt="user" />
+          </Box>
+        );
+      },
+    },
+    {
       flex: 1,
       renderCell: ({ row }) => {
         return (
@@ -74,55 +79,36 @@ const Leaves = () => {
       },
     },
     {
-      field: "leaveQuota",
-      headerName: "Leave Quota",
+      field: "requisitionDate",
+      headerName: "Requisition date",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.leaveQuota}</Typography>
+            <Typography variant="p">{row.requisitionDate}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "createdAt",
-      headerName: "Created on",
+      field: "requestDate",
+      headerName: "Request date",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.createdAt}</Typography>
+            <Typography variant="p">{row.requestDate}</Typography>
           </Box>
         );
       },
     },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Chip
-              variant="outlined"
-              label={row.status}
-              sx={{
-                borderColor: row.status === "Active" ? "primary.main" : "red",
-                color: row.status === "Active" ? "primary.main" : "red",
-                borderRadius: 1,
-                fontWeight: 500,
-                px: 2,
-              }}
-            />
-          </Box>
-        );
-      },
-    },
+
     {
       field: "id",
       headerName: "Action",
       renderCell: ({ row }) => {
+        console.log(row.id);
+
         return (
           <Stack
             direction={"row"}
@@ -134,18 +120,6 @@ const Leaves = () => {
               width: "100%",
             }}
           >
-            <Box
-              onClick={() => handleModal(row.id)}
-              component={"button"}
-              sx={{
-                border: "1px solid gray",
-                borderRadius: 1,
-                p: "5px 3px",
-              }}
-            >
-              <img src={editIcons} alt="" className="w-5 h-5" />
-            </Box>
-
             <Box
               component={"button"}
               sx={{
@@ -165,10 +139,10 @@ const Leaves = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
+      img: data.img,
       name: data.name,
-      leaveQuota: data.leaveQuota,
-      status: data.status,
-      createdAt: data.createdAt,
+      requisitionDate: data.requisitionDate,
+      requestDate: data.requestDate,
     };
   });
 
@@ -180,22 +154,9 @@ const Leaves = () => {
         alignItems={"center"}
       >
         <SectionTitle
-          title={"Leaves"}
-          description={"Manage your leaves type"}
+          title={"Delete account request"}
+          description={"Manage your account here"}
         />
-
-        <Button
-          onClick={() => setCreateModal(true)}
-          startIcon={
-            <img
-              src={plusIcon}
-              alt="plus icon"
-              style={{ width: 30, height: 30 }}
-            />
-          }
-        >
-          Add leave type
-        </Button>
       </Stack>
 
       <Box
@@ -275,14 +236,8 @@ const Leaves = () => {
           onPageChange={handlePageChange}
         />
       </Box>
-
-      {/* Edit leave */}
-      <EditLeaveModal open={open} setOpen={setOpen} id={productId} />
-
-      {/* Add leave */}
-      <CreateLeaveModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
 
-export default Leaves;
+export default Users;
