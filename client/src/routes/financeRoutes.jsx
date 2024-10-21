@@ -33,6 +33,8 @@ import Shifts from "../pages/Dashboard/FinanceDashboard/Shifts/Shifts";
 import Stores from "../pages/Dashboard/FinanceDashboard/Stores/Stores";
 import SupplierReport from "../pages/Dashboard/FinanceDashboard/SupplierReport/SupplierReport";
 import Suppliers from "../pages/Dashboard/FinanceDashboard/Suppliers/Suppliers";
+import GDPRSettings from "../pages/Dashboard/FinanceDashboard/SystemSettings/GDPRSettings";
+import OtpSettings from "../pages/Dashboard/FinanceDashboard/SystemSettings/OtpSettings";
 import SystemSettings from "../pages/Dashboard/FinanceDashboard/SystemSettings/SystemSettings";
 import TaxReport from "../pages/Dashboard/FinanceDashboard/TaxReport/TaxReport";
 import Users from "../pages/Dashboard/FinanceDashboard/Users/Users";
@@ -237,6 +239,14 @@ const financeRoutes = [
       {
         path: "finance/system-settings",
         element: <SystemSettings />,
+      },
+      {
+        path: "finance/otp-settings",
+        element: <OtpSettings />,
+      },
+      {
+        path: "finance/gdpr-settings",
+        element: <GDPRSettings />,
       },
     ],
   },
