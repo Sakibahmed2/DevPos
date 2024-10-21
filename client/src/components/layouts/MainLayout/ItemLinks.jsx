@@ -19,7 +19,6 @@ const ItemsLink = ({ item }) => {
   const { pathname } = useLocation();
 
   const childPath = children?.map((child) => child.path);
-  console.log(childPath);
 
   const [open, setOpen] = useState(false);
 

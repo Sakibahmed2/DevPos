@@ -1,4 +1,6 @@
+import SettingLayout from "../components/layouts/SettingLayout/SettingLayout";
 import AdminAttendance from "../pages/Dashboard/FinanceDashboard/AdminAttendance/AdminAttendance";
+import AppSetting from "../pages/Dashboard/FinanceDashboard/AppSetting/AppSetting";
 import Attendance from "../pages/Dashboard/FinanceDashboard/Attendance/Attendance";
 import CustomerReport from "../pages/Dashboard/FinanceDashboard/CustomerReport/CustomerReport";
 import Customers from "../pages/Dashboard/FinanceDashboard/Customers/Customers";
@@ -11,11 +13,16 @@ import Employees from "../pages/Dashboard/FinanceDashboard/Employees/Employees";
 import ExpenseReport from "../pages/Dashboard/FinanceDashboard/ExpenseReport/ExpenseReport";
 import Expenses from "../pages/Dashboard/FinanceDashboard/Expenses/Expenses";
 import ExpensesCategory from "../pages/Dashboard/FinanceDashboard/ExpensesCategory/ExpensesCategory";
+import FinancialSetting from "../pages/Dashboard/FinanceDashboard/FinancialSetting/FinancialSetting";
+import GeneralSettings from "../pages/Dashboard/FinanceDashboard/GeneralSettings/GeneralSettings";
+import NotificationSetting from "../pages/Dashboard/FinanceDashboard/GeneralSettings/NotificationSetting";
+import SecuritySetting from "../pages/Dashboard/FinanceDashboard/GeneralSettings/SecuritySetting";
 import Holidays from "../pages/Dashboard/FinanceDashboard/Holidays/Holidays";
 import IncomeReport from "../pages/Dashboard/FinanceDashboard/IncomeReport/IncomeReport";
 import InventoryReport from "../pages/Dashboard/FinanceDashboard/InventoryReport/InventoryReport";
 import InvoiceReport from "../pages/Dashboard/FinanceDashboard/InvoiceReport/InvoiceReport";
 import Leaves from "../pages/Dashboard/FinanceDashboard/Leaves/Leaves";
+import OtherSetting from "../pages/Dashboard/FinanceDashboard/OtherSetting/OtherSetting";
 import Payrolls from "../pages/Dashboard/FinanceDashboard/Payrolls/Payrolls";
 import Payslip from "../pages/Dashboard/FinanceDashboard/Payrolls/Payslip";
 import ProfitLoss from "../pages/Dashboard/FinanceDashboard/ProfitLoss/ProfitLoss";
@@ -26,9 +33,18 @@ import Shifts from "../pages/Dashboard/FinanceDashboard/Shifts/Shifts";
 import Stores from "../pages/Dashboard/FinanceDashboard/Stores/Stores";
 import SupplierReport from "../pages/Dashboard/FinanceDashboard/SupplierReport/SupplierReport";
 import Suppliers from "../pages/Dashboard/FinanceDashboard/Suppliers/Suppliers";
+import SystemSettings from "../pages/Dashboard/FinanceDashboard/SystemSettings/SystemSettings";
 import TaxReport from "../pages/Dashboard/FinanceDashboard/TaxReport/TaxReport";
 import Users from "../pages/Dashboard/FinanceDashboard/Users/Users";
 import Warehouses from "../pages/Dashboard/FinanceDashboard/Warehouses/Warehouses";
+import CompanySettings from "../pages/Dashboard/FinanceDashboard/WebsiteSettings/CompanySettings";
+import LocalizationSettings from "../pages/Dashboard/FinanceDashboard/WebsiteSettings/LocalizationSettings";
+import WebsiteSettings from "../pages/Dashboard/FinanceDashboard/WebsiteSettings/WebsiteSettings";
+import {
+  generaleSettingRoute,
+  systemSettingRoute,
+  websiteSettingRoute,
+} from "../utils/settingRoutes";
 
 const financeRoutes = [
   // ** Finance & account routes ** //
@@ -163,6 +179,66 @@ const financeRoutes = [
   {
     path: "finance/delete-account-request",
     element: <DeleteAccountRequest />,
+  },
+
+  // ** Settings routes ** //
+  {
+    path: "/",
+    element: <SettingLayout pathLinks={generaleSettingRoute} />,
+    children: [
+      {
+        path: "finance/general-settings",
+        element: <GeneralSettings />,
+      },
+      {
+        path: "finance/security-settings",
+        element: <SecuritySetting />,
+      },
+      {
+        path: "finance/notification-settings",
+        element: <NotificationSetting />,
+      },
+      {
+        path: "finance/financial-settings",
+        element: <FinancialSetting />,
+      },
+      {
+        path: "finance/other-settings",
+        element: <OtherSetting />,
+      },
+    ],
+  },
+  {
+    path: "/",
+    element: <SettingLayout pathLinks={websiteSettingRoute} />,
+    children: [
+      {
+        path: "finance/website-settings",
+        element: <WebsiteSettings />,
+      },
+      {
+        path: "finance/company-settings",
+        element: <CompanySettings />,
+      },
+      {
+        path: "finance/localization-settings",
+        element: <LocalizationSettings />,
+      },
+    ],
+  },
+  {
+    path: "finance/app-settings",
+    element: <AppSetting />,
+  },
+  {
+    path: "/",
+    element: <SettingLayout pathLinks={systemSettingRoute} />,
+    children: [
+      {
+        path: "finance/system-settings",
+        element: <SystemSettings />,
+      },
+    ],
   },
 ];
 

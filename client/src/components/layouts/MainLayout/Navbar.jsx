@@ -19,10 +19,10 @@ import {
 import { useState } from "react";
 
 // icons
-import searchIcon from "../../assets/dashboard icons/search.svg";
-import settingIcon from "../../assets/dashboard icons/red-setting.svg";
-import bellIcon from "../../assets/dashboard icons/bell.svg";
-import messageIcon from "../../assets/dashboard icons/message.svg";
+import searchIcon from "../../../assets/dashboard icons/search.svg";
+import settingIcon from "../../../assets/dashboard icons/red-setting.svg";
+import bellIcon from "../../../assets/dashboard icons/bell.svg";
+import messageIcon from "../../../assets/dashboard icons/message.svg";
 
 const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
   const [store, setStore] = useState("");

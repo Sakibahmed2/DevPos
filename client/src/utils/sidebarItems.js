@@ -60,6 +60,13 @@ import usersIcon from "../assets/dashboard icons/finance/userManagement/users.sv
 import rolePermissionsIcon from "../assets/dashboard icons/finance/userManagement/rolePermissions.svg";
 import deleteAccountIcon from "../assets/dashboard icons/finance/userManagement/deleteAccount.svg";
 
+import generalSettingIcon from "../assets/dashboard icons/finance/settings/general.svg";
+import websiteSettingIcon from "../assets/dashboard icons/finance/settings/website.svg";
+import appSettingIcon from "../assets/dashboard icons/finance/settings/app.svg";
+import systemSettingIcon from "../assets/dashboard icons/finance/settings/system.svg";
+import financialSettingIcon from "../assets/dashboard icons/finance/settings/financial.svg";
+import otherSettingIcon from "../assets/dashboard icons/finance/settings/other.svg";
+
 export const sidebarItems = (role) => {
   const menus = [];
 
@@ -406,6 +413,43 @@ export const sidebarItems = (role) => {
               title: "Delete account request",
               path: "finance/delete-account-request",
               icon: deleteAccountIcon,
+            },
+          ],
+        },
+
+        // **** Settings sidebar section **** //
+        {
+          section: "Settings",
+          items: [
+            {
+              title: "General settings",
+              path: "finance/general-settings",
+              icon: generalSettingIcon,
+            },
+            {
+              title: "Website settings",
+              path: "finance/website-settings",
+              icon: websiteSettingIcon,
+            },
+            {
+              title: "App settings",
+              path: "finance/app-settings",
+              icon: appSettingIcon,
+            },
+            {
+              title: "System settings",
+              path: "finance/system-settings",
+              icon: systemSettingIcon,
+            },
+            {
+              title: "Financial settings",
+              path: "finance/financial-settings",
+              icon: financialSettingIcon,
+            },
+            {
+              title: "Other settings",
+              path: "finance/other-settings",
+              icon: otherSettingIcon,
             },
           ],
         }

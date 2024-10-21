@@ -11,9 +11,9 @@ import {
 import { NavLink, useLocation } from "react-router-dom";
 
 // icons
-import dashboardHome from "../../assets/dashboard icons/dashboard-home-icon.svg";
-import devPosLogo from "../../assets/devPosLogo.png";
-import { sidebarItems } from "../../utils/sidebarItems";
+import dashboardHome from "../../../assets/dashboard icons/dashboard-home-icon.svg";
+import devPosLogo from "../../../assets/devPosLogo.png";
+import { sidebarItems } from "../../../utils/sidebarItems";
 import ItemsLink from "./ItemLinks";
 
 const Sidebar = () => {

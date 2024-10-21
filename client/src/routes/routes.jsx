@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "../App";
+import MainLayout from "../components/layouts/MainLayout/MainLayout";
 import LoginPage from "../pages/login/LoginPage";
 import adminPath from "./adminRoutes";
 import financeRoutes from "./financeRoutes";
@@ -7,12 +7,12 @@ import financeRoutes from "./financeRoutes";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <MainLayout />,
     children: adminPath,
   },
   {
     path: "/",
-    element: <App />,
+    element: <MainLayout />,
     children: financeRoutes,
   },
   {
