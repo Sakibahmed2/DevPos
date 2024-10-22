@@ -6,7 +6,9 @@ import googleLogo from "../../assets/google-logo.png";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import LockIcon from "@mui/icons-material/Lock";
 import devPosLogo from "../../assets/devPosLogo.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useCreateUserMutation } from "../../redux/api/auth/authApi";
+import { toast } from "sonner";
 
 const defaultValue = {
   name: "",
@@ -16,8 +18,32 @@ const defaultValue = {
 };
 
 const RegisterPage = () => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [createUser] = useCreateUserMutation();
+  const navigate = useNavigate();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating account...");
+    try {
+      if (data.password !== data.confirmPassword) {
+        return toast.error("Passwords do not match", { id: toastId });
+      }
+
+      const userData = {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      };
+
+      const res = await createUser(userData).unwrap();
+      console.log(res);
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+        navigate("/login");
+      }
+    } catch (err) {
+      toast.error("Something went wrong in server", { id: toastId });
+      console.log(err);
+    }
   };
 
   return (

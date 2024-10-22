@@ -6,10 +6,13 @@ import googleLogo from "../../assets/google-logo.png";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import LockIcon from "@mui/icons-material/Lock";
 import devPosLogo from "../../assets/devPosLogo.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useLoginUserMutation } from "../../redux/api/auth/authApi";
+import { setTokenIntoLocalStorage } from "../../utils/local-storage";
 
 const defaultValue = {
   email: "",
@@ -18,9 +21,23 @@ const defaultValue = {
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [loginUser] = useLoginUserMutation();
+  const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Logging in...");
+    try {
+      const res = await loginUser(data).unwrap();
+      console.log(res);
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+        setTokenIntoLocalStorage(res?.data?.accessToken);
+        navigate("/");
+      }
+    } catch (err) {
+      toast.error(err?.data?.message, { id: toastId });
+      console.log(err);
+    }
   };
 
   return (
@@ -101,7 +118,10 @@ const LoginPage = () => {
               <Box
                 sx={{
                   position: "relative",
-                  left: 450,
+                  left: {
+                    xs: 400,
+                    xl: 450,
+                  },
                   bottom: 40,
                 }}
               >
