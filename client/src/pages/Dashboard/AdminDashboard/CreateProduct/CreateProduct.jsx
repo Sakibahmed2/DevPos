@@ -9,39 +9,23 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import DPFileUploader from "../../../../components/form/DPFileUploader";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPSelect from "../../../../components/form/DPSelect";
 import SectionTitle from "../../../../components/ui/SectionTitle";
-import DPFileUploader from "../../../../components/form/DPFileUploader";
-
-// const defaultValues = {
-//   // productName: "",
-//   // slug: "",
-//   // stockKeepingUnit: "",
-//   // quantity: "",
-//   // category: "",
-//   // subCategory: "",
-//   // brand: "",
-//   // unit: "",
-//   // sellingType: "",
-//   // barcodeSymbology: "",
-//   // itemCode: "",
-//   // description: "",
-//   // price: "",
-//   // taxType: "",
-//   // discountType: "",
-//   // discountValue: "",
-//   // quantityAlert: "",
-//   // productImg: "",
-// };
+import convertImgToBase64 from "../../../../utils/convertImgToBase64";
+import { useCreateProductMutation } from "../../../../redux/api/admin/productApi";
+import { toast } from "sonner";
+import { useState } from "react";
+import { getUserInfo } from "../../../../utils/getUserInfo";
 
 const defaultValues = {
-  productName: "Apple Macbook Pro",
-  productImg: "https://source.unsplash.com/random",
+  name: "Laptop Pro 15",
+  img: "",
   productInfo: {
-    slug: "apple-macbook-pro",
-    sku: "MBP-123456",
+    slug: "laptop-pro-15",
+    stockKeepingUnit: "SKU67890",
     category: "laptop",
     subCategory: "tablet",
     brand: "Apple",
@@ -49,22 +33,65 @@ const defaultValues = {
     sellingType: "retail",
     barcodeSymbology: "code128",
     itemCode: "123456",
-    description: "Latest model of Apple MacBook Pro with M1 chip.",
+    description:
+      "A powerful laptop for professionals, offering high performance and a sleek design.",
   },
   pricingAndStock: {
-    price: 2500,
-    quantity: 10,
+    productType: "single",
+    price: 1599.99,
     taxType: "VAT",
-    taxRate: 15, // percentage
-    discountType: "percentage",
-    discountValue: "10%", // percentage
-    quantityAlert: 5,
+    discountType: "fixed",
+    discountValue: 10,
+    quantityAlert: 10,
+    quantity: 100,
   },
 };
 
 const CreateProduct = () => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [createProduct] = useCreateProductMutation();
+  const [productType, setProductType] = useState("single");
+  const userInfo = getUserInfo();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating product...");
+
+    const imgBase64 = await convertImgToBase64(data.img);
+
+    try {
+      const productDetails = {
+        name: data.name,
+        img: imgBase64,
+        createdBy: userInfo.id,
+        productInfo: {
+          slug: data.productInfo.slug,
+          stockKeepingUnit: data.productInfo.stockKeepingUnit,
+          category: data.productInfo.category,
+          subCategory: data.productInfo.subCategory,
+          brand: data.productInfo.brand,
+          unit: data.productInfo.unit,
+          sellingType: data.productInfo.sellingType,
+          barcodeSymbology: data.productInfo.barcodeSymbology,
+          itemCode: data.productInfo.itemCode,
+          description: data.productInfo.description,
+        },
+        pricingAndStock: {
+          productType: data.pricingAndStock.productType,
+          price: data.pricingAndStock.price,
+          taxType: data.pricingAndStock.taxType,
+          discountType: data.pricingAndStock.discountType,
+          discountValue: data.pricingAndStock.discountValue,
+          quantityAlert: data.pricingAndStock.quantityAlert,
+          quantity: data.pricingAndStock.quantity,
+        },
+      };
+
+      const res = await createProduct(productDetails).unwrap();
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -113,13 +140,7 @@ const CreateProduct = () => {
                       lg: 4,
                     }}
                   >
-                    <DPInput
-                      name={"productName"}
-                      label={"Product name"}
-                      required
-                      fullWidth
-                      size="medium"
-                    />
+                    <DPInput name={"name"} label={"Product name"} required />
                   </Grid2>
 
                   <Grid2
@@ -148,7 +169,7 @@ const CreateProduct = () => {
                     item
                   >
                     <DPInput
-                      name={"productInfo.sku"}
+                      name={"productInfo.stockKeepingUnit"}
                       label={"Stock keeping unit"}
                       required
                       fullWidth
@@ -342,10 +363,14 @@ const CreateProduct = () => {
                     <FormControlLabel
                       control={<Checkbox />}
                       label="Single product"
+                      checked={productType === "single"}
+                      onChange={() => setProductType("single")}
                     />
                     <FormControlLabel
                       control={<Checkbox />}
                       label="Variable product"
+                      checked={productType === "variable"}
+                      onChange={() => setProductType("variable")}
                     />
                   </Stack>
                 </Box>
@@ -370,8 +395,6 @@ const CreateProduct = () => {
                       name={"pricingAndStock.quantity"}
                       label={"Quantity"}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
@@ -445,8 +468,8 @@ const CreateProduct = () => {
                   >
                     <DPSelect
                       name={"pricingAndStock.discountValue"}
-                      label={"Discount value"}
-                      items={["10%", "20%"]}
+                      label={"Discount value (%) "}
+                      items={[10, 20]}
                       required
                       fullWidth
                       size="medium"
@@ -496,7 +519,7 @@ const CreateProduct = () => {
                     mt: 3,
                   }}
                 >
-                  <DPFileUploader name={"productImg"} label={"Upload image"} />
+                  <DPFileUploader name={"img"} label={"Upload image"} />
                 </Box>
               </Box>
 

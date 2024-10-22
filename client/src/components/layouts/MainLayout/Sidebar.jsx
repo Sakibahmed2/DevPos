@@ -15,9 +15,11 @@ import dashboardHome from "../../../assets/dashboard icons/dashboard-home-icon.s
 import devPosLogo from "../../../assets/devPosLogo.png";
 import { sidebarItems } from "../../../utils/sidebarItems";
 import ItemsLink from "./ItemLinks";
+import { getUserInfo } from "../../../utils/getUserInfo";
 
 const Sidebar = () => {
   const { pathname } = useLocation();
+  const userInfo = getUserInfo();
 
   return (
     <Box
@@ -90,7 +92,7 @@ const Sidebar = () => {
 
       <Divider />
       <List>
-        {sidebarItems("finance").map((item, index) => (
+        {sidebarItems(userInfo?.role).map((item, index) => (
           <Box
             key={index}
             sx={{
@@ -104,8 +106,8 @@ const Sidebar = () => {
               {item.section}
             </Typography>
             <Stack direction={"column"} gap={1.5}>
-              {item.items.map((item, idx) => (
-                <ItemsLink key={idx} item={item} />
+              {item.items.map((item, index) => (
+                <ItemsLink key={index} item={item} />
               ))}
             </Stack>
             <Divider sx={{ marginY: 3 }} />

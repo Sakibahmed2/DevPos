@@ -69,8 +69,8 @@ const ItemsLink = ({ item }) => {
       {children && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <Box sx={{ pl: 4 }}>
-            {children.map((child, idx) => (
-              <ChildItemLinks key={idx} child={child} />
+            {children.map((child, index) => (
+              <ChildItemLinks key={index} child={child} />
             ))}
           </Box>
         </Collapse>

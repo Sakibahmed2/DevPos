@@ -124,9 +124,9 @@ const RecentProducts = () => {
     },
   ];
 
-  const rows = tableData.map((data, index) => {
+  const rows = tableData.map((data) => {
     return {
-      id: index,
+      id: data?.id,
       name: data.name,
       price: data.price,
       img: data.img,
