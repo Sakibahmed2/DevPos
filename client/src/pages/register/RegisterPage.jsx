@@ -7,18 +7,15 @@ import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import LockIcon from "@mui/icons-material/Lock";
 import devPosLogo from "../../assets/devPosLogo.png";
 import { NavLink } from "react-router-dom";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { useState } from "react";
 
 const defaultValue = {
+  name: "",
   email: "",
   password: "",
+  confirmPassword: "",
 };
 
-const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-
+const RegisterPage = () => {
   const onSubmit = (data) => {
     console.log(data);
   };
@@ -39,7 +36,6 @@ const LoginPage = () => {
         sx={{
           width: "100%",
           height: "100%",
-          overflow: "hidden",
         }}
       >
         <Box
@@ -80,49 +76,32 @@ const LoginPage = () => {
 
           <Box>
             <DPForm onSubmit={onSubmit} defaultValue={defaultValue}>
-              <DPInput
-                name="email"
-                label="Email"
-                type="email"
-                required
-                icon={<MailOutlineIcon />}
-              />
-              <DPInput
-                name="password"
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                required
-                icon={<LockIcon />}
-                sx={{
-                  marginTop: "24px",
-                }}
-              />
+              <Stack direction={"column"} gap={3}>
+                <DPInput name="name" label="Name" />
 
-              <Box
-                sx={{
-                  position: "relative",
-                  left: 450,
-                  bottom: 40,
-                }}
-              >
-                {showPassword ? (
-                  <VisibilityIcon
-                    onClick={() => setShowPassword(false)}
-                    sx={{
-                      color: "gray",
-                      cursor: "pointer",
-                    }}
-                  />
-                ) : (
-                  <VisibilityOffIcon
-                    onClick={() => setShowPassword(true)}
-                    sx={{
-                      color: "gray",
-                      cursor: "pointer",
-                    }}
-                  />
-                )}
-              </Box>
+                <DPInput
+                  name="email"
+                  label="Email"
+                  type="email"
+                  required
+                  icon={<MailOutlineIcon />}
+                />
+                <DPInput
+                  name="password"
+                  label="Password"
+                  type="password"
+                  required
+                  icon={<LockIcon />}
+                />
+
+                <DPInput
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  type="password"
+                  required
+                  icon={<LockIcon />}
+                />
+              </Stack>
 
               <Typography
                 component="p"
@@ -148,7 +127,7 @@ const LoginPage = () => {
                     fontSize: "16px",
                   }}
                 >
-                  Login
+                  SIGN UP
                 </Button>
               </Box>
 
@@ -175,9 +154,9 @@ const LoginPage = () => {
               </Button>
 
               <Typography component="p" sx={{ textAlign: "center" }}>
-                Don’t have account?{" "}
-                <Typography component={NavLink} to="/register" fontWeight={600}>
-                  Register Now
+                Already have account?{" "}
+                <Typography component={NavLink} to="/login" fontWeight={600}>
+                  Sign in here
                 </Typography>
               </Typography>
             </DPForm>
@@ -188,4 +167,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

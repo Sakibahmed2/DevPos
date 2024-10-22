@@ -3,6 +3,7 @@ import MainLayout from "../components/layouts/MainLayout/MainLayout";
 import LoginPage from "../pages/login/LoginPage";
 import adminPath from "./adminRoutes";
 import financeRoutes from "./financeRoutes";
+import RegisterPage from "../pages/register/RegisterPage";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
 ]);
 
