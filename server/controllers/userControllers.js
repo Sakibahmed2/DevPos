@@ -1,9 +1,9 @@
-import { User } from "../models/userModel.js";
+import { Users } from "../models/userModel.js";
 import sendResponse from "../utils/sendResponse.js";
 
 const createUser = async (req, res, next) => {
   try {
-    const result = await User.create(req.body);
+    const result = await Users.create(req.body);
     sendResponse(res, {
       success: true,
       statusCode: 201,

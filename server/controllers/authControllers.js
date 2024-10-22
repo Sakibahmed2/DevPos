@@ -1,5 +1,5 @@
 import config from "../config/index.js";
-import { User } from "../models/userModel.js";
+import { Users } from "../models/userModel.js";
 import AppError from "../utils/AppError.js";
 import { createJwtToken } from "../utils/createJwtToken.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -9,7 +9,7 @@ const loginUser = async (req, res, next) => {
     const userInfo = req.body;
 
     // Check is user exists in database
-    const isUserExist = await User.findOne({ email: userInfo.email });
+    const isUserExist = await Users.findOne({ email: userInfo.email });
 
     if (!isUserExist) {
       throw new AppError(404, "User not found");

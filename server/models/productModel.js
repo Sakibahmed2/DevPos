@@ -26,11 +26,22 @@ const productPriceAndStock = {
   quantityAlert: { type: Number, required: true },
 };
 
-const productSchema = new Schema({
-  name: { type: String, required: true },
-  img: { type: String, required: true },
-  productInfo: productInfo,
-  productPriceAndStock: productPriceAndStock,
-});
+const createdBy = {
+  type: Schema.Types.ObjectId,
+  ref: "Users",
+};
+
+const productSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    img: { type: String, required: true },
+    productInfo: productInfo,
+    productPriceAndStock: productPriceAndStock,
+    createdBy: createdBy,
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export const Products = mongoose.model("Products", productSchema);

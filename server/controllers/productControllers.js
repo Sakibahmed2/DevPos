@@ -1,3 +1,5 @@
+import QueryBuilder from "../builder/QueryBuilder.js";
+import { ProductSearchableFields } from "../constant/productConstant.js";
 import { Products } from "../models/productModel.js";
 import AppError from "../utils/AppError.js";
 import sendResponse from "../utils/sendResponse.js";
@@ -20,7 +22,13 @@ const createProduct = async (req, res, next) => {
 
 const getAllProducts = async (req, res, next) => {
   try {
-    const result = await Products.find();
+    const productQuery = new QueryBuilder(Products.find(), req.query)
+      .search(ProductSearchableFields)
+      .filter()
+      .sort()
+      .paginate();
+
+    const result = await productQuery.moduleQuery;
 
     sendResponse(res, {
       success: true,
@@ -36,7 +44,10 @@ const getAllProducts = async (req, res, next) => {
 const getSingleProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await Products.findById(id);
+    const result = await Products.findById(id).populate(
+      "createdBy",
+      "name email"
+    );
 
     if (!result) {
       throw new AppError(404, "Product not found");
