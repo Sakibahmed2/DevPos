@@ -1,20 +1,49 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
+import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
+import { useGetAllCategoriesQuery } from "../../../../redux/api/admin/categoriesApi";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
+import { useCreateSubCategoriesMutation } from "../../../../redux/api/admin/subCategoriesApi";
+import { toast } from "sonner";
+import { getUserInfo } from "../../../../utils/getUserInfo";
 
 const defaultValues = {
   parentCategory: "",
-  category: "",
-  categoryCode: "",
+  name: "",
+  code: "",
   description: "",
-  status: "",
 };
 
 const CreateSubCategoryModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const { data: categoriesData } = useGetAllCategoriesQuery({});
+  const categoriesForSelect = convertDataForSelect(
+    categoriesData?.data?.result
+  );
+  const [createSubCategories] = useCreateSubCategoriesMutation();
+  const userInfo = getUserInfo();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating sub category...");
+    try {
+      const subCategoryData = {
+        name: data.name,
+        code: data.code,
+        description: data.description,
+        parentCategory: data.parentCategory,
+        createdBy: userInfo.id,
+      };
+
+      const res = await createSubCategories(subCategoryData).unwrap();
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -27,45 +56,22 @@ const CreateSubCategoryModal = ({ open, setOpen }) => {
             width: "500px",
           }}
         >
-          <DPInput
+          <DPSelect
             name={"parentCategory"}
             label={"Parent category"}
-            fullWidth
-            size="medium"
+            items={categoriesForSelect}
           />
 
-          <DPInput
-            name={"category"}
-            label={"Category name"}
-            fullWidth
-            size="medium"
-          />
+          <DPInput name={"name"} label={"Category name"} />
 
-          <DPInput
-            name={"categoryCode"}
-            label={"Category code"}
-            fullWidth
-            size="medium"
-          />
+          <DPInput name={"code"} label={"Category code"} />
 
           <DPInput
             name={"description"}
             label={"Description"}
-            fullWidth
             multiline
             rows={3}
-            size="medium"
           />
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography component={"p"}>Status</Typography>
-            <Switch defaultChecked size="medium" />
-          </Box>
         </Stack>
 
         <Box

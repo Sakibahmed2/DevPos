@@ -32,9 +32,9 @@ const DPSelect = ({
           error={isError}
           helperText={isError ? formState.errors[name]?.message : ""}
         >
-          {items.map((name) => (
-            <MenuItem key={name} value={name}>
-              {name}
+          {items?.map((item, idx) => (
+            <MenuItem key={idx} value={item.value}>
+              {item.name}
             </MenuItem>
           ))}
         </TextField>

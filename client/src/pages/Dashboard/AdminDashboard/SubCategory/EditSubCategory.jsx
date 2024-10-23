@@ -1,25 +1,58 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import { useState } from "react";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
+import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
-
-const defaultValues = {
-  category: "",
-  categorySlug: "",
-  status: "",
-};
+import { useGetAllCategoriesQuery } from "../../../../redux/api/admin/categoriesApi";
+import {
+  useGetSingleSubCategoriesQuery,
+  useUpdateSubCategoriesMutation,
+} from "../../../../redux/api/admin/subCategoriesApi";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
+import { toast } from "sonner";
 
 const EditSubCategory = ({ open, setOpen, id }) => {
-  console.log(id);
+  const [status, setStatus] = useState("Active");
+  const { data: singleSubCategory, isLoading } =
+    useGetSingleSubCategoriesQuery(id);
+  const { data: categoriesData } = useGetAllCategoriesQuery({});
+  const categoriesForSelect = convertDataForSelect(
+    categoriesData?.data?.result
+  );
+  const [updateSubCategory] = useUpdateSubCategoriesMutation();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  if (isLoading) return <p>Loading...</p>;
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating category");
+    try {
+      const subCategoryData = {
+        name: data.name,
+        code: data.code,
+        description: data.description,
+        parentCategory: data.parentCategory,
+        status: status,
+      };
+
+      const res = await updateSubCategory({
+        categoryId: id,
+        categoryData: subCategoryData,
+      }).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
     <DPModal title="Edit sub category" open={open} setOpen={setOpen}>
-      <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
+      <DPForm onSubmit={onSubmit} defaultValue={singleSubCategory?.data}>
         <Stack
           direction={"column"}
           gap={3}
@@ -27,26 +60,15 @@ const EditSubCategory = ({ open, setOpen, id }) => {
             width: "500px",
           }}
         >
-          <DPInput
+          <DPSelect
             name={"parentCategory"}
             label={"Parent category"}
-            fullWidth
-            size="medium"
+            items={categoriesForSelect}
           />
 
-          <DPInput
-            name={"category"}
-            label={"Category name"}
-            fullWidth
-            size="medium"
-          />
+          <DPInput name={"name"} label={"Category name"} />
 
-          <DPInput
-            name={"categoryCode"}
-            label={"Category code"}
-            fullWidth
-            size="medium"
-          />
+          <DPInput name={"code"} label={"Category code"} />
 
           <DPInput
             name={"description"}
@@ -64,7 +86,13 @@ const EditSubCategory = ({ open, setOpen, id }) => {
             }}
           >
             <Typography component={"p"}>Status</Typography>
-            <Switch defaultChecked size="medium" />
+            <Switch
+              checked={status === "Active"}
+              size="medium"
+              onChange={() =>
+                setStatus((prev) => (prev === "Active" ? "Inactive" : "Active"))
+              }
+            />
           </Box>
         </Stack>
 
@@ -76,7 +104,7 @@ const EditSubCategory = ({ open, setOpen, id }) => {
             marginTop: 5,
           }}
         >
-          <Button>Save</Button>
+          <Button type="submit">Save</Button>
           <Button
             sx={{
               backgroundColor: "black",

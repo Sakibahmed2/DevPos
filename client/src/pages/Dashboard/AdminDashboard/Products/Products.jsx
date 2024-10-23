@@ -63,7 +63,7 @@ const ProductsPage = () => {
       const res = await deleteProduct(productId).unwrap();
       console.log(res);
       if (res.success) {
-        toast.success(res.message, toastId);
+        toast.success(res.message, { id: toastId });
         refetch();
       }
     } catch (error) {

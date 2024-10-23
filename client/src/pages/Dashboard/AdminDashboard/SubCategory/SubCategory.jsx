@@ -19,58 +19,56 @@ import { useState } from "react";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import laptopImg from "../../../../assets/laptopPng.png";
-import EditSubCategory from "./EditSubCategory";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteSubCategoriesMutation,
+  useGetAllSubCategoriesQuery,
+} from "../../../../redux/api/admin/subCategoriesApi";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateSubCategoryModal from "./CreateSubCategoryModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
-  },
-  {
-    id: 2,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
-  },
-  {
-    id: 3,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
-  },
-  {
-    id: 4,
-    categoryImg: laptopImg,
-    category: "Laptop",
-    parentCategory: "Electronics",
-    categoryCode: "LPTP",
-    description: "This is a laptop",
-    createdBy: "admin",
-  },
-];
+import EditSubCategory from "./EditSubCategory";
+import { toast } from "sonner";
 
 const SubCategory = () => {
   const [sortBy, setSortBy] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createCategoriesModal, setCreateCategoriesModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const {
+    data: subCategoryData,
+    isLoading,
+    refetch,
+  } = useGetAllSubCategoriesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteSubCategories] = useDeleteSubCategoriesMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const limit = subCategoryData?.data?.meta?.limit;
+  const paginateData = paginateFormateData(
+    subCategoryData?.data?.result,
+    page,
+    limit
+  );
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting category...");
+    try {
+      const res = await deleteSubCategories(id).unwrap();
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        refetch();
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -82,25 +80,6 @@ const SubCategory = () => {
   };
 
   const columns = [
-    {
-      field: "categoryImg",
-      headerName: "Img",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            <img src={row.categoryImg} alt="laptop" className="h-8 w-12" />
-          </Box>
-        );
-      },
-    },
     {
       field: "category",
       headerName: "Category ",
@@ -190,6 +169,7 @@ const SubCategory = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -204,15 +184,14 @@ const SubCategory = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      categoryImg: data.categoryImg,
-      category: data.category,
-      parentCategory: data.parentCategory,
-      categoryCode: data.categoryCode,
+      id: data._id,
+      category: data.name,
+      parentCategory: data.parentCategory.name,
+      categoryCode: data.code,
       description: data.description,
-      createdBy: data.createdBy,
+      createdBy: data.createdBy.name,
     };
   });
   return (
@@ -265,6 +244,7 @@ const SubCategory = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -286,7 +266,8 @@ const SubCategory = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -315,7 +296,7 @@ const SubCategory = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={subCategoryData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
