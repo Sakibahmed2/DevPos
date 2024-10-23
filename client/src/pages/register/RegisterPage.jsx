@@ -1,14 +1,15 @@
+import LockIcon from "@mui/icons-material/Lock";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { useGoogleLogin } from "@react-oauth/google";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import devPosLogo from "../../assets/devPosLogo.png";
+import googleLogo from "../../assets/google-logo.png";
 import loginImg from "../../assets/login-img.png";
 import DPForm from "../../components/form/DPForm";
 import DPInput from "../../components/form/DPInput";
-import googleLogo from "../../assets/google-logo.png";
-import MailOutlineIcon from "@mui/icons-material/MailOutline";
-import LockIcon from "@mui/icons-material/Lock";
-import devPosLogo from "../../assets/devPosLogo.png";
-import { NavLink, useNavigate } from "react-router-dom";
 import { useCreateUserMutation } from "../../redux/api/auth/authApi";
-import { toast } from "sonner";
 
 const defaultValue = {
   name: "",
@@ -35,7 +36,6 @@ const RegisterPage = () => {
       };
 
       const res = await createUser(userData).unwrap();
-      console.log(res);
       if (res?.success) {
         toast.success(res?.message, { id: toastId });
         navigate("/login");
@@ -45,6 +45,41 @@ const RegisterPage = () => {
       console.log(err);
     }
   };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      const toastId = toast.loading("Creating account...");
+      try {
+        const res = await fetch(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${response.access_token}`,
+            },
+            method: "GET",
+          }
+        );
+
+        const userInfo = await res.json();
+
+        const userData = {
+          name: userInfo.name,
+          email: userInfo.email,
+          password: userInfo.sub,
+          img: userInfo.picture,
+        };
+
+        const newUser = await createUser(userData).unwrap();
+        console.log(newUser);
+        if (newUser?.success) {
+          toast.success(newUser?.message, { id: toastId });
+          navigate("/login");
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+  });
 
   return (
     <Box
@@ -175,6 +210,7 @@ const RegisterPage = () => {
                   color: "#00000080",
                   bgcolor: "rgba(0, 176, 117, 0.09)",
                 }}
+                onClick={() => googleLogin()}
               >
                 Continue with Google
               </Button>

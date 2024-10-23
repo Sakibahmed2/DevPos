@@ -13,6 +13,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useLoginUserMutation } from "../../redux/api/auth/authApi";
 import { setTokenIntoLocalStorage } from "../../utils/local-storage";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const defaultValue = {
   email: "",
@@ -39,6 +40,41 @@ const LoginPage = () => {
       console.log(err);
     }
   };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      const toastId = toast.loading("Login user with google...");
+      try {
+        const res = await fetch(
+          "https://www.googleapis.com/oauth2/v3/userinfo",
+          {
+            headers: {
+              Authorization: `Bearer ${response.access_token}`,
+            },
+            method: "GET",
+          }
+        );
+
+        const userInfo = await res.json();
+
+        const userData = {
+          email: userInfo.email,
+          password: userInfo.sub,
+        };
+
+        const loggedUser = await loginUser(userData).unwrap();
+        console.log(loggedUser);
+        if (loggedUser?.success) {
+          toast.success(loggedUser?.message, { id: toastId });
+          setTokenIntoLocalStorage(loggedUser?.data?.accessToken);
+          navigate("/");
+        }
+      } catch (err) {
+        toast.error(err?.data?.message, { id: toastId });
+        console.log(err);
+      }
+    },
+  });
 
   return (
     <Box
@@ -176,6 +212,7 @@ const LoginPage = () => {
 
               <Button
                 variant="text"
+                onClick={googleLogin}
                 startIcon={
                   <img
                     src={googleLogo}

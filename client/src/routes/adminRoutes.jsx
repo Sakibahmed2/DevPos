@@ -8,6 +8,7 @@ import ManageStocks from "../pages/Dashboard/AdminDashboard/ManageStocks/ManageS
 import PrintBarcode from "../pages/Dashboard/AdminDashboard/PrintBarcode/PrintBarcode";
 import PrintQRCode from "../pages/Dashboard/AdminDashboard/PrintQRCode/PrintQRCode";
 import ProductDetail from "../pages/Dashboard/AdminDashboard/ProductDetail/ProductDetail";
+import EditProduct from "../pages/Dashboard/AdminDashboard/Products/EditProducts";
 import ProductsPage from "../pages/Dashboard/AdminDashboard/Products/Products";
 import Promo from "../pages/Dashboard/AdminDashboard/Promo/Promo";
 import PurchaseOrder from "../pages/Dashboard/AdminDashboard/PurchaseOrder/PurchaseOrder";
@@ -38,6 +39,10 @@ const adminPath = [
   {
     path: "/admin/products/:id",
     element: <ProductDetail />,
+  },
+  {
+    path: "/admin/products/edit/:id",
+    element: <EditProduct />,
   },
   {
     path: "/admin/create-product",

@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Container,
   FormControl,
@@ -11,72 +12,37 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
-import laptopImg from "../../../../assets/laptopPng.png";
-import userImg from "../../../../assets/userImg.png";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
+import { NavLink } from "react-router-dom";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import visibilityIcon from "../../../../assets/dashboard icons/visibility-icon.svg";
-import { NavLink } from "react-router-dom";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    category: "Laptop",
-    brand: "Walton",
-    price: 5100,
-    unit: "Pc",
-    quantity: 100,
-    createdBy: {
-      name: "Tanjid",
-      userImg: userImg,
-    },
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    category: "Laptop",
-    brand: "Walton",
-    price: 5100,
-    unit: "Pc",
-    quantity: 100,
-    createdBy: {
-      name: "Tanjid",
-      userImg: userImg,
-    },
-  },
-  {
-    id: 3,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    category: "Laptop",
-    brand: "Walton",
-    price: 5100,
-    unit: "Pc",
-    quantity: 100,
-    createdBy: {
-      name: "Tanjid",
-      userImg: userImg,
-    },
-  },
-];
+import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
 
 const ProductsPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
+  const { data: productsData, isLoading } = useGetAllProductsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const itemsPerPage = 5; // Number of items per page
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  // Get paginated data based on current page
+  const paginatedData = productsData?.data?.slice(
+    page * itemsPerPage,
+    (page + 1) * itemsPerPage
+  );
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -191,11 +157,7 @@ const ProductsPage = () => {
               gap: 1,
             }}
           >
-            <img
-              src={row.createdBy.userImg}
-              alt="user img"
-              className="size-10"
-            />
+            <Avatar alt="Remy Sharp" src={row.createdBy.img} />
             <Typography variant="p">{row.createdBy.name}</Typography>
           </Box>
         );
@@ -224,13 +186,14 @@ const ProductsPage = () => {
                 p: "5px 3px",
               }}
               component={NavLink}
-              to={`/dashboard/products/${row.id}`}
+              to={`/admin/products/${row.id}`}
             >
               <img src={visibilityIcon} alt="" className="h-5 w-5" />
             </Box>
 
             <Box
-              component={"button"}
+              component={NavLink}
+              to={`/admin/products/edit/${row.id}`}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -256,17 +219,17 @@ const ProductsPage = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginatedData?.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       name: data.name,
-      price: data.price,
-      productImg: data.productImg,
-      stockKeepingUnit: data.stockKeepingUnit,
-      category: data.category,
-      brand: data.brand,
-      unit: data.unit,
-      quantity: data.quantity,
+      price: data.pricingAndStock.price,
+      productImg: data.img,
+      stockKeepingUnit: data.productInfo.stockKeepingUnit,
+      category: data.productInfo.category,
+      brand: data.productInfo.brand,
+      unit: data.productInfo.unit,
+      quantity: data.pricingAndStock.quantity,
       createdBy: data.createdBy,
     };
   });
@@ -300,6 +263,7 @@ const ProductsPage = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -321,7 +285,8 @@ const ProductsPage = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -350,7 +315,7 @@ const ProductsPage = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={productsData?.data?.length}
           currentPage={page}
           onPageChange={handlePageChange}
         />

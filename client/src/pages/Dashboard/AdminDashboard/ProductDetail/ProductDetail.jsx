@@ -8,43 +8,33 @@ import {
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import SectionTitle from "../../../../components/ui/SectionTitle";
-
-const productDetails = {
-  product: "Laptop",
-  category: "Computers",
-  subCategory: "None",
-  brand: "Waltion",
-  unit: "Piece",
-  sku: "PT007",
-  minQty: 5,
-  quantity: 50,
-  tax: "0.00%",
-  discountType: "Percentage",
-  price: 5100.0,
-  status: "Active",
-  description:
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-};
+import { useGetSingleProductQuery } from "../../../../redux/api/admin/productApi";
+import DPLoading from "../../../../components/ui/DPLoading";
 
 const ProductDetail = () => {
-  const tableData = [
-    ["Product", productDetails.product],
-    ["Category", productDetails.category],
-    ["Sub Category", productDetails.subCategory],
-    ["Brand", productDetails.brand],
-    ["Unit", productDetails.unit],
-    ["SKU", productDetails.sku],
-    ["Min Qty", productDetails.minQty],
-    ["Quantity", productDetails.quantity],
-    ["Tax", productDetails.tax],
-    ["Discount Type", productDetails.discountType],
-    ["Price", productDetails.price],
-    ["Status", productDetails.status],
-    ["Description", productDetails.description],
-  ];
-
   const { id } = useParams();
-  console.log(id);
+  const { data, isLoading } = useGetSingleProductQuery(id);
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const productDetails = data?.data;
+
+  const tableData = [
+    ["Product", productDetails.name],
+    ["Category", productDetails.productInfo.category],
+    ["Sub Category", productDetails.productInfo.subCategory],
+    ["Brand", productDetails.productInfo.brand],
+    ["Unit", productDetails.productInfo.unit],
+    ["SKU", productDetails.productInfo.stockKeepingUnit],
+    ["Quantity", productDetails.pricingAndStock.quantity],
+    ["Tax", productDetails.pricingAndStock.taxType],
+    ["Discount Type", productDetails.pricingAndStock.discountType],
+    ["Price", productDetails.pricingAndStock.price],
+    ["Status", productDetails.productInfo.status],
+    ["Description", productDetails.productInfo.description],
+  ];
 
   return (
     <Container>
