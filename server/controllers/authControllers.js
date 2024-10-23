@@ -20,6 +20,10 @@ const loginUser = async (req, res, next) => {
       throw new AppError(401, "Password is incorrect");
     }
 
+    if (isUserExist.role === "user") {
+      throw new AppError(403, "You are not authorized to login");
+    }
+
     // Create token
     const jwtPayload = {
       id: isUserExist._id,

@@ -11,6 +11,9 @@ const productInfo = {
   barcodeSymbology: { type: String, required: true },
   itemCode: { type: String, required: true },
   description: { type: String, required: true },
+  status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+  warehouse: { type: String },
+  store: { type: String },
 };
 
 const productPriceAndStock = {
@@ -24,6 +27,7 @@ const productPriceAndStock = {
   discountType: { type: String, required: true },
   discountValue: { type: Number, required: true },
   quantityAlert: { type: Number, required: true },
+  quantity: { type: Number, required: true },
 };
 
 const createdBy = {
@@ -35,8 +39,9 @@ const productSchema = new Schema(
   {
     name: { type: String, required: true },
     img: { type: String, required: true },
+    expiryDate: { type: Date, required: true },
     productInfo: productInfo,
-    productPriceAndStock: productPriceAndStock,
+    pricingAndStock: productPriceAndStock,
     createdBy: createdBy,
   },
   {

@@ -7,7 +7,19 @@ import sendResponse from "../utils/sendResponse.js";
 const createProduct = async (req, res, next) => {
   try {
     const productInfo = req.body;
-    const result = await Products.create(productInfo);
+
+    const currentDate = new Date();
+
+    const expiryDate = new Date(currentDate);
+
+    expiryDate.setFullYear(currentDate.getFullYear() + 1);
+
+    const productData = {
+      ...productInfo,
+      expiryDate,
+    };
+
+    const result = await Products.create(productData);
 
     sendResponse(res, {
       success: true,
@@ -22,19 +34,26 @@ const createProduct = async (req, res, next) => {
 
 const getAllProducts = async (req, res, next) => {
   try {
-    const productQuery = new QueryBuilder(Products.find(), req.query)
+    const productQuery = new QueryBuilder(
+      Products.find().populate("createdBy", "name email img"),
+      req.query
+    )
       .search(ProductSearchableFields)
       .filter()
       .sort()
       .paginate();
 
     const result = await productQuery.moduleQuery;
+    const meta = await productQuery.countTotal();
 
     sendResponse(res, {
       success: true,
       statusCode: 200,
       message: "All products fetched successfully",
-      data: result,
+      data: {
+        result,
+        meta,
+      },
     });
   } catch (error) {
     next(error);
