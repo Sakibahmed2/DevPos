@@ -21,50 +21,54 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import EditCategoriesModal from "./EditCategoriesModal";
 import CreateCategoriesModal from "./CreateCategoriesModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 2,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 3,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    category: "Laptop",
-    categorySlug: "laptop",
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-];
+import {
+  useDeleteCategoriesMutation,
+  useGetAllCategoriesQuery,
+} from "../../../../redux/api/admin/categoriesApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const Categories = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createCategoriesModal, setCreateCategoriesModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [deleteCategory] = useDeleteCategoriesMutation();
+  const {
+    data: categoriesData,
+    isLoading,
+    refetch,
+  } = useGetAllCategoriesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = categoriesData?.data?.result?.slice(
+    page * categoriesData?.data?.meta?.limit,
+    (page + 1) * categoriesData?.data?.meta?.limit
+  );
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting category");
+    try {
+      const res = await deleteCategory(id).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, toastId);
+        refetch();
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleModal = (productId) => {
@@ -161,6 +165,7 @@ const Categories = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -175,12 +180,12 @@ const Categories = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      category: data.category,
+      id: data._id,
+      category: data.name,
       categorySlug: data.categorySlug,
-      createdAt: data.createdAt,
+      createdAt: formatDate(new Date(data.createdAt)),
       status: data.status,
     };
   });
@@ -235,6 +240,7 @@ const Categories = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -256,7 +262,8 @@ const Categories = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -285,7 +292,7 @@ const Categories = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={categoriesData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

@@ -11,51 +11,58 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
-import laptopImg from "../../../../assets/laptopPng.png";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
+import { toast } from "sonner";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
-import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    manufactureDate: "29 Mar 2024",
-    expiryDate: "29 Mar 2025",
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    manufactureDate: "29 Mar 2024",
-    expiryDate: "29 Mar 2025",
-  },
-  {
-    id: 3,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    manufactureDate: "29 Mar 2024",
-    expiryDate: "29 Mar 2025",
-  },
-];
+import {
+  useDeleteProductMutation,
+  useGetAllProductsQuery,
+} from "../../../../redux/api/admin/productApi";
+import formatDate from "../../../../utils/formateDate";
 
 const ExpiredProduct = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
+  const {
+    data: productData,
+    isLoading,
+    refetch,
+  } = useGetAllProductsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteProduct] = useDeleteProductMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) <DPLoading />;
+
+  // Get paginated data based on current page
+  const paginatedData = productData?.data?.result?.slice(
+    page * productData?.data?.meta?.limit,
+    (page + 1) * productData?.data?.meta?.limit
+  );
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    const toastId = toast.loading("Deleting product...");
+    try {
+      const res = await deleteProduct(productId).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success(res.message, toastId);
+        refetch();
+      }
+    } catch (error) {
+      console.log("Error deleting product", error);
+    }
   };
 
   const columns = [
@@ -128,8 +135,7 @@ const ExpiredProduct = () => {
     {
       field: "id",
       headerName: "Action",
-
-      renderCell: () => {
+      renderCell: ({ row }) => {
         return (
           <Stack
             direction={"row"}
@@ -143,17 +149,7 @@ const ExpiredProduct = () => {
           >
             <Box
               component={"button"}
-              sx={{
-                border: "1px solid gray",
-                borderRadius: 1,
-                p: "5px 3px",
-              }}
-            >
-              <img src={editIcons} alt="" className="w-5 h-5" />
-            </Box>
-
-            <Box
-              component={"button"}
+              onClick={() => handleDeleteProduct(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -168,14 +164,14 @@ const ExpiredProduct = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginatedData?.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       name: data.name,
-      productImg: data.productImg,
-      stockKeepingUnit: data.stockKeepingUnit,
-      manufactureDate: data.manufactureDate,
-      expiryDate: data.expiryDate,
+      productImg: data.img,
+      stockKeepingUnit: data.productInfo.stockKeepingUnit,
+      manufactureDate: formatDate(new Date(data.createdAt)),
+      expiryDate: formatDate(new Date(data.expiryDate)),
     };
   });
 
@@ -208,6 +204,7 @@ const ExpiredProduct = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -229,7 +226,8 @@ const ExpiredProduct = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -257,7 +255,7 @@ const ExpiredProduct = () => {
       </Box>
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={productData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

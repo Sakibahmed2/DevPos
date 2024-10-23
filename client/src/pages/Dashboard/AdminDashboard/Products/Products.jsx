@@ -22,30 +22,53 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import visibilityIcon from "../../../../assets/dashboard icons/visibility-icon.svg";
 import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
+import {
+  useDeleteProductMutation,
+  useGetAllProductsQuery,
+} from "../../../../redux/api/admin/productApi";
+import { toast } from "sonner";
 
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
-  const { data: productsData, isLoading } = useGetAllProductsQuery({
+  const {
+    data: productsData,
+    isLoading,
+    refetch,
+  } = useGetAllProductsQuery({
     searchTerm: searchTerm,
     sort: sortBy,
   });
-  const itemsPerPage = 5; // Number of items per page
+  const [deleteProduct] = useDeleteProductMutation();
+  const itemsPerPage = 5;
 
   if (isLoading) {
     return <DPLoading />;
   }
 
   // Get paginated data based on current page
-  const paginatedData = productsData?.data?.slice(
+  const paginatedData = productsData?.data?.result?.slice(
     page * itemsPerPage,
     (page + 1) * itemsPerPage
   );
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    const toastId = toast.loading("Deleting product...");
+    try {
+      const res = await deleteProduct(productId).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success(res.message, toastId);
+        refetch();
+      }
+    } catch (error) {
+      console.log("Error deleting product", error);
+    }
   };
 
   const columns = [
@@ -205,6 +228,7 @@ const ProductsPage = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDeleteProduct(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,

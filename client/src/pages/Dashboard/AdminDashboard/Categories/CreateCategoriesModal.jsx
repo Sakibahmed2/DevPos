@@ -1,18 +1,31 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { useCreateCategoriesMutation } from "../../../../redux/api/admin/categoriesApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  category: "",
+  name: "",
   categorySlug: "",
-  status: "",
 };
 
 const CreateCategoriesModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [createCategories] = useCreateCategoriesMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating category");
+    try {
+      const res = await createCategories(data).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -26,8 +39,8 @@ const CreateCategoriesModal = ({ open, setOpen }) => {
           }}
         >
           <DPInput
-            name={"category"}
-            label={"Category"}
+            name={"name"}
+            label={"Category name"}
             fullWidth
             size="medium"
           />
@@ -37,16 +50,6 @@ const CreateCategoriesModal = ({ open, setOpen }) => {
             fullWidth
             size="medium"
           />
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <Typography component={"p"}>Status</Typography>
-            <Switch defaultChecked size="medium" />
-          </Box>
         </Stack>
 
         <Box

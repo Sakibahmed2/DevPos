@@ -11,63 +11,49 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
-import laptopImg from "../../../../assets/laptopPng.png";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
+import {
+  useDeleteProductMutation,
+  useGetAllProductsQuery,
+} from "../../../../redux/api/admin/productApi";
 import EditLowStockModal from "./EditLowStockModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    category: "Laptop",
-    quantity: 20,
-    quantityAlert: 10,
-    warehouse: "Lobar handy",
-    store: "Selosy",
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    category: "Laptop",
-    quantity: 20,
-    quantityAlert: 10,
-    warehouse: "Lobar handy",
-    store: "Selosy",
-  },
-  {
-    id: 3,
-    productImg: laptopImg,
-    name: "Walton 8rd Generation",
-    stockKeepingUnit: "PT07",
-    category: "Laptop",
-    quantity: 20,
-    quantityAlert: 10,
-    warehouse: "Lobar handy",
-    store: "Selosy",
-  },
-];
+import { toast } from "sonner";
 
 const LowStocks = () => {
   const [sortBy, setSortBy] = useState("");
-  const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [page, setPage] = useState(0);
+  const [limit] = useState(5);
+  const { data, isLoading, refetch } = useGetAllProductsQuery({});
+  const [deleteProduct] = useDeleteProductMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) return <DPLoading />;
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
+  const productData = data?.data?.result?.filter(
+    (product) =>
+      product.pricingAndStock.quantity < product.pricingAndStock.quantityAlert
+  );
+
+  const handleDeleteProduct = async (productId) => {
+    const toastId = toast.loading("Deleting product...");
+    try {
+      const res = await deleteProduct(productId).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success(res.message, toastId);
+        refetch();
+      }
+    } catch (error) {
+      console.log("Error deleting product", error);
+    }
   };
 
   const handleModal = (productId) => {
@@ -80,158 +66,147 @@ const LowStocks = () => {
       field: "img",
       headerName: "Products",
       width: 90,
-      renderCell: ({ row }) => {
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            <img src={row.productImg} alt="laptop" className="h-8 w-12" />
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+            width: "100%",
+          }}
+        >
+          <img src={row.productImg} alt="laptop" className="h-8 w-12" />
+        </Box>
+      ),
     },
     {
       flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.name}</Typography>
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box>
+          <Typography variant="p">{row.name}</Typography>
+        </Box>
+      ),
     },
     {
-      field: "wareHouse",
+      field: "warehouse",
       headerName: "Warehouse",
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.warehouse}</Typography>
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box>
+          <Typography variant="p">{row.warehouse}</Typography>
+        </Box>
+      ),
     },
     {
       field: "store",
       headerName: "Store",
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.store}</Typography>
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box>
+          <Typography variant="p">{row.store}</Typography>
+        </Box>
+      ),
     },
     {
       field: "category",
       headerName: "Category",
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.category}</Typography>
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box>
+          <Typography variant="p">{row.category}</Typography>
+        </Box>
+      ),
     },
     {
       field: "stockKeepingUnit",
       headerName: "SKU",
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.stockKeepingUnit}</Typography>
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box>
+          <Typography variant="p">{row.stockKeepingUnit}</Typography>
+        </Box>
+      ),
     },
     {
       field: "quantity",
       headerName: "Qty",
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.quantity}</Typography>
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box>
+          <Typography variant="p">{row.quantity}</Typography>
+        </Box>
+      ),
     },
     {
       field: "quantityAlert",
       headerName: "Qty alert",
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.quantityAlert}</Typography>
-          </Box>
-        );
-      },
+      renderCell: ({ row }) => (
+        <Box>
+          <Typography variant="p">{row.quantityAlert}</Typography>
+        </Box>
+      ),
     },
     {
       field: "id",
       headerName: "Action",
-      renderCell: ({ row }) => {
-        return (
-          <Stack
-            direction={"row"}
-            gap={1}
-            justifyContent={"center"}
-            alignItems={"center"}
+      renderCell: ({ row }) => (
+        <Stack
+          direction={"row"}
+          gap={1}
+          justifyContent={"center"}
+          alignItems={"center"}
+          sx={{
+            height: "100%",
+            width: "100%",
+          }}
+        >
+          <Box
+            onClick={() => handleModal(row.id)}
+            component={"button"}
             sx={{
-              height: "100%",
-              width: "100%",
+              border: "1px solid gray",
+              borderRadius: 1,
+              p: "5px 3px",
             }}
           >
-            <Box
-              onClick={() => handleModal(row.id)}
-              component={"button"}
-              sx={{
-                border: "1px solid gray",
-                borderRadius: 1,
-                p: "5px 3px",
-              }}
-            >
-              <img src={editIcons} alt="" className="w-5 h-5" />
-            </Box>
+            <img src={editIcons} alt="" className="w-5 h-5" />
+          </Box>
 
-            <Box
-              component={"button"}
-              sx={{
-                border: "1px solid gray",
-                borderRadius: 1,
-                p: "5px 3px",
-              }}
-            >
-              <img src={deleteIcon} alt="" className="w-5 h-5" />
-            </Box>
-          </Stack>
-        );
-      },
+          <Box
+            component={"button"}
+            onClick={() => handleDeleteProduct(row.id)}
+            sx={{
+              border: "1px solid gray",
+              borderRadius: 1,
+              p: "5px 3px",
+            }}
+          >
+            <img src={deleteIcon} alt="" className="w-5 h-5" />
+          </Box>
+        </Stack>
+      ),
     },
   ];
 
-  const rows = tableData.map((data) => {
-    return {
-      id: data.id,
-      name: data.name,
-      productImg: data.productImg,
-      stockKeepingUnit: data.stockKeepingUnit,
-      category: data.category,
-      warehouse: data.warehouse,
-      store: data.store,
-      quantity: data.quantity,
-      quantityAlert: data.quantityAlert,
-    };
-  });
+  // Calculate paginated data
+  const paginatedData = productData?.slice(page * limit, (page + 1) * limit);
+
+  // Prepare rows for the DataGrid
+  const rows = paginatedData?.map((data) => ({
+    id: data._id,
+    name: data.name,
+    productImg: data.img,
+    stockKeepingUnit: data.productInfo.stockKeepingUnit,
+    category: data.productInfo.category,
+    warehouse: data.productInfo.warehouse,
+    store: data.productInfo.store,
+    quantity: data.pricingAndStock.quantity,
+    quantityAlert: data.pricingAndStock.quantityAlert,
+  }));
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   return (
     <Container>
-      <SectionTitle title="Low stocks" description="Mange your low stocks" />
+      <SectionTitle title="Low stocks" description="Manage your low stocks" />
 
       <Box
         sx={{
@@ -305,9 +280,10 @@ const LowStocks = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={productData?.length}
           currentPage={page}
           onPageChange={handlePageChange}
+          itemsPerPage={limit} // Optionally pass itemsPerPage if needed
         />
       </Box>
 
