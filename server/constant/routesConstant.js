@@ -1,4 +1,5 @@
 import { authRouter } from "../routes/authRoutes.js";
+import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
 import { subCategoryRouter } from "../routes/subCategoryRoutes.js";
@@ -24,6 +25,10 @@ const routes = [
   {
     path: "/sub-categories",
     routes: subCategoryRouter,
+  },
+  {
+    path: "/brands",
+    routes: brandRouter,
   },
 ];
 
