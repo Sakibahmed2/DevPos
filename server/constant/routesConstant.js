@@ -3,6 +3,7 @@ import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
 import { subCategoryRouter } from "../routes/subCategoryRoutes.js";
+import { unitsRouter } from "../routes/unitsRoutes.js";
 import { userRouter } from "../routes/userRoutes.js";
 
 const routes = [
@@ -29,6 +30,10 @@ const routes = [
   {
     path: "/brands",
     routes: brandRouter,
+  },
+  {
+    path: "/units",
+    routes: unitsRouter,
   },
 ];
 
