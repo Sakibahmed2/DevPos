@@ -40,15 +40,16 @@ const EditProduct = () => {
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating product");
-    if (!data.img) {
-      data.img = productDetails.data.img;
-    }
-    const imgBase64 = await convertImgToBase64(data.img);
 
+    let base64Img = productDetails?.data?.img;
+
+    if (data.img instanceof Blob) {
+      base64Img = await convertImgToBase64(data.img);
+    }
     try {
       const productDetails = {
         name: data.name,
-        img: imgBase64,
+        img: base64Img,
         productInfo: {
           slug: data.productInfo.slug,
           stockKeepingUnit: data.productInfo.stockKeepingUnit,

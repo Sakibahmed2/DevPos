@@ -1,3 +1,4 @@
+import { tagTypes } from "../../tag-types";
 import { baseApi } from "../baseApi";
 
 const subCategoriesApi = baseApi.injectEndpoints({
@@ -8,6 +9,7 @@ const subCategoriesApi = baseApi.injectEndpoints({
         method: "POST",
         body: categoriesData,
       }),
+      invalidatesTags: [tagTypes.subCategories],
     }),
 
     getAllSubCategories: builder.query({
@@ -16,6 +18,7 @@ const subCategoriesApi = baseApi.injectEndpoints({
         method: "GET",
         params: params,
       }),
+      providesTags: [tagTypes.subCategories],
     }),
 
     getSingleSubCategories: builder.query({
@@ -23,6 +26,7 @@ const subCategoriesApi = baseApi.injectEndpoints({
         url: `/sub-categories/${categoriesId}`,
         method: "GET",
       }),
+      providesTags: [tagTypes.subCategories],
     }),
 
     updateSubCategories: builder.mutation({
@@ -33,6 +37,7 @@ const subCategoriesApi = baseApi.injectEndpoints({
           body: categoryData,
         };
       },
+      invalidatesTags: [tagTypes.subCategories],
     }),
 
     deleteSubCategories: builder.mutation({
@@ -40,6 +45,7 @@ const subCategoriesApi = baseApi.injectEndpoints({
         url: `/sub-categories/${categoriesId}`,
         method: "DELETE",
       }),
+      invalidatesTags: [tagTypes.subCategories],
     }),
   }),
 });

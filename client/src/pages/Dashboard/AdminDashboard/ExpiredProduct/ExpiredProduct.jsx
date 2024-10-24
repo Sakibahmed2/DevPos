@@ -39,7 +39,9 @@ const ExpiredProduct = () => {
   });
   const [deleteProduct] = useDeleteProductMutation();
 
-  if (isLoading) <DPLoading />;
+  if (isLoading) {
+    return <DPLoading />;
+  }
 
   // Get paginated data based on current page
   const paginatedData = productData?.data?.result?.slice(

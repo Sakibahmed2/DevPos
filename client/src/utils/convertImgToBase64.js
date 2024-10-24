@@ -1,10 +1,16 @@
 const convertImgToBase64 = async (img) => {
-  const reader = new FileReader();
-
   return new Promise((resolve, reject) => {
-    reader.onload = () => resolve(reader.result); // Resolve the base64 result
-    reader.onerror = (err) => reject("Base64 Error: " + err); // Reject on error
-    reader.readAsDataURL(img); // Start reading the file
+    // Validation: Check if the input is a File or Blob
+    if (!(img instanceof Blob)) {
+      return reject("Invalid input: The provided value is not a File or Blob.");
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (err) => reject("Base64 Error: " + err);
+
+    reader.readAsDataURL(img);
   });
 };
 

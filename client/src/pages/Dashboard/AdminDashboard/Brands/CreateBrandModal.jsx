@@ -4,15 +4,38 @@ import DPFileUploader from "../../../../components/form/DPFileUploader";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { toast } from "sonner";
+import convertImgToBase64 from "../../../../utils/convertImgToBase64";
+import { useState } from "react";
+import { useCreateBrandMutation } from "../../../../redux/api/admin/brandApi";
 
 const defaultValues = {
   name: "",
-  brandLogo: "",
-  status: "",
+  img: "",
 };
 const CreateBrandModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [status, setStatus] = useState("Active");
+  const [createBrand] = useCreateBrandMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating brand...");
+    const base64Img = await convertImgToBase64(data.img);
+    try {
+      const brandData = {
+        name: data.name,
+        img: base64Img,
+        status: status,
+      };
+
+      const res = await createBrand(brandData).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -27,7 +50,7 @@ const CreateBrandModal = ({ open, setOpen }) => {
         >
           <DPInput name={"name"} label={"Brand name"} fullWidth size="medium" />
 
-          <DPFileUploader name={"brandLogo"} label={"Logo"} />
+          <DPFileUploader name={"img"} label={"Logo"} />
 
           <Box
             sx={{
@@ -36,7 +59,13 @@ const CreateBrandModal = ({ open, setOpen }) => {
             }}
           >
             <Typography component={"p"}>Status</Typography>
-            <Switch defaultChecked size="medium" />
+            <Switch
+              checked={status === "Active"}
+              size="medium"
+              onChange={() =>
+                setStatus((prev) => (prev === "Active" ? "Inactive" : "Active"))
+              }
+            />
           </Box>
         </Stack>
 

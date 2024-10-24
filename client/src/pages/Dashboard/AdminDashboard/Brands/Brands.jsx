@@ -19,53 +19,53 @@ import PaginationUi from "../../../../components/ui/PaginationUi";
 import EditBrandModal from "./EditBrandModal";
 
 // icons
-import appleLogo from "../../../../assets/apple.png";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
-import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
+import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteBrandMutation,
+  useGetAllBrandsQuery,
+} from "../../../../redux/api/admin/brandApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateBrandModal from "./CreateBrandModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    name: "Apple",
-    brandLogo: appleLogo,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Apple",
-    brandLogo: appleLogo,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Apple",
-    brandLogo: appleLogo,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 4,
-    name: "Apple",
-    brandLogo: appleLogo,
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-];
+import { toast } from "sonner";
 
 const Brands = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createBrandModal, setCreateBrandModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: brandData, isLoading } = useGetAllBrandsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteBrand] = useDeleteBrandMutation();
+  isLoading && <DPLoading />;
 
-  // const itemsPerPage = 3 ;
+  const limit = brandData?.data?.meta?.limit;
+
+  const paginateData = paginateFormateData(
+    brandData?.data?.result,
+    page,
+    limit
+  );
+
+  const handleDelete = async (brandId) => {
+    const toastId = toast.loading("Deleting brand...");
+    try {
+      const res = await deleteBrand(brandId).unwrap();
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -170,6 +170,7 @@ const Brands = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -184,12 +185,12 @@ const Brands = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       name: data.name,
-      brandLogo: data.brandLogo,
-      createdAt: data.createdAt,
+      brandLogo: data.img,
+      createdAt: formatDate(new Date(data.createdAt)),
       status: data.status,
     };
   });
@@ -239,6 +240,7 @@ const Brands = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -260,7 +262,8 @@ const Brands = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -289,7 +292,7 @@ const Brands = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={brandData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
