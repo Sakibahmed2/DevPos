@@ -132,7 +132,9 @@ const Brands = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  color: row.status === "Active" ? "green" : "red",
+                  color: row.status === "Active" ? "primary.main" : "red",
+                  borderColor: row.status === "Active" ? "primary.main" : "red",
+                  borderRadius: 1,
                 }}
                 label={row.status}
               ></Chip>

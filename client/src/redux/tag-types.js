@@ -3,6 +3,7 @@ export const tagTypes = {
   categories: "categories",
   subCategories: "subCategories",
   brands: "brands",
+  units: "units",
 };
 
 export const tagTypesList = [
@@ -10,4 +11,5 @@ export const tagTypesList = [
   tagTypes.categories,
   tagTypes.subCategories,
   tagTypes.brands,
+  tagTypes.units,
 ];

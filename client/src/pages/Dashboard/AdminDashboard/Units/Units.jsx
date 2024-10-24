@@ -21,60 +21,52 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import EditUnitsModal from "./EditUnitsModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteUnitMutation,
+  useGetAllUnitsQuery,
+} from "../../../../redux/api/admin/unitsApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateUnitsModal from "./CreateUnitsModal";
-
-const tableData = [
-  {
-    id: 1,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 2,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 3,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 5,
-    units: "Kilogram",
-    short: "kg",
-    noOfProducts: 10,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-];
+import EditUnitsModal from "./EditUnitsModal";
+import { toast } from "sonner";
 
 const Units = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createUnitsModal, setCreateUnitsModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: unitsData, isLoading } = useGetAllUnitsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteUnit] = useDeleteUnitMutation();
+  if (isLoading) {
+    return <DPLoading />;
+  }
 
-  // const itemsPerPage = 3 ;
+  const limits = unitsData?.data?.meta?.limit;
+
+  const paginateData = paginateFormateData(
+    unitsData?.data?.result,
+    page,
+    limits
+  );
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting unit...");
+    try {
+      const res = await deleteUnit(id).unwrap();
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -134,7 +126,9 @@ const Units = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  color: row.status === "Active" ? "green" : "red",
+                  color: row.status === "Active" ? "primary.main" : "red",
+                  borderColor: row.status === "Active" ? "primary.main" : "red",
+                  borderRadius: 1,
                 }}
                 label={row.status}
               ></Chip>
@@ -172,6 +166,7 @@ const Units = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -186,13 +181,12 @@ const Units = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      units: data.units,
-      short: data.short,
-      noOfProducts: data.noOfProducts,
-      createdAt: data.createdAt,
+      id: data._id,
+      units: data.name,
+      short: data.shortName,
+      createdAt: formatDate(new Date(data.createdAt)),
       status: data.status,
     };
   });
@@ -243,6 +237,7 @@ const Units = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -264,7 +259,8 @@ const Units = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -293,7 +289,7 @@ const Units = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={unitsData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
