@@ -5,6 +5,7 @@ import { productRouter } from "../routes/productRoutes.js";
 import { subCategoryRouter } from "../routes/subCategoryRoutes.js";
 import { unitsRouter } from "../routes/unitsRoutes.js";
 import { userRouter } from "../routes/userRoutes.js";
+import { variantAttributesRouter } from "../routes/variantAttributesRoutes.js";
 
 const routes = [
   {
@@ -34,6 +35,10 @@ const routes = [
   {
     path: "/units",
     routes: unitsRouter,
+  },
+  {
+    path: "/variant-attributes",
+    routes: variantAttributesRouter,
   },
 ];
 
