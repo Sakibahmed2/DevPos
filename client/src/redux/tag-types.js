@@ -4,6 +4,7 @@ export const tagTypes = {
   subCategories: "subCategories",
   brands: "brands",
   units: "units",
+  variantAttributes: "variantAttributes",
 };
 
 export const tagTypesList = [
@@ -12,4 +13,5 @@ export const tagTypesList = [
   tagTypes.subCategories,
   tagTypes.brands,
   tagTypes.units,
+  tagTypes.variantAttributes,
 ];

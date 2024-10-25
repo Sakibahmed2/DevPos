@@ -45,7 +45,10 @@ const Brands = () => {
     sort: sortBy,
   });
   const [deleteBrand] = useDeleteBrandMutation();
-  isLoading && <DPLoading />;
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
 
   const limit = brandData?.data?.meta?.limit;
 

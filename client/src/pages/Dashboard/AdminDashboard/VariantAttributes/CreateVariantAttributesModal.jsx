@@ -3,16 +3,40 @@ import { Box, Button, Stack, Switch, Typography } from "@mui/material";
 import DPModal from "../../../../components/modal/DPModal";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
+import { useState } from "react";
+import { useCreateVariantAttributesMutation } from "../../../../redux/api/admin/variantAttributesApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  variants: "",
+  name: "",
   value: "",
-  status: "",
 };
 
 const CreateVariantAttributesModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [status, setStatus] = useState("Active");
+  const [createVariantAttributes] = useCreateVariantAttributesMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating variant attributes...");
+
+    try {
+      const variantAttributeData = {
+        name: data.name,
+        value: data.value,
+        status: status,
+      };
+
+      const res = await createVariantAttributes(variantAttributeData).unwrap();
+
+      console.log(res);
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -27,7 +51,7 @@ const CreateVariantAttributesModal = ({ open, setOpen }) => {
             }}
           >
             <DPInput
-              name={"variants"}
+              name={"name"}
               label={"Variant name"}
               fullWidth
               size="medium"
@@ -42,7 +66,15 @@ const CreateVariantAttributesModal = ({ open, setOpen }) => {
               }}
             >
               <Typography component={"p"}>Status</Typography>
-              <Switch defaultChecked size="medium" />
+              <Switch
+                checked={status === "Active"}
+                size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
+              />
             </Box>
           </Stack>
 

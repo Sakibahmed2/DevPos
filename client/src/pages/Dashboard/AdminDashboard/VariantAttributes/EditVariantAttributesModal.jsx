@@ -3,24 +3,61 @@ import { Box, Button, Stack, Switch, Typography } from "@mui/material";
 import DPModal from "../../../../components/modal/DPModal";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
-
-const defaultValues = {
-  variants: "",
-  value: "",
-  status: "",
-};
+import {
+  useGetSingleVariantAttributesQuery,
+  useUpdateVariantAttributesMutation,
+} from "../../../../redux/api/admin/variantAttributesApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const EditVariantAttributesModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const { data: singleVariantAttributes, isLoading } =
+    useGetSingleVariantAttributesQuery(id);
+  const [status, setStatus] = useState("");
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const [updateVariantAttributes] = useUpdateVariantAttributesMutation();
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  console.log(status);
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating variant attributes...");
+
+    try {
+      const variantAttributeData = {
+        name: data.name,
+        value: data.value,
+        status: status,
+      };
+
+      const res = await updateVariantAttributes({
+        variantAttributeId: id,
+        variantAttributeData,
+      }).unwrap();
+
+      console.log(res);
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update variant attributes", { id: toastId });
+    }
   };
 
   return (
     <Box>
       <DPModal open={open} setOpen={setOpen} title="Edit attributes">
-        <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
+        <DPForm
+          onSubmit={onSubmit}
+          defaultValue={singleVariantAttributes?.data}
+        >
           <Stack
             direction={"column"}
             gap={3}
@@ -29,7 +66,7 @@ const EditVariantAttributesModal = ({ open, setOpen, id }) => {
             }}
           >
             <DPInput
-              name={"variants"}
+              name={"name"}
               label={"Variant name"}
               fullWidth
               size="medium"
@@ -44,7 +81,19 @@ const EditVariantAttributesModal = ({ open, setOpen, id }) => {
               }}
             >
               <Typography component={"p"}>Status</Typography>
-              <Switch defaultChecked size="medium" />
+              <Switch
+                defaultChecked={
+                  singleVariantAttributes?.data.status === "Active"
+                    ? true
+                    : false
+                }
+                size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Inactive" ? "Active" : "Inactive"
+                  )
+                }
+              />
             </Box>
           </Stack>
 

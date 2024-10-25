@@ -21,49 +21,52 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import EditVariantAttributesModal from "./EditVariantAttributesModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteVariantAttributesMutation,
+  useGetAllVariantAttributesQuery,
+} from "../../../../redux/api/admin/variantAttributesApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateVariantAttributesModal from "./CreateVariantAttributesModal";
-
-const tableData = [
-  {
-    id: 1,
-    variants: "Memory",
-    value: "4GB",
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 2,
-    variants: "Memory",
-    value: "7GB",
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-  {
-    id: 3,
-    variants: "Memory",
-    value: "4GB",
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 4,
-    variants: "Memory",
-    value: "4GB",
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-];
+import EditVariantAttributesModal from "./EditVariantAttributesModal";
+import { toast } from "sonner";
 
 const VariantAttributes = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createVariantAttributesModal, setCreateVariantAttributesModal] =
     useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: variantAttributeData, isLoading } =
+    useGetAllVariantAttributesQuery({
+      searchTerm: searchTerm,
+      sort: sortBy,
+    });
+  const [deleteVariantAttributes] = useDeleteVariantAttributesMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const paginateData = paginateFormateData(
+    variantAttributeData?.data?.result,
+    page
+  );
+
+  const handelDelete = async (id) => {
+    const toastId = toast.loading("Deleting variant attributes...");
+    try {
+      const res = await deleteVariantAttributes(id).unwrap();
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -123,7 +126,9 @@ const VariantAttributes = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  color: row.status === "Active" ? "green" : "red",
+                  color: row.status === "Active" ? "primary.main" : "red",
+                  borderColor: row.status === "Active" ? "primary.main" : "red",
+                  borderRadius: 1,
                 }}
                 label={row.status}
               ></Chip>
@@ -161,6 +166,7 @@ const VariantAttributes = () => {
 
             <Box
               component={"button"}
+              onClick={() => handelDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -175,12 +181,12 @@ const VariantAttributes = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      variants: data.variants,
+      id: data._id,
+      variants: data.name,
       value: data.value,
-      createdAt: data.createdAt,
+      createdAt: formatDate(new Date(data.createdAt)),
       status: data.status,
     };
   });
@@ -234,6 +240,7 @@ const VariantAttributes = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -255,7 +262,8 @@ const VariantAttributes = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -284,7 +292,7 @@ const VariantAttributes = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={variantAttributeData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
