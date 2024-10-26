@@ -6,6 +6,7 @@ import { subCategoryRouter } from "../routes/subCategoryRoutes.js";
 import { unitsRouter } from "../routes/unitsRoutes.js";
 import { userRouter } from "../routes/userRoutes.js";
 import { variantAttributesRouter } from "../routes/variantAttributesRoutes.js";
+import { warrantyRouter } from "../routes/warrantyRoutes.js";
 
 const routes = [
   {
@@ -39,6 +40,10 @@ const routes = [
   {
     path: "/variant-attributes",
     routes: variantAttributesRouter,
+  },
+  {
+    path: "/warranties",
+    routes: warrantyRouter,
   },
 ];
 
