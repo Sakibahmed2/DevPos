@@ -27,6 +27,7 @@ import {
   useGetAllProductsQuery,
 } from "../../../../redux/api/admin/productApi";
 import { toast } from "sonner";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const ProductsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,17 +42,13 @@ const ProductsPage = () => {
     sort: sortBy,
   });
   const [deleteProduct] = useDeleteProductMutation();
-  const itemsPerPage = 5;
 
   if (isLoading) {
     return <DPLoading />;
   }
 
   // Get paginated data based on current page
-  const paginatedData = productsData?.data?.result?.slice(
-    page * itemsPerPage,
-    (page + 1) * itemsPerPage
-  );
+  const paginatedData = paginateFormateData(productsData?.data?.result, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -339,7 +336,7 @@ const ProductsPage = () => {
 
       <Box>
         <PaginationUi
-          totalItems={productsData?.data?.length}
+          totalItems={productsData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

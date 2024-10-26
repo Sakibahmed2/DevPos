@@ -4,26 +4,42 @@ import DPModal from "../../../../components/modal/DPModal";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import { useState } from "react";
+import DPSelect from "../../../../components/form/DPSelect";
+import { useCreateWarrantiesMutation } from "../../../../redux/api/admin/warrantiesApi";
+import { toast } from "sonner";
 
 const defaultValues = {
   name: "",
   description: "",
   duration: "",
   periods: "",
-  status: "",
 };
 
-const CreateWarrantyModal = ({ open, setOpen, id }) => {
+const CreateWarrantyModal = ({ open, setOpen }) => {
   const [toggleStatus, setToggleStatus] = useState("Active");
 
-  const handleToggle = (event) => {
-    setToggleStatus(event.target.checked ? "Active" : "Inactive");
-  };
+  const [createWarranties] = useCreateWarrantiesMutation();
 
-  console.log(id);
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating warranty...");
+    try {
+      const warrantyData = {
+        name: data.name,
+        description: data.description,
+        duration: `${data.duration} ${data.periods}`,
+        status: toggleStatus,
+      };
 
-  const onSubmit = (data) => {
-    console.log(data);
+      const res = await createWarranties(warrantyData).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong", { id: toastId });
+    }
   };
 
   return (
@@ -39,25 +55,21 @@ const CreateWarrantyModal = ({ open, setOpen, id }) => {
           >
             <DPInput name={"name"} label={"Name"} fullWidth size="medium" />
 
-            <DPInput
-              name={"duration"}
-              label={"Duration"}
-              fullWidth
-              size="medium"
-            />
+            <DPInput name={"duration"} label={"Duration"} />
 
-            <DPInput
+            <DPSelect
               name={"periods"}
               label={"Periods"}
-              fullWidth
-              size="medium"
+              items={[
+                { name: "Month", value: "Month" },
+                { name: "Year", value: "Year" },
+                { name: "Week", value: "Week" },
+              ]}
             />
 
             <DPInput
               name={"description"}
               label={"description"}
-              fullWidth
-              size="medium"
               multiline
               rows={4}
             />
@@ -72,7 +84,11 @@ const CreateWarrantyModal = ({ open, setOpen, id }) => {
               <Typography component={"p"}>Status</Typography>
               <Switch
                 checked={toggleStatus === "Active"}
-                onChange={handleToggle}
+                onChange={() =>
+                  setToggleStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
                 size="medium"
               />
             </Box>

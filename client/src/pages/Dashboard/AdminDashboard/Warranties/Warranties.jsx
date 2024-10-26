@@ -21,51 +21,48 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import EditWarrantyModal from "./EditWarrantyModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteWarrantiesMutation,
+  useGetAllWarrantiesQuery,
+} from "../../../../redux/api/admin/warrantiesApi";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateWarrantyModal from "./CreateWarrantyModal";
+import EditWarrantyModal from "./EditWarrantyModal";
+import { toast } from "sonner";
 
-const tableData = [
-  {
-    id: 1,
-    name: "Express Warranty",
-    description:
-      "Repairs or a replacement for a faulty  product within a specified time period after it was purchased.",
-    duration: "3 years",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Express Warranty",
-    description:
-      "Repairs or a replacement for a faulty  product within a specified time period after it was purchased.",
-    duration: "3 years",
-    status: "Active",
-  },
-  {
-    id: 3,
-    name: "Express Warranty",
-    description:
-      "Repairs or a replacement for a faulty  product within a specified time period after it was purchased.",
-    duration: "3 years",
-    status: "Inactive",
-  },
-  {
-    id: 4,
-    name: "Express Warranty",
-    description:
-      "Repairs or a replacement for a faulty  product within a specified time period after it was purchased.",
-    duration: "3 years",
-    status: "Active",
-  },
-];
 const Warranties = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
+  const { data: warrantiesData, isLoading } = useGetAllWarrantiesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteWarranty] = useDeleteWarrantiesMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const paginateData = paginateFormateData(warrantiesData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting warranty...");
+    try {
+      const res = await deleteWarranty(id).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -130,7 +127,9 @@ const Warranties = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  color: row.status === "Active" ? "green" : "red",
+                  color: row.status === "Active" ? "primary.main" : "red",
+                  borderColor: row.status === "Active" ? "primary.main" : "red",
+                  borderRadius: 1,
                 }}
                 label={row.status}
               ></Chip>
@@ -168,6 +167,7 @@ const Warranties = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -182,9 +182,9 @@ const Warranties = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       name: data.name,
       description: data.description,
       duration: data.duration,
@@ -241,6 +241,7 @@ const Warranties = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -262,7 +263,8 @@ const Warranties = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -291,7 +293,7 @@ const Warranties = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={warrantiesData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

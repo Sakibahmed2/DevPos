@@ -5,6 +5,10 @@ export const tagTypes = {
   brands: "brands",
   units: "units",
   variantAttributes: "variantAttributes",
+  warranties: "warranties",
+  manageStock: "manageStock",
+  warehouse: "warehouse",
+  store: "store",
 };
 
 export const tagTypesList = [
@@ -14,4 +18,8 @@ export const tagTypesList = [
   tagTypes.brands,
   tagTypes.units,
   tagTypes.variantAttributes,
+  tagTypes.warranties,
+  tagTypes.manageStock,
+  tagTypes.warehouse,
+  tagTypes.store,
 ];
