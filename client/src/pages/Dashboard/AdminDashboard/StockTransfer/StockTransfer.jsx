@@ -23,45 +23,47 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 
 import CreateStockTransferModal from "./CreateStockTransferModal";
 import EditStockTransferModal from "./EditStockTransferModal";
-
-const tableData = [
-  {
-    id: 1,
-    from: "Warehouse 1",
-    to: "Warehouse 2",
-    NoOfProduct: 9,
-    quantityTransferred: 23,
-    refNo: "ST-001",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 2,
-    from: "Warehouse 1",
-    to: "Warehouse 2",
-    NoOfProduct: 9,
-    quantityTransferred: 23,
-    refNo: "ST-001",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 3,
-    from: "Warehouse 1",
-    to: "Warehouse 2",
-    NoOfProduct: 9,
-    quantityTransferred: 23,
-    refNo: "ST-001",
-    date: "09 Sep 2024",
-  },
-];
+import {
+  useDeleteStockTransferMutation,
+  useGetAllStockTransferQuery,
+} from "../../../../redux/api/admin/stockTransferApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const StockTransfer = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createStockModal, setCreateStockModal] = useState(false);
+  const { data: stockTransferData, isLoading } = useGetAllStockTransferQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteStockTransfer] = useDeleteStockTransferMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(
+    stockTransferData?.data?.result,
+    page
+  );
+
+  const deleteStockTransferHandler = async (id) => {
+    const toastId = toast.loading("Deleting stock transfer...");
+    try {
+      const res = await deleteStockTransfer(id).unwrap();
+      if (res.success) {
+        toast.success("Stock transfer deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete stock transfer", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -103,8 +105,20 @@ const StockTransfer = () => {
       flex: 1,
       renderCell: ({ row }) => {
         return (
-          <Box>
+          <Box textAlign={"center"}>
             <Typography variant="p">{row.NoOfProduct}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "quantityTransferred",
+      headerName: "Quantity transferred",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box textAlign={"center"}>
+            <Typography variant="p">{row.quantityTransferred}</Typography>
           </Box>
         );
       },
@@ -164,6 +178,7 @@ const StockTransfer = () => {
 
             <Box
               component={"button"}
+              onClick={() => deleteStockTransferHandler(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -178,15 +193,15 @@ const StockTransfer = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      from: data.from,
-      to: data.to,
-      NoOfProduct: data.NoOfProduct,
+      id: data._id,
+      from: data.from.name,
+      to: data.to.name,
+      NoOfProduct: data.noOfProduct,
       quantityTransferred: data.quantityTransferred,
       refNo: data.refNo,
-      date: data.date,
+      date: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -212,7 +227,7 @@ const StockTransfer = () => {
             />
           }
         >
-          Add new
+          Add new stock transfer
         </Button>
       </Stack>
 
@@ -239,6 +254,7 @@ const StockTransfer = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -260,7 +276,8 @@ const StockTransfer = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -289,7 +306,7 @@ const StockTransfer = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={stockTransferData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

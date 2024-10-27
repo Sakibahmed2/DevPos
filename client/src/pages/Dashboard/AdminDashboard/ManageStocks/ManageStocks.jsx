@@ -200,13 +200,13 @@ const ManageStocks = () => {
 
   const rows = paginateData.map((data) => {
     return {
-      id: data._id,
-      name: data.product.name,
-      productImg: data.product.img,
-      shop: data.shop.name,
-      warehouse: data.warehouse.name,
-      date: formatDate(new Date(data.createdAt)),
-      quantity: data.quantity || 0,
+      id: data?._id,
+      name: data?.product?.name || "N/A",
+      productImg: data?.product?.img || "N/A",
+      shop: data?.shop?.name || "N/A",
+      warehouse: data?.warehouse?.name || "N/A",
+      date: formatDate(new Date(data?.createdAt)),
+      quantity: data?.quantity || 0,
     };
   });
 

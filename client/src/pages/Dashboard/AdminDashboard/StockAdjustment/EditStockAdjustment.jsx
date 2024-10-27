@@ -1,53 +1,62 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack } from "@mui/material";
-import DPForm from "../../../../components/form/DPForm";
-import DPInput from "../../../../components/form/DPInput";
-import DPModal from "../../../../components/modal/DPModal";
-import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
-import { useGetAllWarehousesQuery } from "../../../../redux/api/finance/warehouseApi";
-import DPLoading from "../../../../components/ui/DPLoading";
-import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
-import DPSelect from "../../../../components/form/DPSelect";
-import {
-  useGetSingleStockTransferQuery,
-  useUpdateStockTransferMutation,
-} from "../../../../redux/api/admin/stockTransferApi";
 import { toast } from "sonner";
+import DPForm from "../../../../components/form/DPForm";
+import DPSelect from "../../../../components/form/DPSelect";
+import DPModal from "../../../../components/modal/DPModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useGetSingleManageStockQuery,
+  useUpdateManageStockMutation,
+} from "../../../../redux/api/admin/manageStockApi";
+import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
+import { useGetAllStoresQuery } from "../../../../redux/api/finance/storeApi";
+import { useGetAllWarehousesQuery } from "../../../../redux/api/finance/warehouseApi";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
+import DPInput from "../../../../components/form/DPInput";
 
-const EditStockTransferModal = ({ open, setOpen, id }) => {
+const EditStockAdjustment = ({ open, setOpen, id }) => {
   const { data: warehouseData, isLoading: warehouseLoading } =
     useGetAllWarehousesQuery({});
+  const { data: storeData, isLoading: storeLoading } = useGetAllStoresQuery({});
   const { data: productData, isLoading: productLoading } =
     useGetAllProductsQuery({});
-  const { data: stockTransferData, isLoading: stockTransferLoading } =
-    useGetSingleStockTransferQuery(id);
-  const [updateStockTransfer] = useUpdateStockTransferMutation();
+  const { data: singleStockData, isLoading: singleStockLoading } =
+    useGetSingleManageStockQuery(id);
+  const [updateMangeStock] = useUpdateManageStockMutation({});
 
-  if (warehouseLoading || productLoading || stockTransferLoading)
+  if (warehouseLoading || storeLoading || productLoading || singleStockLoading)
     return <DPLoading />;
 
-  console.log(stockTransferData);
-
   const defaultValues = {
-    product: stockTransferData?.data?.product,
-    from: stockTransferData?.data?.from,
-    to: stockTransferData?.data?.to,
-    noOfProduct: stockTransferData?.data?.noOfProduct,
-    quantityTransferred: stockTransferData?.data?.quantityTransferred,
-    note: stockTransferData?.data?.note,
+    product: singleStockData?.data?.product._id,
+    warehouse: singleStockData?.data?.warehouse._id,
+    shop: singleStockData?.data?.shop._id,
+    responsiblePerson: singleStockData?.data?.responsiblePerson,
+    note: singleStockData?.data?.note || "",
   };
 
   const warehouseDataForSelect = convertDataForSelect(
     warehouseData?.data?.result
   );
+  const storeDataForSelect = convertDataForSelect(storeData?.data?.result);
   const productDataForSelect = convertDataForSelect(productData?.data?.result);
 
   const onSubmit = async (data) => {
-    const toastId = toast.loading("Updating stock transfer...");
+    const toastId = toast.loading("Updating stock adjustment...");
+
     try {
-      const res = await updateStockTransfer({
-        stockTransferId: id,
-        stockTransferData: data,
+      const stockData = {
+        product: data.product,
+        warehouse: data.warehouse,
+        shop: data.shop,
+        responsiblePerson: data.responsiblePerson,
+        note: data.note,
+      };
+
+      const res = await updateMangeStock({
+        manageStockId: id,
+        manageStockData: stockData,
       }).unwrap();
 
       if (res.success) {
@@ -56,13 +65,13 @@ const EditStockTransferModal = ({ open, setOpen, id }) => {
       }
     } catch (err) {
       console.log(err);
-      toast.error("Failed to update stock transfer", { id: toastId });
+      toast.error("Failed to update stock", { id: toastId });
     }
   };
 
   return (
     <Box>
-      <DPModal open={open} setOpen={setOpen} title="Edit stock transfer">
+      <DPModal open={open} setOpen={setOpen} title="Edit stock adjustment">
         <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
           <Stack
             direction={"column"}
@@ -73,31 +82,28 @@ const EditStockTransferModal = ({ open, setOpen, id }) => {
           >
             <DPSelect
               name={"product"}
-              label={"Product"}
+              label={"Product name"}
               items={productDataForSelect}
             />
 
             <Stack direction={"row"} gap={2}>
               <DPSelect
-                name={"from"}
-                label={"Warehouse from"}
+                name={"warehouse"}
+                label={"Warehouse"}
                 items={warehouseDataForSelect}
               />
               <DPSelect
-                name={"to"}
-                label={"Warehouse to"}
-                items={warehouseDataForSelect}
+                name={"shop"}
+                label={"Shop"}
+                items={storeDataForSelect}
               />
             </Stack>
 
-            <Stack direction={"row"} gap={2}>
-              <DPInput name={"noOfProduct"} label={"No of product"} />
-
-              <DPInput
-                name={"quantityTransferred"}
-                label={"Quantity transferred"}
-              />
-            </Stack>
+            <DPSelect
+              name={"responsiblePerson"}
+              label={"Responsible person"}
+              items={["Person 1", "Person 2"]}
+            />
 
             <DPInput name={"note"} label={"Note"} multiline rows={4} />
           </Stack>
@@ -110,7 +116,7 @@ const EditStockTransferModal = ({ open, setOpen, id }) => {
               marginTop: 5,
             }}
           >
-            <Button type="submit">Save</Button>
+            <Button type="submit">Update stock adjustment</Button>
             <Button
               sx={{
                 backgroundColor: "black",
@@ -126,4 +132,4 @@ const EditStockTransferModal = ({ open, setOpen, id }) => {
   );
 };
 
-export default EditStockTransferModal;
+export default EditStockAdjustment;

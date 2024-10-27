@@ -9,6 +9,7 @@ export const tagTypes = {
   manageStock: "manageStock",
   warehouse: "warehouse",
   store: "store",
+  stockTransfers: "stockTransfers",
 };
 
 export const tagTypesList = [
@@ -22,4 +23,5 @@ export const tagTypesList = [
   tagTypes.manageStock,
   tagTypes.warehouse,
   tagTypes.store,
+  tagTypes.stockTransfers,
 ];

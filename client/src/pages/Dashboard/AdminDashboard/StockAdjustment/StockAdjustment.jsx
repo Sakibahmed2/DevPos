@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Container,
   FormControl,
   InputLabel,
@@ -18,54 +17,50 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 // icons
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
-import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 
-import mackbookImg from "../../../../assets/laptopPng.png";
-import EditStockModal from "../ManageStocks/EditStockModal";
-import CreateStockModal from "../ManageStocks/CreateStockModal";
-
-const tableData = [
-  {
-    id: 1,
-    name: "Apple mackbook pro",
-    productImg: mackbookImg,
-    shop: "Apple",
-    warehouse: "Warehouse 1",
-    date: "09 Sep 2024",
-    quantity: 10,
-    note: "This is a note",
-  },
-  {
-    id: 2,
-    name: "Apple mackbook pro",
-    productImg: mackbookImg,
-    shop: "Apple",
-    warehouse: "Warehouse 1",
-    date: "09 Sep 2024",
-    quantity: 10,
-    note: "This is a note",
-  },
-  {
-    id: 3,
-    name: "Apple mackbook pro",
-    productImg: mackbookImg,
-    shop: "Apple",
-    warehouse: "Warehouse 1",
-    date: "09 Sep 2024",
-    quantity: 10,
-    note: "This is a note",
-  },
-];
+import { toast } from "sonner";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteManageStockMutation,
+  useGetAllManageStocksQuery,
+} from "../../../../redux/api/admin/manageStockApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
+import EditStockAdjustment from "./EditStockAdjustment";
 
 const StockAdjustment = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
-  const [createStockModal, setCreateStockModal] = useState(false);
 
-  // const itemsPerPage = 3 ;
+  const { data: manageStockData, isLoading } = useGetAllManageStocksQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteMangeStock] = useDeleteManageStockMutation();
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const paginateData = paginateFormateData(manageStockData?.data?.result, page);
+
+  const handleDeleteStock = async (id) => {
+    const toastId = toast.loading("Deleting stock...");
+
+    try {
+      const res = await deleteMangeStock(id).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete stock", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -196,6 +191,7 @@ const StockAdjustment = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDeleteStock(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -210,16 +206,16 @@ const StockAdjustment = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      name: data.name,
-      productImg: data.productImg,
-      shop: data.shop,
-      warehouse: data.warehouse,
-      date: data.date,
-      quantity: data.quantity,
-      note: data.note,
+      id: data?._id,
+      name: data?.product?.name || "N/A",
+      productImg: data?.product?.img || "N/A",
+      shop: data?.shop?.name || "N/A",
+      warehouse: data?.warehouse?.name || "N/A",
+      date: formatDate(new Date(data?.createdAt)),
+      quantity: data?.quantity || 0,
+      note: data?.note || "N/A",
     };
   });
 
@@ -234,19 +230,6 @@ const StockAdjustment = () => {
           title={"Stock adjustment"}
           description={"Manage your stock"}
         />
-
-        <Button
-          onClick={() => setCreateStockModal(true)}
-          startIcon={
-            <img
-              src={plusIcon}
-              alt="plus icon"
-              style={{ width: 30, height: 30 }}
-            />
-          }
-        >
-          Add new stock
-        </Button>
       </Stack>
 
       <Box
@@ -272,6 +255,7 @@ const StockAdjustment = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -293,7 +277,8 @@ const StockAdjustment = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -322,17 +307,14 @@ const StockAdjustment = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={manageStockData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
       </Box>
 
       {/* Edit warranty modal */}
-      <EditStockModal open={open} setOpen={setOpen} id={productId} />
-
-      {/* Add warranty modal */}
-      <CreateStockModal open={createStockModal} setOpen={setCreateStockModal} />
+      <EditStockAdjustment open={open} setOpen={setOpen} id={productId} />
     </Container>
   );
 };

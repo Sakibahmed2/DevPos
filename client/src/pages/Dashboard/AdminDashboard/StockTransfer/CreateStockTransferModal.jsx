@@ -3,18 +3,51 @@ import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { useGetAllWarehousesQuery } from "../../../../redux/api/finance/warehouseApi";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
+import DPSelect from "../../../../components/form/DPSelect";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
+import { useCreateStockTransferMutation } from "../../../../redux/api/admin/stockTransferApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  product: "",
   from: "",
   to: "",
-  responsiblePerson: "",
+  product: "",
+  noOfProduct: "",
+  quantityTransferred: "",
   note: "",
 };
 
 const CreateStockTransferModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const { data: warehouseData, isLoading: warehouseLoading } =
+    useGetAllWarehousesQuery({});
+  const { data: productData, isLoading: productLoading } =
+    useGetAllProductsQuery({});
+  const [createStockTransfer] = useCreateStockTransferMutation();
+
+  if (warehouseLoading || productLoading) return <DPLoading />;
+
+  const warehouseDataForSelect = convertDataForSelect(
+    warehouseData?.data?.result
+  );
+  const productDataForSelect = convertDataForSelect(productData?.data?.result);
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating stock transfer...");
+
+    try {
+      const res = await createStockTransfer(data).unwrap();
+
+      console.log(res);
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -28,36 +61,35 @@ const CreateStockTransferModal = ({ open, setOpen }) => {
               width: "500px",
             }}
           >
-            <DPInput
+            <DPSelect
               name={"product"}
               label={"Product"}
-              fullWidth
-              size="medium"
+              items={productDataForSelect}
             />
 
             <Stack direction={"row"} gap={2}>
-              <DPInput
+              <DPSelect
                 name={"from"}
                 label={"Warehouse from"}
-                fullWidth
-                size="medium"
+                items={warehouseDataForSelect}
               />
-              <DPInput
+              <DPSelect
                 name={"to"}
                 label={"Warehouse to"}
-                fullWidth
-                size="medium"
+                items={warehouseDataForSelect}
               />
             </Stack>
 
-            <DPInput
-              name={"note"}
-              label={"Note"}
-              fullWidth
-              size="medium"
-              multiline
-              rows={4}
-            />
+            <Stack direction={"row"} gap={2}>
+              <DPInput name={"noOfProduct"} label={"No of product"} />
+
+              <DPInput
+                name={"quantityTransferred"}
+                label={"Quantity transferred"}
+              />
+            </Stack>
+
+            <DPInput name={"note"} label={"Note"} multiline rows={4} />
           </Stack>
 
           <Box
@@ -68,7 +100,7 @@ const CreateStockTransferModal = ({ open, setOpen }) => {
               marginTop: 5,
             }}
           >
-            <Button>Save</Button>
+            <Button type="submit">Save</Button>
             <Button
               sx={{
                 backgroundColor: "black",
