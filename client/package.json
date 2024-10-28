@@ -18,6 +18,8 @@
     "@mui/x-date-pickers": "^7.19.0",
     "@react-oauth/google": "^0.12.1",
     "@reduxjs/toolkit": "^2.3.0",
+    "@stripe/react-stripe-js": "^2.8.1",
+    "@stripe/stripe-js": "^4.9.0",
     "apexcharts": "^3.53.0",
     "dayjs": "^1.11.13",
     "jwt-decode": "^4.0.0",

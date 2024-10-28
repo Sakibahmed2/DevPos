@@ -21,68 +21,45 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import CreateWarrantyModal from "../Warranties/CreateWarrantyModal";
+import CreateSaleModal from "./CreateSalesModal";
 import EditSalesModal from "./EditSalesModal";
-
-const tableData = [
-  {
-    id: 1,
-    customerName: "John Doe",
-    reference: "123456",
-    date: "09 Sep 2024",
-    status: "Completed",
-    grandTotal: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-    biller: "Admin",
-  },
-  {
-    id: 2,
-    customerName: "John Doe",
-    reference: "123456",
-    date: "09 Sep 2024",
-    status: "Completed",
-    grandTotal: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-    biller: "Admin",
-  },
-  {
-    id: 3,
-    customerName: "John Doe",
-    reference: "123456",
-    date: "09 Sep 2024",
-    status: "Pending",
-    grandTotal: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Due",
-    biller: "Admin",
-  },
-  {
-    id: 4,
-    customerName: "John Doe",
-    reference: "123456",
-    date: "09 Sep 2024",
-    status: "Completed",
-    grandTotal: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-    biller: "Admin",
-  },
-];
+import {
+  useDeleteSaleMutation,
+  useGetAllSalesQuery,
+} from "../../../../redux/api/admin/paymentApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const Sales = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
+  const { data: salesData, isLoading } = useGetAllSalesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteSale] = useDeleteSaleMutation();
+  if (isLoading) return <DPLoading />;
 
-  // const itemsPerPage = 3 ;
+  const paginateData = paginateFormateData(salesData?.data?.result, page);
+
+  const handleDeleteSale = async (id) => {
+    const toastId = toast.loading("Deleting sale...");
+    try {
+      const res = await deleteSale(id).unwrap();
+      if (res.success) {
+        toast.success("Sale deleted successfully", { id: toastId });
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete sale", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -185,7 +162,7 @@ const Sales = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">${row.due}</Typography>
+            <Typography variant="p">${row.due.toFixed(2)}</Typography>
           </Box>
         );
       },
@@ -258,6 +235,7 @@ const Sales = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDeleteSale(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -272,18 +250,18 @@ const Sales = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       customerName: data.customerName,
-      reference: data.reference,
-      date: data.date,
+      reference: data.refNo,
+      date: formatDate(new Date(data.date)),
       status: data.status,
-      grandTotal: data.grandTotal,
-      paid: data.paid,
-      due: data.due,
-      payment: data.payment,
-      biller: data.biller,
+      grandTotal: data.amount.toFixed(2),
+      paid: data.paid || 0,
+      due: data.due || 0,
+      payment: data.paymentTypeStatus,
+      biller: data.biller?.name,
     };
   });
 
@@ -333,6 +311,7 @@ const Sales = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -354,7 +333,8 @@ const Sales = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -383,7 +363,7 @@ const Sales = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={salesData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
@@ -393,7 +373,7 @@ const Sales = () => {
       <EditSalesModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add warranty modal */}
-      <CreateWarrantyModal open={createModal} setOpen={setCreateModal} />
+      <CreateSaleModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };

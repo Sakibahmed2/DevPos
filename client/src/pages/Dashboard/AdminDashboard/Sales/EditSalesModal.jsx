@@ -1,29 +1,19 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import DPModal from "../../../../components/modal/DPModal";
-import DPForm from "../../../../components/form/DPForm";
-import DPInput from "../../../../components/form/DPInput";
-import DPDatePicker from "../../../../components/form/DPDatePicker";
-import DPSelect from "../../../../components/form/DPSelect";
-import SalesTable from "./SalesTable";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import DuePaymentForm from "../../../../components/paymentForm/DuePaymentForm";
+import { useGetSingleSaleQuery } from "../../../../redux/api/admin/paymentApi";
+import DPLoading from "../../../../components/ui/DPLoading";
 
-const defaultValues = {
-  customerName: "",
-  date: "",
-  productName: "",
-  orderTax: "",
-  discount: "",
-  shipping: "",
-  status: "",
-  note: "",
-};
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const EditSalesModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const { data: singleSale, isLoading } = useGetSingleSaleQuery(id);
+  if (isLoading) return <DPLoading />;
 
-  const onSubmit = (data) => {
-    console.log(data);
-  };
+  const amountDue = Number(singleSale?.data?.due).toFixed(2);
 
   return (
     <Box>
@@ -39,60 +29,25 @@ const EditSalesModal = ({ open, setOpen, id }) => {
           alignItems: "center",
         }}
       >
-        <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
-          <Stack
-            direction={"column"}
-            gap={3}
-            sx={{
-              width: "800px",
-            }}
-          >
-            <Stack direction={"row"} gap={2}>
-              <DPInput name={"customerName"} label={"Customer"} />
-              <DPDatePicker name={"date"} label={"Purchase date"} />
-            </Stack>
-
-            <DPInput name={"productName"} label={"Product"} />
-
-            {/* Sale table */}
-            <SalesTable />
-
-            <Stack direction={"row"} gap={2}>
-              <DPInput name={"orderTax"} label={"Order tax"} />
-              <DPInput name={"discount"} label={"Discount"} />
-            </Stack>
-
-            <Stack direction={"row"} gap={2}>
-              <DPInput name={"shipping"} label={"Shipping"} />
-              <DPSelect
-                name={"status"}
-                label={"Status"}
-                items={["Completed", "Pending"]}
-              />
-            </Stack>
-
-            <DPInput name={"note"} label={"Note"} multiline rows={4} />
-          </Stack>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "10px",
-              marginTop: 5,
-            }}
-          >
-            <Button type="submit">Submit</Button>
-            <Button
-              sx={{
-                backgroundColor: "black",
-              }}
-              onClick={() => setOpen(false)}
-            >
-              Cancel
-            </Button>
-          </Box>
-        </DPForm>
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
+            justifyContent: "end",
+            gap: 1,
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6">You have to pay:</Typography>
+          <Typography variant="h6" fontWeight={600}>
+            ${amountDue}
+          </Typography>
+        </Box>
+        <Box>
+          <Elements stripe={stripePromise}>
+            <DuePaymentForm setOpen={setOpen} totalPrice={amountDue} id={id} />
+          </Elements>
+        </Box>
       </DPModal>
     </Box>
   );

@@ -10,6 +10,7 @@ const DPSelect = ({
   required,
   fullWidth = true,
   sx,
+  onChange, // add onChange prop here
 }) => {
   const { control, formState } = useFormContext();
   const isError = formState.errors[name] !== undefined;
@@ -31,6 +32,10 @@ const DPSelect = ({
           fullWidth={fullWidth}
           error={isError}
           helperText={isError ? formState.errors[name]?.message : ""}
+          onChange={(e) => {
+            field.onChange(e);
+            if (onChange) onChange(e.target.name);
+          }}
         >
           {items?.map((item, idx) => (
             <MenuItem key={idx} value={item.value ? item.value : item}>
