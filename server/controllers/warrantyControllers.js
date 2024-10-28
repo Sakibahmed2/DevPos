@@ -6,14 +6,6 @@ const createWarranty = async (req, res, next) => {
   try {
     const warrantyData = req.body;
 
-    if (warrantyData.duration >= 12) {
-      const years = (warrantyData.duration / 12).toFixed(1);
-
-      warrantyData.duration = `${years} years`;
-    } else {
-      warrantyData.duration = `${warrantyData.duration} months`;
-    }
-
     const result = await Warranties.create(warrantyData);
 
     sendResponse(res, {
@@ -79,14 +71,6 @@ const updateWarranty = async (req, res, next) => {
   try {
     const { id } = req.params;
     const warrantyData = req.body;
-
-    if (warrantyData.duration >= 12) {
-      const years = (warrantyData.duration / 12).toFixed(1);
-
-      warrantyData.duration = `${years} years`;
-    } else {
-      warrantyData.duration = `${warrantyData.duration} months`;
-    }
 
     const result = await Warranties.findByIdAndUpdate(id, warrantyData, {
       new: true,

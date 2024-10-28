@@ -38,7 +38,7 @@ const getAllProducts = async (req, res, next) => {
       Products.find().populate("createdBy", "name email img"),
       req.query
     )
-      .search(ProductSearchableFields)
+      .search(["name", "productInfo.category", "productInfo.brand"])
       .filter()
       .sort()
       .paginate();

@@ -2,12 +2,19 @@ import mongoose, { Schema } from "mongoose";
 
 const stockTransferSchema = new Schema(
   {
+    product: {
+      type: Schema.Types.ObjectId,
+      ref: "Products",
+      required: true,
+    },
     from: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Warehouses",
       required: true,
     },
     to: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Warehouses",
       required: true,
     },
     noOfProduct: {
@@ -21,6 +28,10 @@ const stockTransferSchema = new Schema(
     refNo: {
       type: String,
       required: true,
+      unique: true,
+    },
+    note: {
+      type: String,
     },
   },
   {

@@ -3,7 +3,7 @@ import { activeStatus } from "../constant/global.js";
 
 const storeSchema = new Schema(
   {
-    storeName: {
+    name: {
       type: String,
       required: true,
     },

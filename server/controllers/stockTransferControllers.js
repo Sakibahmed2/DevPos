@@ -4,7 +4,16 @@ import sendResponse from "../utils/sendResponse.js";
 
 const createStockTransfer = async (req, res, next) => {
   try {
-    const stockTransfer = await StockTransfers.create(req.body);
+    const stockTransferData = req.body;
+
+    if (!stockTransferData.refNo) {
+      stockTransferData.refNo = `REF${Math.random()
+        .toString()
+        .substr(2, 6)
+        .toUpperCase()}`;
+    }
+
+    const stockTransfer = await StockTransfers.create(stockTransferData);
 
     sendResponse(res, {
       statusCode: 201,
@@ -19,8 +28,11 @@ const createStockTransfer = async (req, res, next) => {
 
 const getStockAllTransfer = async (req, res, next) => {
   try {
-    const stockTransfer = new QueryBuilder(StockTransfers.find(), req.query)
-      .search(["from", "to", "refNo"])
+    const stockTransfer = new QueryBuilder(
+      StockTransfers.find().populate("from to product", "name"),
+      req.query
+    )
+      .search(["from.name", "to.name", "refNo"])
       .filter()
       .sort()
       .paginate();

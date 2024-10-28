@@ -20,6 +20,9 @@ const manageStockSchema = new Schema(
     responsiblePerson: {
       type: String,
     },
+    note: {
+      type: String,
+    },
   },
   {
     timestamps: true,

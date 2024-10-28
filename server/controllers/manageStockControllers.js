@@ -28,7 +28,7 @@ const getAllManageStocks = async (req, res, next) => {
         .populate("shop", ["name"]),
       req.query
     )
-      .search(["warehouse", "shop", "responsiblePerson"])
+      .search(["warehouse.name", "shop.name"])
       .filter()
       .sort()
       .paginate();
@@ -56,7 +56,8 @@ const getSingleManageStock = async (req, res, next) => {
 
     const result = await MangeStocks.findById(id)
       .populate("product", ["name", "img"])
-      .populate("warehouse", ["name"]);
+      .populate("warehouse", ["name"])
+      .populate("shop", ["name"]);
 
     sendResponse(res, {
       statusCode: 200,
