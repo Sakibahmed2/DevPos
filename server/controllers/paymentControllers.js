@@ -116,17 +116,19 @@ const updateSale = async (req, res, next) => {
 
     const sale = await Sales.findOne({ _id: id });
 
-    const saleData = updatedData.data;
+    const saleData = updatedData;
 
     // check if payment due
     if (saleData.amount > saleData.paid) {
       saleData.due = saleData.amount - saleData.paid;
-      saleData.paid = sale.paid + saleData.paid;
+      saleData.amount = sale.amount;
+      saleData.paid = saleData.paid + sale.paid;
       saleData.status = "Pending";
       saleData.paymentTypeStatus = "Due";
     } else {
       saleData.due = 0;
-      saleData.paid = sale.paid + saleData.paid;
+      saleData.amount = sale.amount;
+      saleData.paid = saleData.paid + sale.paid;
       saleData.status = "Completed";
       saleData.paymentTypeStatus = "Paid";
     }

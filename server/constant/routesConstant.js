@@ -4,6 +4,7 @@ import { categoriesRouter } from "../routes/categoriesRoutes.js";
 import { manageStockRouter } from "../routes/manageStockRoutes.js";
 import { paymentRouter } from "../routes/paymentRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
+import { promoRouter } from "../routes/promoRoutes.js";
 import { stockTransferRouter } from "../routes/stockTransferRoutes.js";
 import { storeRouter } from "../routes/storeRoutes.js";
 import { subCategoryRouter } from "../routes/subCategoryRoutes.js";
@@ -69,6 +70,10 @@ const routes = [
   {
     path: "/payments",
     routes: paymentRouter,
+  },
+  {
+    path: "/promo",
+    routes: promoRouter,
   },
 ];
 
