@@ -17,45 +17,27 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-
-const tableData = [
-  {
-    id: 1,
-    invoiceNo: "INV-123456",
-    customerName: "John Doe",
-    amount: 1000,
-    paid: 1000,
-    due: 0,
-    status: "Paid",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 2,
-    invoiceNo: "INV-123456",
-    customerName: "John Doe",
-    amount: 1000,
-    paid: 1000,
-    due: 0,
-    status: "Unpaid",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 3,
-    invoiceNo: "INV-123456",
-    customerName: "John Doe",
-    amount: 1000,
-    paid: 1000,
-    due: 0,
-    status: "Paid",
-    date: "09 Sep 2024",
-  },
-];
+import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
 
 const Invoices = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: saleData, isLoading } = useGetAllSalesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const paginateData = paginateFormateData(saleData?.data?.result, page);
+
+  console.log(paginateData);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -165,16 +147,16 @@ const Invoices = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      invoiceNo: data.invoiceNo,
+      id: data._id,
+      invoiceNo: data.refNo,
       customerName: data.customerName,
       amount: data.amount,
       paid: data.paid,
       due: data.due,
-      status: data.status,
-      date: data.date,
+      status: data.paymentTypeStatus,
+      date: formatDate(new Date(data.date)),
     };
   });
 
@@ -214,6 +196,7 @@ const Invoices = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -235,7 +218,8 @@ const Invoices = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -264,7 +248,7 @@ const Invoices = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={saleData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

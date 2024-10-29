@@ -17,54 +17,53 @@ import PaginationUi from "../../../../components/ui/PaginationUi";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
-import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
-import EditPromoModal from "./EditPromoModal";
+import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeletePromoMutation,
+  useGetAllPromoQuery,
+} from "../../../../redux/api/admin/promoApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreatePromoModal from "./CreatePromoModal";
-
-const tableData = [
-  {
-    id: 1,
-    name: "coupons 1",
-    code: "GHGDHJ",
-    type: "Percentage",
-    discount: 10, // percentage
-    status: "Active",
-    limit: 100,
-    valid: "09 Sep 2024",
-  },
-  {
-    id: 2,
-    name: "coupons 1",
-    code: "GHGDHJ",
-    type: "Percentage",
-    discount: 10, // percentage
-    status: "Active",
-    limit: 100,
-    valid: "09 Sep 2024",
-  },
-  {
-    id: 3,
-    name: "coupons 1",
-    code: "GHGDHJ",
-    type: "Percentage",
-    discount: 10, // percentage
-    status: "Active",
-    limit: 100,
-    valid: "09 Sep 2024",
-  },
-];
+import EditPromoModal from "./EditPromoModal";
+import { toast } from "sonner";
 
 const Promo = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
+  const [deletePromo] = useDeletePromoMutation();
 
-  // const itemsPerPage = 3 ;
+  const { data: promoData, isLoading } = useGetAllPromoQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const paginateData = paginateFormateData(promoData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting promo...");
+    try {
+      const res = await deletePromo(id).unwrap();
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete promo", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -206,6 +205,7 @@ const Promo = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -220,16 +220,16 @@ const Promo = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       name: data.name,
       code: data.code,
       type: data.type,
       discount: data.discount,
       status: data.status,
       limit: data.limit,
-      valid: data.valid,
+      valid: formatDate(new Date(data.endDate)),
     };
   });
 
@@ -279,6 +279,7 @@ const Promo = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -300,7 +301,8 @@ const Promo = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -329,14 +331,14 @@ const Promo = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={promoData?.data?.meta.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
       </Box>
 
       {/* Edit promo modal  */}
-      <EditPromoModal open={open} setOpen={setOpen} productId={productId} />
+      <EditPromoModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Create promo modal */}
       <CreatePromoModal open={createModal} setOpen={setCreateModal} />

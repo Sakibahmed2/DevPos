@@ -5,22 +5,61 @@ import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPSelect from "../../../../components/form/DPSelect";
 import DPDatePicker from "../../../../components/form/DPDatePicker";
+import {
+  useGetSinglePromoQuery,
+  useUpdatePromoMutation,
+} from "../../../../redux/api/admin/promoApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useState } from "react";
+import { toast } from "sonner";
 
-const defaultValues = {
-  name: "",
-  code: "",
-  type: "",
-  discount: "",
-  limit: "",
-  startDate: "",
-  endDate: "",
-  status: "",
-};
 const EditPromoModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const [status, setStatus] = useState("Active");
+  const { data: singlePromo, isLoading } = useGetSinglePromoQuery(id);
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const [updatePromo] = useUpdatePromoMutation();
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const defaultValues = {
+    name: singlePromo?.data?.name,
+    code: singlePromo?.data?.code,
+    type: singlePromo?.data?.type,
+    discount: singlePromo?.data?.discount,
+    limit: singlePromo?.data?.limit,
+    startDate: singlePromo?.data?.startDate,
+    endDate: singlePromo?.data?.endDate,
+  };
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating promo...");
+    try {
+      const updatedData = {
+        name: data.name,
+        code: data.code,
+        type: data.type,
+        discount: data.discount,
+        limit: data.limit,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        status: status,
+      };
+
+      const res = await updatePromo({
+        promoId: id,
+        promoData: updatedData,
+      }).unwrap();
+
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update promo", { id: toastId });
+    }
   };
 
   return (
@@ -59,7 +98,7 @@ const EditPromoModal = ({ open, setOpen, id }) => {
 
             <Stack direction={"row"} gap={2}>
               <DPDatePicker name={"startDate"} label={"Start date"} />
-              <DPDatePicker name={"endData"} label={"End date"} />
+              <DPDatePicker name={"endDate"} label={"End date"} />
             </Stack>
 
             {/* Status toggle */}
@@ -70,7 +109,15 @@ const EditPromoModal = ({ open, setOpen, id }) => {
               }}
             >
               <Typography component={"p"}>Status</Typography>
-              <Switch defaultChecked size="medium" />
+              <Switch
+                checked={status === "Active"}
+                size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
+              />
             </Box>
           </Stack>
 

@@ -3,8 +3,12 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useUpdateSaleMutation } from "../../redux/api/admin/paymentApi";
+import {
+  useGetSingleSaleQuery,
+  useUpdateSaleMutation,
+} from "../../redux/api/admin/paymentApi";
 import { getUserInfo } from "../../utils/getUserInfo";
+import DPLoading from "../ui/DPLoading";
 
 const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
   const stripe = useStripe();
@@ -15,6 +19,7 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
   const [amount, setAmount] = useState(totalPrice);
   const userInfo = getUserInfo();
   const [updatePayment] = useUpdateSaleMutation();
+  const { data: singleSale, isLoading } = useGetSingleSaleQuery(id);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/v1/payments/create-payment-intent", {
@@ -30,6 +35,10 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
         setClientSecret(data.data.clientSecret);
       });
   }, [amount]);
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -109,6 +118,7 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
       <TextField
         label="Name"
         value={name}
+        defaultValue={singleSale?.customerName}
         onChange={(e) => setName(e.target.value)}
         fullWidth
         margin="normal"

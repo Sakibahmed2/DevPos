@@ -5,6 +5,9 @@ import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPSelect from "../../../../components/form/DPSelect";
 import DPDatePicker from "../../../../components/form/DPDatePicker";
+import { useState } from "react";
+import { useCreatePromoMutation } from "../../../../redux/api/admin/promoApi";
+import { toast } from "sonner";
 
 const defaultValues = {
   name: "",
@@ -14,12 +17,35 @@ const defaultValues = {
   limit: "",
   startDate: "",
   endDate: "",
-  status: "",
 };
 
 const CreatePromoModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [status, setStatus] = useState("Active");
+  const [createPromo] = useCreatePromoMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating promo...");
+    try {
+      const promoData = {
+        name: data.name,
+        code: data.code,
+        type: data.type,
+        discount: data.discount,
+        limit: data.limit,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        status: status,
+      };
+      console.log(promoData);
+      const res = await createPromo(data).unwrap();
+      if (res.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create promo", { id: toastId });
+    }
   };
 
   return (
@@ -42,7 +68,7 @@ const CreatePromoModal = ({ open, setOpen }) => {
               <DPSelect
                 name={"type"}
                 label={"Type"}
-                items={["Fixed", "Percentage"]}
+                items={["Flat", "Percentage"]}
                 fullWidth
                 size="medium"
               />
@@ -58,7 +84,7 @@ const CreatePromoModal = ({ open, setOpen }) => {
 
             <Stack direction={"row"} gap={2}>
               <DPDatePicker name={"startDate"} label={"Start date"} />
-              <DPDatePicker name={"endData"} label={"End date"} />
+              <DPDatePicker name={"endDate"} label={"End date"} />
             </Stack>
 
             {/* Status toggle */}
@@ -69,7 +95,15 @@ const CreatePromoModal = ({ open, setOpen }) => {
               }}
             >
               <Typography component={"p"}>Status</Typography>
-              <Switch defaultChecked size="medium" />
+              <Switch
+                checked={status === "Active"}
+                size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
+              />
             </Box>
           </Stack>
 
