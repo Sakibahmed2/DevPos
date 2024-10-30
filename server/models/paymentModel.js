@@ -30,13 +30,21 @@ const paymentSchema = new Schema(
     },
     status: {
       type: String,
-      enum: [paymentStatus.COMPLETED, paymentStatus.PENDING],
+      enum: [
+        paymentStatus.COMPLETED,
+        paymentStatus.PENDING,
+        paymentStatus.ORDERED,
+      ],
       default: paymentStatus.PENDING,
     },
     paymentTypeStatus: {
       type: String,
-      enum: [paymentType.PAID, paymentType.UNPAID],
+      enum: [paymentType.PAID, paymentType.UNPAID, paymentType.PARTIAL],
       default: paymentType.UNPAID,
+    },
+    isReceived: {
+      type: Boolean,
+      default: false,
     },
   },
   {

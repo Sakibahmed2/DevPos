@@ -1,6 +1,7 @@
 import { authRouter } from "../routes/authRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
+import { expanseRouter } from "../routes/expensesRoutes.js";
 import { manageStockRouter } from "../routes/manageStockRoutes.js";
 import { paymentRouter } from "../routes/paymentRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
@@ -74,6 +75,12 @@ const routes = [
   {
     path: "/promo",
     routes: promoRouter,
+  },
+
+  // Finance routes
+  {
+    path: "/expanses",
+    routes: expanseRouter,
   },
 ];
 

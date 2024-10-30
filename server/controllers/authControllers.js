@@ -29,6 +29,7 @@ const loginUser = async (req, res, next) => {
       id: isUserExist._id,
       role: isUserExist.role,
       email: isUserExist.email,
+      name: isUserExist.name,
     };
 
     const accessToken = createJwtToken(

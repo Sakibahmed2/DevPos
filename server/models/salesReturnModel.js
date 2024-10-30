@@ -1,13 +1,18 @@
 import { Schema } from "mongoose";
+import { salesReturnStatus } from "../constant/global";
 
 const salesReturnSchema = new Schema({
   product: {
     type: Schema.Types.ObjectId,
-    ref: "Products",
+    ref: "Sales",
     required: true,
   },
-  customerName: {
+  status: {
     type: String,
-    required: true,
+    enum: [
+      salesReturnStatus.RECEIVED,
+      salesReturnStatus.PENDING,
+      salesReturnStatus.ORDERED,
+    ],
   },
 });

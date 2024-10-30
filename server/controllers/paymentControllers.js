@@ -3,6 +3,7 @@ import config from "../config/index.js";
 import sendResponse from "../utils/sendResponse.js";
 import { Sales } from "../models/paymentModel.js";
 import QueryBuilder from "../builder/QueryBuilder.js";
+import { paymentStatus, paymentType } from "../constant/global.js";
 
 const stripe = new Stripe(config.stripe_secret_key);
 
@@ -43,12 +44,24 @@ const createOrder = async (req, res, next) => {
     // Check if payment due
     if (orderData.amount > orderData.paid) {
       orderData.due = orderData.amount - orderData.paid;
-      orderData.status = "Pending";
-      orderData.paymentTypeStatus = "Due";
-    } else {
+
+      if (orderData.paid === 0) {
+        orderData.status = paymentStatus.ORDERED;
+        orderData.paymentTypeStatus = paymentType.PARTIAL;
+        orderData.due = orderData.amount;
+      } else {
+        orderData.status = paymentStatus.PENDING;
+        orderData.paymentTypeStatus = paymentType.UNPAID;
+        orderData.due = orderData.amount - orderData.paid;
+      }
+    } else if (orderData.amount === orderData.paid) {
       orderData.due = 0;
-      orderData.status = "Completed";
-      orderData.paymentTypeStatus = "Paid";
+      orderData.status = paymentStatus.COMPLETED;
+      orderData.paymentTypeStatus = paymentType.PAID;
+    }
+
+    if (orderData?.received) {
+      orderData.isReceived = true;
     }
 
     const result = await Sales.create(orderData);

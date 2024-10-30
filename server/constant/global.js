@@ -6,9 +6,17 @@ export const activeStatus = {
 export const paymentStatus = {
   COMPLETED: "Completed",
   PENDING: "Pending",
+  ORDERED: "Ordered",
 };
 
 export const paymentType = {
   PAID: "Paid",
   UNPAID: "Due",
+  PARTIAL: "Partial",
+};
+
+export const salesReturnStatus = {
+  RECEIVED: "Received",
+  PENDING: "Pending",
+  ORDERED: "Ordered",
 };
