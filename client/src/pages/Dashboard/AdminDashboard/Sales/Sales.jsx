@@ -120,7 +120,11 @@ const Sales = () => {
                 size="small"
                 sx={{
                   backgroundColor:
-                    row.status === "Completed" ? "primary.main" : "red",
+                    row.status === "Completed"
+                      ? "primary.main"
+                      : row.status === "Pending"
+                      ? "red"
+                      : "orange",
                   color: "white",
                   borderRadius: 1,
                 }}
@@ -179,12 +183,19 @@ const Sales = () => {
                 variant="outlined"
                 size="small"
                 sx={{
-                  color: row.payment === "Paid" ? "primary.main" : "red",
-                  borderRadius: 1,
-                  border:
+                  color:
                     row.payment === "Paid"
-                      ? "1px solid lightgreen"
-                      : "1px solid red",
+                      ? "primary.main"
+                      : row.payment === "Due"
+                      ? "red"
+                      : "orange",
+                  borderRadius: 1,
+                  borderColor:
+                    row.payment === "Paid"
+                      ? "primary.main"
+                      : row.payment === "Due"
+                      ? "red"
+                      : "orange",
                   px: 1,
                 }}
                 label={row.payment}

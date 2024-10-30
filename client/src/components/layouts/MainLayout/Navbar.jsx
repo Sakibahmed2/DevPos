@@ -6,29 +6,21 @@ import {
   Badge,
   Box,
   Container,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Stack,
-  TextField,
   Toolbar,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 
 // icons
-import searchIcon from "../../../assets/dashboard icons/search.svg";
-import settingIcon from "../../../assets/dashboard icons/red-setting.svg";
 import bellIcon from "../../../assets/dashboard icons/bell.svg";
 import messageIcon from "../../../assets/dashboard icons/message.svg";
+import settingIcon from "../../../assets/dashboard icons/red-setting.svg";
+import { getUserInfo } from "../../../utils/getUserInfo";
+import DPClock from "../../ui/DPClock";
 
 const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
-  const [store, setStore] = useState("");
-  const handleChange = (e) => {
-    setStore(e.target.value);
-  };
+  const userInfo = getUserInfo();
 
   return (
     <AppBar
@@ -61,51 +53,49 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
             alignItems={"center"}
             justifyContent={"space-between"}
           >
-            {/* search and sort */}
-            <Stack direction={"row"} gap={2}>
-              <Box
-                sx={{
-                  width: "600px",
-                }}
-              >
-                <TextField
-                  label="Search here"
-                  fullWidth
-                  slotProps={{
-                    input: {
-                      endAdornment: <img src={searchIcon} />,
-                    },
+            <Stack
+              direction={"row"}
+              gap={2}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+              sx={{
+                width: {
+                  xs: "100%",
+                  lg: "70%",
+                },
+              }}
+            >
+              <Box>
+                <Typography variant="p">Hi, {userInfo.name}</Typography>
+                <Typography
+                  component={"h1"}
+                  variant={"h5"}
+                  sx={{
+                    fontWeight: 600,
+                    color: "primary.main",
                   }}
-                />
+                >
+                  Welcome to DevPos
+                </Typography>
               </Box>
 
-              <Box
-                sx={{
-                  width: {
-                    xs: "100%",
-                    lg: "170px",
-                  },
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">
-                    Select store
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={store}
-                    label="Select store"
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={"store"}>Store</MenuItem>
-                  </Select>
-                </FormControl>
+              <Box>
+                <DPClock />
               </Box>
             </Stack>
 
             {/* message and user info */}
-            <Stack direction={"row"} gap={2}>
+            <Stack
+              direction={"row"}
+              gap={2}
+              justifyContent={"center"}
+              sx={{
+                width: {
+                  xs: "100%",
+                  lg: "30%",
+                },
+              }}
+            >
               <Stack direction={"row"}>
                 <IconButton>
                   <Badge color="info" badgeContent={"21"}>

@@ -1,31 +1,62 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
+import DPDatePicker from "../../../../components/form/DPDatePicker";
+import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
-import DPForm from "../../../../components/form/DPForm";
-import DPDatePicker from "../../../../components/form/DPDatePicker";
-import { useState } from "react";
+import { useGetAllExpenseCategoriesQuery } from "../../../../redux/api/finance/expenseCategoriesApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
+import DPSelect from "../../../../components/form/DPSelect";
+import {
+  useCreateExpensesMutation,
+  useGetAllExpensesQuery,
+} from "../../../../redux/api/finance/expensesApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  categoryName: "",
+  expenseCategory: "",
   date: "",
   amount: "",
-  reference: "",
+  refNo: "",
   expenseFor: "",
   description: "",
-  status: "",
 };
 
 const CreateExpanseModal = ({ open, setOpen }) => {
-  const [toggleStatus, setToggleStatus] = useState("Active");
+  const { data: expanseCategory, isLoading } = useGetAllExpenseCategoriesQuery(
+    {}
+  );
+  const { data: expensesData } = useGetAllExpensesQuery({});
+  const [createExpanses] = useCreateExpensesMutation();
 
-  const handleToggle = (event) => {
-    setToggleStatus(event.target.checked ? "Active" : "Inactive");
-  };
+  if (isLoading) return <DPLoading />;
 
-  const onSubmit = (data) => {
-    data.status = toggleStatus;
-    console.log(data);
+  const expanseCategoryForSelect = convertDataForSelect(
+    expanseCategory?.data?.result
+  );
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating expenses...");
+    try {
+      // check if refNo already exists
+      const isRefNoExists = expensesData?.data?.result?.find(
+        (item) => item.refNo === data.refNo
+      );
+      if (isRefNoExists) {
+        toast.error("Reference number already exists ", { id: toastId });
+        return;
+      }
+      const res = await createExpanses(data).unwrap();
+
+      if (res?.success) {
+        toast.success("Expenses created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.message, { id: toastId });
+    }
   };
 
   return (
@@ -40,13 +71,17 @@ const CreateExpanseModal = ({ open, setOpen }) => {
             }}
           >
             <Stack direction={"row"} gap={3}>
-              <DPInput name={"categoryName"} label={"Expenses category"} />
+              <DPSelect
+                name={"expenseCategory"}
+                label={"Expenses category"}
+                items={expanseCategoryForSelect}
+              />
               <DPDatePicker name={"date"} label={"Date"} />
             </Stack>
 
             <Stack direction={"row"} gap={3}>
               <DPInput name={"amount"} label={"Amount"} />
-              <DPInput name={"reference"} label={"Reference"} />
+              <DPInput name={"refNo"} label={"Reference"} />
             </Stack>
 
             <DPInput name={"expenseFor"} label={"Expanse for"} />
@@ -57,20 +92,6 @@ const CreateExpanseModal = ({ open, setOpen }) => {
               multiline
               rows={4}
             />
-
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography component={"p"}>Status</Typography>
-              <Switch
-                checked={toggleStatus === "Active"}
-                onChange={handleToggle}
-                size="medium"
-              />
-            </Box>
           </Stack>
 
           <Box

@@ -106,7 +106,11 @@ const Brands = () => {
               width: "100%",
             }}
           >
-            <img src={row.brandLogo} alt="laptop" className="" />
+            <img
+              src={row.brandLogo}
+              alt="laptop"
+              className="object-contain h-8 w-12"
+            />
           </Box>
         );
       },

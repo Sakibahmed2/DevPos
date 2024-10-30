@@ -23,46 +23,49 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateExpanseModal from "./CreateExpensesModal";
 import EditExpensesModal from "./EditExpensesModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
-    description: "This is a description",
-  },
-  {
-    id: 2,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Inactive",
-    amount: 1000,
-    description: "This is a description",
-  },
-  {
-    id: 3,
-    categoryName: "Laptop",
-    date: "09 Sep 2024",
-    reference: "REF-123",
-    status: "Active",
-    amount: 1000,
-    description: "This is a description",
-  },
-];
+import {
+  useDeleteExpensesMutation,
+  useGetAllExpensesQuery,
+} from "../../../../redux/api/finance/expensesApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const Expenses = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: expensesData, isLoading } = useGetAllExpensesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteExpenses] = useDeleteExpensesMutation();
 
-  // const itemsPerPage = 3 ;
+  console.log(expensesData);
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const paginateData = paginateFormateData(expensesData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting expenses...");
+    try {
+      const res = await deleteExpenses(id).unwrap();
+
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.message, { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -186,6 +189,7 @@ const Expenses = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -200,12 +204,12 @@ const Expenses = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      categoryName: data.categoryName,
-      date: data.date,
-      reference: data.reference,
+      id: data._id,
+      categoryName: data.expenseCategory?.name,
+      date: formatDate(new Date(data.date)),
+      reference: data.refNo,
       status: data.status,
       amount: data.amount,
       description: data.description,
@@ -260,6 +264,7 @@ const Expenses = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -281,7 +286,8 @@ const Expenses = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -310,7 +316,7 @@ const Expenses = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={expensesData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

@@ -3,15 +3,32 @@ import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { useCreateExpenseCategoriesMutation } from "../../../../redux/api/finance/expenseCategoriesApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  categoryName: "",
+  name: "",
   description: "",
 };
 
 const CreateExpensesCategoryModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [createExpanseCategory] = useCreateExpenseCategoriesMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating expenses category");
+    try {
+      const res = await createExpanseCategory(data).unwrap();
+
+      if (res.success) {
+        toast.success("Expenses category created successfully", {
+          id: toastId,
+        });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create expenses category", { id: toastId });
+    }
   };
 
   return (
@@ -25,7 +42,7 @@ const CreateExpensesCategoryModal = ({ open, setOpen }) => {
               width: "500px",
             }}
           >
-            <DPInput name={"categoryName"} label={"Expenses category"} />
+            <DPInput name={"name"} label={"Expenses category"} />
             <DPInput
               name={"description"}
               label={"Description"}

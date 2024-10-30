@@ -5,34 +5,73 @@ import DPModal from "../../../../components/modal/DPModal";
 import DPForm from "../../../../components/form/DPForm";
 import DPDatePicker from "../../../../components/form/DPDatePicker";
 import { useState } from "react";
+import {
+  useGetSingleExpensesQuery,
+  useUpdateExpensesMutation,
+} from "../../../../redux/api/finance/expensesApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { toast } from "sonner";
+import { useGetAllExpenseCategoriesQuery } from "../../../../redux/api/finance/expenseCategoriesApi";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
+import DPSelect from "../../../../components/form/DPSelect";
 
-const defaultValues = {
-  categoryName: "",
-  date: "",
-  amount: "",
-  reference: "",
-  expenseFor: "",
-  description: "",
-  status: "",
-};
+const EditExpensesModal = ({ open, setOpen, id }) => {
+  const [status, setStatus] = useState("Active");
+  const { data: singleExpense, isLoading } = useGetSingleExpensesQuery(id);
+  const { data: expenseCategory, isLoading: expenseCategoryLoading } =
+    useGetAllExpenseCategoriesQuery({});
+  const [updateExpenses] = useUpdateExpensesMutation();
 
-const EditExpensesModal = ({ open, setOpen, id = "" }) => {
-  const [toggleStatus, setToggleStatus] = useState("Active");
+  const expenseCategoryForSelect = convertDataForSelect(
+    expenseCategory?.data?.result
+  );
 
-  const handleToggle = (event) => {
-    setToggleStatus(event.target.checked ? "Active" : "Inactive");
+  if (isLoading || expenseCategoryLoading) {
+    return <DPLoading />;
+  }
+
+  const defaultValue = {
+    expenseCategory: singleExpense?.data?.expenseCategory._id,
+    date: singleExpense?.data?.date,
+    amount: singleExpense?.data?.amount,
+    reference: singleExpense?.data?.refNo,
+    expenseFor: singleExpense?.data?.expenseFor,
+    description: singleExpense?.data?.description,
+    status: singleExpense?.data?.status,
   };
-  console.log(id);
 
-  const onSubmit = (data) => {
-    data.status = toggleStatus;
-    console.log(data);
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating expenses...");
+    try {
+      const updatedData = {
+        expenseCategory: data.categoryName,
+        date: data.date,
+        amount: data.amount,
+        refNo: data.reference,
+        expenseFor: data.expenseFor,
+        description: data.description,
+        status: status,
+      };
+
+      const res = await updateExpenses({
+        id: id,
+        data: updatedData,
+      }).unwrap();
+
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Error in updating expenses", { id: toastId });
+    }
   };
 
   return (
     <Box>
       <DPModal open={open} setOpen={setOpen} title="Edit expenses">
-        <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
+        <DPForm onSubmit={onSubmit} defaultValue={defaultValue}>
           <Stack
             direction={"column"}
             gap={3}
@@ -41,7 +80,11 @@ const EditExpensesModal = ({ open, setOpen, id = "" }) => {
             }}
           >
             <Stack direction={"row"} gap={3}>
-              <DPInput name={"categoryName"} label={"Expenses category"} />
+              <DPSelect
+                name={"expenseCategory"}
+                label={"Expenses category"}
+                items={expenseCategoryForSelect}
+              />
               <DPDatePicker name={"date"} label={"Date"} />
             </Stack>
 
@@ -67,9 +110,13 @@ const EditExpensesModal = ({ open, setOpen, id = "" }) => {
             >
               <Typography component={"p"}>Status</Typography>
               <Switch
-                checked={toggleStatus === "Active"}
-                onChange={handleToggle}
+                checked={status === "Active"}
                 size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
               />
             </Box>
           </Stack>
