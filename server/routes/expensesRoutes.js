@@ -13,4 +13,4 @@ router.put("/:id", expensesControllers.updateExpanses);
 
 router.delete("/:id", expensesControllers.deleteExpanses);
 
-export const expanseRouter = router;
+export const expenseRouter = router;

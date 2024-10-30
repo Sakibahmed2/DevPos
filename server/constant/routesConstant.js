@@ -1,7 +1,8 @@
 import { authRouter } from "../routes/authRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
-import { expanseRouter } from "../routes/expensesRoutes.js";
+import { expenseCategoryRouter } from "../routes/expenseCategoryRoutes.js";
+import { expenseRouter } from "../routes/expensesRoutes.js";
 import { manageStockRouter } from "../routes/manageStockRoutes.js";
 import { paymentRouter } from "../routes/paymentRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
@@ -79,8 +80,12 @@ const routes = [
 
   // Finance routes
   {
-    path: "/expanses",
-    routes: expanseRouter,
+    path: "/expenses",
+    routes: expenseRouter,
+  },
+  {
+    path: "/expense-categories",
+    routes: expenseCategoryRouter,
   },
 ];
 

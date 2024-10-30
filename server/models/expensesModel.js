@@ -3,8 +3,9 @@ import { activeStatus } from "../constant/global.js";
 
 const expenseSchema = new Schema(
   {
-    expanseCategory: {
-      type: String,
+    expenseCategory: {
+      type: Schema.Types.ObjectId,
+      ref: "ExpenseCategories",
       required: true,
     },
     amount: {
@@ -15,7 +16,7 @@ const expenseSchema = new Schema(
       type: String,
       required: true,
     },
-    expanseFor: {
+    expenseFor: {
       type: String,
       required: true,
     },

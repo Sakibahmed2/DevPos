@@ -20,8 +20,11 @@ const createExpenses = async (req, res, next) => {
 
 const getAllExpenses = async (req, res, next) => {
   try {
-    const expanseQuery = new QueryBuilder(Expanses.find(), req.query)
-      .search(["expanseCategory", "expanseFor", "refNo"])
+    const expanseQuery = new QueryBuilder(
+      Expanses.find().populate("expenseCategory", ["name"]),
+      req.query
+    )
+      .search(["expenseCategory.name", "expenseFor", "refNo"])
       .filter()
       .sort()
       .paginate();
@@ -46,7 +49,10 @@ const getAllExpenses = async (req, res, next) => {
 const getSingleExpanses = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await Expanses.findById(id);
+    const result = await Expanses.findById(id).populate(
+      "expenseCategory",
+      "name"
+    );
 
     sendResponse(res, {
       statusCode: 200,
