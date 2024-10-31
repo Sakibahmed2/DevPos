@@ -2,30 +2,61 @@
 import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
-import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
 import DPFileUploader from "../../../../components/form/DPFileUploader";
-
-const defaultValues = {
-  supplierName: "",
-  supplierImg: "",
-  email: "",
-  phone: "",
-  country: "",
-  description: "",
-};
+import {
+  useGetSingleSuppliersQuery,
+  useUpdateSuppliersMutation,
+} from "../../../../redux/api/finance/suppliersApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { toast } from "sonner";
+import convertImgToBase64 from "../../../../utils/convertImgToBase64";
+import { useMemo, useState } from "react";
+import countryList from "react-select-country-list";
+import Select from "react-select";
 
 const EditSupplierModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const [value, setValue] = useState("");
+  const options = useMemo(() => countryList().getData(), []);
+  const { data: singleSupplier, isLoading } = useGetSingleSuppliersQuery(id);
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const [updateSupplier] = useUpdateSuppliersMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating supplier...");
+    let base64Img = singleSupplier?.data?.img;
+
+    if (data.img instanceof Blob) {
+      base64Img = await convertImgToBase64(data.img);
+    }
+
+    try {
+      const updateData = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        country: value.label,
+        description: data.description,
+        img: base64Img,
+      };
+
+      const res = await updateSupplier({ id, data: updateData }).unwrap();
+      if (res?.success) {
+        toast.success("Supplier updated successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update supplier", { id: toastId });
+    }
   };
 
   return (
     <Box>
       <DPModal open={open} setOpen={setOpen} title="Edit supplier">
-        <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
+        <DPForm onSubmit={onSubmit} defaultValue={singleSupplier?.data}>
           <Stack
             direction={"column"}
             gap={3}
@@ -34,20 +65,38 @@ const EditSupplierModal = ({ open, setOpen, id }) => {
             }}
           >
             <Box>
-              <DPFileUploader name={"supplierImg"} label={"Supplier img"} />
+              <DPFileUploader
+                name={"img"}
+                label={"Supplier img"}
+                defaultImage={singleSupplier?.data?.img}
+              />
             </Box>
             <Stack direction={"row"} gap={3}>
-              <DPInput name={"supplierName"} label={"Supplier name"} />
+              <DPInput name={"name"} label={"Supplier name"} />
               <DPInput name={"email"} label={"Email"} />
             </Stack>
 
             <Stack direction={"row"} gap={3}>
               <DPInput name={"phone"} label={"Phone"} />
-              <DPSelect
-                name={"country"}
-                label={"Country"}
-                items={["Bangladesh", "Nepal"]}
-              />
+              <Box
+                sx={{
+                  width: "100%",
+                  overflow: "hidden 0",
+                }}
+              >
+                <Select
+                  options={options}
+                  value={value}
+                  onChange={(e) => setValue(e)}
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      padding: "9px 0",
+                      borderRadius: "8px",
+                    }),
+                  }}
+                />
+              </Box>
             </Stack>
 
             <DPInput

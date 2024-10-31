@@ -23,35 +23,43 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateStoreModal from "./CreateStoreModal";
 import EditStoresModal from "./EditStoresModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    storeName: "Store 1",
-    username: "jhno_doe",
-    email: "jhon@gmail.com",
-    phone: "123456789",
-    status: "Active",
-  },
-  {
-    id: 2,
-    storeName: "Store 1",
-    username: "jhno_doe",
-    email: "jhon@gmail.com",
-    phone: "123456789",
-    status: "Inactive",
-  },
-];
+import {
+  useDeleteStoresMutation,
+  useGetAllStoresQuery,
+} from "../../../../redux/api/finance/storeApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import { toast } from "sonner";
 
 const Stores = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: storeData, isLoading } = useGetAllStoresQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteStore] = useDeleteStoresMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(storeData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting store...");
+    try {
+      const res = await deleteStore(id).unwrap();
+      if (res?.success) {
+        toast.success("Store deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete store", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -122,8 +130,8 @@ const Stores = () => {
               variant="outlined"
               label={row.status}
               sx={{
-                borderColor: row.status === "Active" ? "green" : "red",
-                color: row.status === "Active" ? "green" : "red",
+                borderColor: row.status === "Active" ? "primary.main" : "red",
+                color: row.status === "Active" ? "primary.main" : "red",
                 borderRadius: 1,
               }}
             />
@@ -160,6 +168,7 @@ const Stores = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -174,13 +183,13 @@ const Stores = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      storeName: data.storeName,
-      username: data.username,
-      email: data.email,
-      phone: data.phone,
+      id: data._id,
+      storeName: data.name,
+      username: data.ownerName,
+      email: data.ownerEmail,
+      phone: data.ownerPhone,
       status: data.status,
     };
   });
@@ -230,6 +239,7 @@ const Stores = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -251,7 +261,8 @@ const Stores = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -280,7 +291,7 @@ const Stores = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={storeData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

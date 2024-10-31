@@ -4,9 +4,15 @@ import { Input, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Controller, useFormContext } from "react-hook-form";
 import plusIcon from "../../assets/dashboard icons/plusIcon.svg";
+import { useState, useEffect } from "react";
 
-export default function DPFileUploader({ name, label, sx }) {
+export default function DPFileUploader({ name, label, sx, defaultImage }) {
   const { control } = useFormContext();
+  const [preview, setPreview] = useState(defaultImage);
+
+  useEffect(() => {
+    setPreview(defaultImage);
+  }, [defaultImage]);
 
   return (
     <Controller
@@ -28,20 +34,24 @@ export default function DPFileUploader({ name, label, sx }) {
               border: "1px solid rgba(0, 0, 0, 0.23)",
               borderRadius: "8px",
               cursor: "pointer",
+              backgroundImage: preview ? `url(${preview})` : "none",
+              backgroundSize: "cover",
               ...sx,
             }}
             startIcon={
-              <img
-                src={plusIcon}
-                alt="plus icon"
-                style={{
-                  width: 30,
-                  height: 30,
-                  filter: "invert(1)",
-                  display: "flex",
-                  marginLeft: "10px",
-                }}
-              />
+              !preview && (
+                <img
+                  src={plusIcon}
+                  alt="plus icon"
+                  style={{
+                    width: 30,
+                    height: 30,
+                    filter: "invert(1)",
+                    display: "flex",
+                    marginLeft: "10px",
+                  }}
+                />
+              )
             }
             variant="text"
           >
@@ -49,7 +59,11 @@ export default function DPFileUploader({ name, label, sx }) {
             <Input
               {...field}
               type="file"
-              onChange={(e) => onChange(e?.target?.files?.[0])}
+              onChange={(e) => {
+                const file = e?.target?.files?.[0];
+                onChange(file);
+                setPreview(file ? URL.createObjectURL(file) : defaultImage);
+              }}
               style={{ display: "none" }}
             />
             {value && (

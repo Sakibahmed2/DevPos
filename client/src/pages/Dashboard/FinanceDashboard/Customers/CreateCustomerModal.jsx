@@ -2,24 +2,55 @@
 import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
-import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
+import Select from "react-select";
+import { useMemo, useState } from "react";
+import countryList from "react-select-country-list";
+import { toast } from "sonner";
+import { useCreateCustomersMutation } from "../../../../redux/api/finance/customersApi";
 
 const defaultValues = {
-  customerName: "",
+  name: "",
   email: "",
   phone: "",
-  country: "",
   description: "",
 };
 
 const CreateCustomerModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [value, setValue] = useState("");
+  const options = useMemo(() => countryList().getData(), []);
+  const [createCustomer] = useCreateCustomersMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating customer...");
+
+    try {
+      const customerData = {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        description: data.description,
+        country: value.label,
+      };
+
+      const res = await createCustomer(customerData).unwrap();
+
+      if (res.success) {
+        toast.success("Customer created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create customer", { id: toastId });
+    }
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        overflow: "hidden",
+      }}
+    >
       <DPModal open={open} setOpen={setOpen} title="Add customer">
         <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
           <Stack
@@ -30,17 +61,31 @@ const CreateCustomerModal = ({ open, setOpen }) => {
             }}
           >
             <Stack direction={"row"} gap={3}>
-              <DPInput name={"customerName"} label={"Customer name"} />
+              <DPInput name={"name"} label={"Customer name"} />
               <DPInput name={"email"} label={"Email"} />
             </Stack>
 
-            <Stack direction={"row"} gap={3}>
+            <Stack direction={"row"} gap={3} alignItems={"center"}>
               <DPInput name={"phone"} label={"Phone"} />
-              <DPSelect
-                name={"email"}
-                label={"Email"}
-                items={["Bangladesh", "Nepal"]}
-              />
+              <Box
+                sx={{
+                  width: "100%",
+                  overflow: "hidden 0",
+                }}
+              >
+                <Select
+                  options={options}
+                  value={value}
+                  onChange={(e) => setValue(e)}
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      padding: "9px 0",
+                      borderRadius: "8px",
+                    }),
+                  }}
+                />
+              </Box>
             </Stack>
 
             <DPInput

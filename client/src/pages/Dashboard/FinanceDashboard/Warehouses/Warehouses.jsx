@@ -23,39 +23,46 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateWarehouseModal from "./CreateWarehouseModal";
 import EditWarehouseModal from "./EditWarehouseModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    warehouse: "Warehouse 1",
-    contactPerson: "John Doe",
-    phone: "123456789",
-    stock: 100,
-    quantity: 1000,
-    createdAt: "09 Sep 2024",
-    status: "Active",
-  },
-  {
-    id: 2,
-    warehouse: "Warehouse 1",
-    contactPerson: "John Doe",
-    phone: "123456789",
-    stock: 100,
-    quantity: 1000,
-    createdAt: "09 Sep 2024",
-    status: "Inactive",
-  },
-];
+import {
+  useDeleteWarehousesMutation,
+  useGetAllWarehousesQuery,
+} from "../../../../redux/api/finance/warehouseApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const Warehouses = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
-  // const itemsPerPage = 3 ;
+  const { data: warehousesData, isLoading } = useGetAllWarehousesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteWarehouse] = useDeleteWarehousesMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(warehousesData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting warehouse...");
+    try {
+      const res = await deleteWarehouse(id).unwrap();
+
+      if (res.success) {
+        toast.success("Warehouse deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete warehouse", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -151,8 +158,8 @@ const Warehouses = () => {
               variant="outlined"
               label={row.status}
               sx={{
-                borderColor: row.status === "Active" ? "green" : "red",
-                color: row.status === "Active" ? "green" : "red",
+                borderColor: row.status === "Active" ? "primary.main" : "red",
+                color: row.status === "Active" ? "primary.main" : "red",
                 borderRadius: 1,
               }}
             />
@@ -189,6 +196,7 @@ const Warehouses = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -203,15 +211,15 @@ const Warehouses = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      warehouse: data.warehouse,
+      id: data._id,
+      warehouse: data.name,
       contactPerson: data.contactPerson,
       phone: data.phone,
       stock: data.stock,
       quantity: data.quantity,
-      createdAt: data.createdAt,
+      createdAt: formatDate(new Date(data.createdAt)),
       status: data.status,
     };
   });
@@ -264,6 +272,7 @@ const Warehouses = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -285,7 +294,8 @@ const Warehouses = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -314,7 +324,7 @@ const Warehouses = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={warehousesData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

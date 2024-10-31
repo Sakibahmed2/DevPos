@@ -1,14 +1,19 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack } from "@mui/material";
+import { useMemo, useState } from "react";
+import Select from "react-select";
+import countryList from "react-select-country-list";
+import DPFileUploader from "../../../../components/form/DPFileUploader";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
-import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
-import DPFileUploader from "../../../../components/form/DPFileUploader";
+import { toast } from "sonner";
+import convertImgToBase64 from "../../../../utils/convertImgToBase64";
+import { useCreateSuppliersMutation } from "../../../../redux/api/finance/suppliersApi";
 
 const defaultValues = {
-  supplierName: "",
-  supplierImg: "",
+  name: "",
+  img: "",
   email: "",
   phone: "",
   country: "",
@@ -16,8 +21,35 @@ const defaultValues = {
 };
 
 const CreateSupplierModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [value, setValue] = useState("");
+  const options = useMemo(() => countryList().getData(), []);
+  const [createSupplier] = useCreateSuppliersMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating supplier...");
+
+    const base64Img = await convertImgToBase64(data.img);
+    try {
+      const supplierData = {
+        name: data.name,
+        img: base64Img,
+        email: data.email,
+        phone: data.phone,
+        country: value.label,
+        description: data.description,
+      };
+
+      const res = await createSupplier(supplierData).unwrap();
+
+      if (res.success) {
+        toast.success("Supplier created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+
+      toast.error("Failed to create supplier", { id: toastId });
+    }
   };
 
   return (
@@ -32,20 +64,34 @@ const CreateSupplierModal = ({ open, setOpen }) => {
             }}
           >
             <Box>
-              <DPFileUploader name={"supplierImg"} label={"Supplier img"} />
+              <DPFileUploader name={"img"} label={"Supplier img"} />
             </Box>
             <Stack direction={"row"} gap={3}>
-              <DPInput name={"supplierName"} label={"Supplier name"} />
+              <DPInput name={"name"} label={"Supplier name"} />
               <DPInput name={"email"} label={"Email"} />
             </Stack>
 
             <Stack direction={"row"} gap={3}>
               <DPInput name={"phone"} label={"Phone"} />
-              <DPSelect
-                name={"country"}
-                label={"Country"}
-                items={["Bangladesh", "Nepal"]}
-              />
+              <Box
+                sx={{
+                  width: "100%",
+                  overflow: "hidden 0",
+                }}
+              >
+                <Select
+                  options={options}
+                  value={value}
+                  onChange={(e) => setValue(e)}
+                  styles={{
+                    control: (base) => ({
+                      ...base,
+                      padding: "9px 0",
+                      borderRadius: "8px",
+                    }),
+                  }}
+                />
+              </Box>
             </Stack>
 
             <DPInput

@@ -19,50 +19,47 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import supplierImg from "../../../../assets/userImg.png";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
+import {
+  useDeleteSuppliersMutation,
+  useGetAllSuppliersQuery,
+} from "../../../../redux/api/finance/suppliersApi";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateSupplierModal from "./CreateSuppliersModal";
 import EditSupplierModal from "./EditSupplierModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    supplierName: "John Doe",
-    supplierImg: supplierImg,
-    code: "C-123",
-    phone: "123456789",
-    email: "email@gmail.com",
-    country: "Bangladesh",
-  },
-  {
-    id: 3,
-    supplierName: "John Doe",
-    supplierImg: supplierImg,
-    code: "C-123",
-    phone: "123456789",
-    email: "email@gmail.com",
-    country: "Bangladesh",
-  },
-  {
-    id: 2,
-    supplierName: "John Doe",
-    supplierImg: supplierImg,
-    code: "C-123",
-    phone: "123456789",
-    email: "email@gmail.com",
-    country: "Bangladesh",
-  },
-];
+import { toast } from "sonner";
 
 const Suppliers = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: supplierData, isLoading } = useGetAllSuppliersQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteSupplier] = useDeleteSuppliersMutation();
+  if (isLoading) return <DPLoading />;
 
-  // const itemsPerPage = 3 ;
+  const paginateData = paginateFormateData(supplierData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting supplier...");
+
+    try {
+      const res = await deleteSupplier(id).unwrap();
+      if (res?.success) {
+        toast.success("Supplier deleted successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete supplier", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -89,7 +86,11 @@ const Suppliers = () => {
               width: "100%",
             }}
           >
-            <img src={row.supplierImg} alt="laptop" />
+            <img
+              src={row.supplierImg}
+              alt="laptop"
+              className="rounded-full object-contain size-12"
+            />
           </Box>
         );
       },
@@ -181,6 +182,7 @@ const Suppliers = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -195,11 +197,11 @@ const Suppliers = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      supplierName: data.supplierName,
-      supplierImg: data.supplierImg,
+      id: data._id,
+      supplierName: data.name,
+      supplierImg: data.img,
       code: data.code,
       phone: data.phone,
       email: data.email,
@@ -255,6 +257,7 @@ const Suppliers = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -276,7 +279,8 @@ const Suppliers = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -305,7 +309,7 @@ const Suppliers = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={supplierData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

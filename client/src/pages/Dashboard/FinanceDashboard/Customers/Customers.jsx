@@ -22,43 +22,41 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateCustomerModal from "./CreateCustomerModal";
 import EditCustomerModal from "./EditCustomersModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    customerName: "John Doe",
-    email: "jhon@gmail.com",
-    code: "C-123",
-    phone: "123456789",
-    country: "Bangladesh",
-  },
-  {
-    id: 2,
-    customerName: "John Doe",
-    email: "jhon@gmail.com",
-    code: "C-123",
-    phone: "123456789",
-    country: "Bangladesh",
-  },
-  {
-    id: 3,
-    customerName: "John Doe",
-    email: "jhon@gmail.com",
-    code: "C-123",
-    phone: "123456789",
-    country: "Bangladesh",
-  },
-];
+import {
+  useDeleteCustomersMutation,
+  useGetAllCustomersQuery,
+} from "../../../../redux/api/finance/customersApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import { toast } from "sonner";
 
 const Customers = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: customerData, isLoading } = useGetAllCustomersQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteCustomer] = useDeleteCustomersMutation();
 
-  // const itemsPerPage = 3 ;
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(customerData?.data?.result, page);
+
+  const handleCustomer = async (id) => {
+    const toastId = toast.loading("Deleting customer...");
+    try {
+      await deleteCustomer(id).unwrap();
+      toast.success("Customer deleted successfully", { id: toastId });
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete customer", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -159,6 +157,7 @@ const Customers = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleCustomer(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -173,12 +172,12 @@ const Customers = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      customerName: data.customerName,
+      id: data._id,
+      customerName: data.name,
       email: data.email,
-      code: data.code,
+      code: data.code || 0,
       phone: data.phone,
       country: data.country,
     };
@@ -232,6 +231,7 @@ const Customers = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -253,7 +253,8 @@ const Customers = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -282,7 +283,7 @@ const Customers = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={customerData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

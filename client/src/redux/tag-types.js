@@ -14,6 +14,8 @@ export const tagTypes = {
   promo: "promo",
   expenseCategories: "expenseCategories",
   expenses: "expenses",
+  suppliers: "suppliers",
+  customers: "customers",
 };
 
 export const tagTypesList = [
@@ -32,4 +34,6 @@ export const tagTypesList = [
   tagTypes.promo,
   tagTypes.expenseCategories,
   tagTypes.expenses,
+  tagTypes.suppliers,
+  tagTypes.customers,
 ];

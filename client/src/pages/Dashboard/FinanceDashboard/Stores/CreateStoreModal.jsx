@@ -4,24 +4,45 @@ import { useState } from "react";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { useCreateStoresMutation } from "../../../../redux/api/finance/storeApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  storeName: "",
-  username: "",
-  email: "",
-  phone: "",
-  status: "",
+  name: "",
+  ownerName: "",
+  ownerPhone: "",
+  ownerEmail: "",
 };
 
 const CreateStoreModal = ({ open, setOpen }) => {
   const [toggleStatus, setToggleStatus] = useState("Active");
+  const [createStore] = useCreateStoresMutation();
 
   const handleToggle = (event) => {
     setToggleStatus(event.target.checked ? "Active" : "Inactive");
   };
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating store...");
+
+    try {
+      const storeData = {
+        name: data.name,
+        ownerName: data.ownerName,
+        ownerPhone: data.ownerPhone,
+        ownerEmail: data.ownerEmail,
+        status: toggleStatus,
+      };
+
+      const res = await createStore(storeData).unwrap();
+      if (res?.success) {
+        toast.success("Store created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create store", { id: toastId });
+    }
   };
 
   return (
@@ -36,13 +57,13 @@ const CreateStoreModal = ({ open, setOpen }) => {
             }}
           >
             <Stack direction={"row"} gap={3}>
-              <DPInput name={"storeName"} label={"Store name"} />
-              <DPInput name={"username"} label={"Username"} />
+              <DPInput name={"name"} label={"Store name"} />
+              <DPInput name={"ownerName"} label={"Username"} />
             </Stack>
 
             <Stack direction={"row"} gap={3}>
-              <DPInput name={"phone"} label={"Phone"} />
-              <DPInput name={"email"} label={"Email"} />
+              <DPInput name={"ownerPhone"} label={"Phone"} />
+              <DPInput name={"ownerEmail"} label={"Email"} />
             </Stack>
 
             <Box
