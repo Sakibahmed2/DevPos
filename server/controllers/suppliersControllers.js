@@ -4,7 +4,13 @@ import sendResponse from "../utils/sendResponse.js";
 
 const createSupplier = async (req, res, next) => {
   try {
-    const supplier = await Suppliers.create(req.body);
+    // Create supplier code
+    const supplierCount = await Suppliers.countDocuments();
+    const supplierCode = `S-${(supplierCount + 1).toString().padStart(4, "0")}`;
+
+    const supplierData = { ...req.body, code: supplierCode };
+
+    const supplier = await Suppliers.create(supplierData);
     sendResponse(res, {
       statusCode: 201,
       success: true,

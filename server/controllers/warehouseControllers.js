@@ -69,7 +69,6 @@ const updateWarehouse = async (req, res, next) => {
       warehouseUpdatedData,
       {
         new: true,
-        runValidators: true,
       }
     );
 

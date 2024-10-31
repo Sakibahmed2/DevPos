@@ -1,31 +1,22 @@
 import mongoose, { Schema } from "mongoose";
 
-const suppliersSchema = new Schema(
+const shiftsSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
     },
-    img: {
+    startTime: {
       type: String,
       required: true,
     },
-    code: {
-      type: String,
-    },
-    phone: {
+    endTime: {
       type: String,
       required: true,
     },
-    email: {
+    weekOff: {
       type: String,
       required: true,
-    },
-    country: {
-      type: String,
-    },
-    description: {
-      type: String,
     },
   },
   {
@@ -33,4 +24,4 @@ const suppliersSchema = new Schema(
   }
 );
 
-export const Suppliers = mongoose.model("Suppliers", suppliersSchema);
+export const Shifts = mongoose.model("Shifts", shiftsSchema);

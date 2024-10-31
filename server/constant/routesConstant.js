@@ -2,12 +2,15 @@ import { authRouter } from "../routes/authRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
 import { customerRouter } from "../routes/customerRoutes.js";
+import { departmentsRouter } from "../routes/departmentsRoutes.js";
+import { designationRouter } from "../routes/designationRoutes.js";
 import { expenseCategoryRouter } from "../routes/expenseCategoryRoutes.js";
 import { expenseRouter } from "../routes/expensesRoutes.js";
 import { manageStockRouter } from "../routes/manageStockRoutes.js";
 import { paymentRouter } from "../routes/paymentRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
 import { promoRouter } from "../routes/promoRoutes.js";
+import { shiftsRouter } from "../routes/shiftsRoutes.js";
 import { stockTransferRouter } from "../routes/stockTransferRoutes.js";
 import { storeRouter } from "../routes/storeRoutes.js";
 import { subCategoryRouter } from "../routes/subCategoryRoutes.js";
@@ -96,6 +99,18 @@ const routes = [
   {
     path: "/stores",
     routes: storeRouter,
+  },
+  {
+    path: "/departments",
+    routes: departmentsRouter,
+  },
+  {
+    path: "/designations",
+    routes: designationRouter,
+  },
+  {
+    path: "/shifts",
+    routes: shiftsRouter,
   },
 ];
 
