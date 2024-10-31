@@ -1,6 +1,7 @@
 import { authRouter } from "../routes/authRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
+import { customerRouter } from "../routes/customerRoutes.js";
 import { expenseCategoryRouter } from "../routes/expenseCategoryRoutes.js";
 import { expenseRouter } from "../routes/expensesRoutes.js";
 import { manageStockRouter } from "../routes/manageStockRoutes.js";
@@ -10,6 +11,7 @@ import { promoRouter } from "../routes/promoRoutes.js";
 import { stockTransferRouter } from "../routes/stockTransferRoutes.js";
 import { storeRouter } from "../routes/storeRoutes.js";
 import { subCategoryRouter } from "../routes/subCategoryRoutes.js";
+import { suppliersRouter } from "../routes/suppliersRoutes.js";
 import { unitsRouter } from "../routes/unitsRoutes.js";
 import { userRouter } from "../routes/userRoutes.js";
 import { variantAttributesRouter } from "../routes/variantAttributesRoutes.js";
@@ -58,14 +60,6 @@ const routes = [
     routes: manageStockRouter,
   },
   {
-    path: "/warehouses",
-    routes: warehouseRouter,
-  },
-  {
-    path: "/stores",
-    routes: storeRouter,
-  },
-  {
     path: "/stock-transfers",
     routes: stockTransferRouter,
   },
@@ -86,6 +80,22 @@ const routes = [
   {
     path: "/expense-categories",
     routes: expenseCategoryRouter,
+  },
+  {
+    path: "/customers",
+    routes: customerRouter,
+  },
+  {
+    path: "/suppliers",
+    routes: suppliersRouter,
+  },
+  {
+    path: "/warehouses",
+    routes: warehouseRouter,
+  },
+  {
+    path: "/stores",
+    routes: storeRouter,
   },
 ];
 
