@@ -1,28 +1,83 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Stack, Switch, Typography } from "@mui/material";
-import DPForm from "../../../../components/form/DPForm";
-import DPModal from "../../../../components/modal/DPModal";
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+  Switch,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
+import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPTimePicker from "../../../../components/form/DPTimePicker";
+import DPModal from "../../../../components/modal/DPModal";
+import { toast } from "sonner";
+import formatTime from "../../../../utils/formateTime";
+import dayjs from "dayjs";
+import { useCreateShiftsMutation } from "../../../../redux/api/finance/shiftsApi";
 
 const defaultValues = {
-  shiftName: "",
+  name: "",
   startTime: "",
   endTime: "",
-  weekOff: "",
 };
+
+const daysOfWeek = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 const CreateShiftModal = ({ open, setOpen }) => {
   const [toggleStatus, setToggleStatus] = useState("Active");
+  const [selectedDays, setSelectedDays] = useState("");
+  const [createShift] = useCreateShiftsMutation();
 
   const handleToggle = (event) => {
     setToggleStatus(event.target.checked ? "Active" : "Inactive");
   };
 
-  const onSubmit = (data) => {
-    data.status = toggleStatus;
-    console.log(data);
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating shift...");
+
+    try {
+      const shiftData = {
+        name: data.name,
+        startTime: formatTime(dayjs(data.startTime)),
+        endTime: formatTime(dayjs(data.endTime)),
+        weekOff: selectedDays,
+        status: toggleStatus,
+      };
+
+      const res = await createShift(shiftData).unwrap();
+      if (res) {
+        toast.success("Shift created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create shift", { id: toastId });
+    }
+  };
+
+  const toggleDay = (day) => {
+    setSelectedDays((prevSelectedDays) => {
+      const daysArray = prevSelectedDays ? prevSelectedDays.split(", ") : [];
+
+      if (daysArray.includes(day)) {
+        // Remove the day if it's already selected
+        return daysArray.filter((d) => d !== day).join(", ");
+      } else {
+        // Add the day if it's not selected
+        return [...daysArray, day].join(", ");
+      }
+    });
   };
 
   return (
@@ -36,14 +91,38 @@ const CreateShiftModal = ({ open, setOpen }) => {
               width: "500px",
             }}
           >
-            <DPInput name={"shiftName"} label={"Shift name"} />
+            <DPInput name={"name"} label={"Shift name"} />
 
             <Stack direction={"row"} gap={2}>
               <DPTimePicker name={"startTime"} label={"Start time"} />
               <DPTimePicker name={"endTime"} label={"End time"} />
             </Stack>
 
-            <DPInput name={"weekOff"} label={"Week of"} />
+            {/* Week off toggles */}
+
+            <Box>
+              <Typography component={"p"} variant="h6">
+                Weekdays
+              </Typography>
+            </Box>
+
+            <Box>
+              <Box display="flex" flexWrap="wrap" gap={1}>
+                {daysOfWeek.map((day) => (
+                  <FormControlLabel
+                    key={day}
+                    control={
+                      <Checkbox
+                        checked={selectedDays.split(", ").includes(day)}
+                        onChange={() => toggleDay(day)}
+                        size="small"
+                      />
+                    }
+                    label={day}
+                  />
+                ))}
+              </Box>
+            </Box>
 
             {/* Status toggle */}
             <Box

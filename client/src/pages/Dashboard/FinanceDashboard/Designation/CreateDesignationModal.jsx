@@ -3,14 +3,37 @@ import { Box, Button, Stack, Switch, Typography } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { useState } from "react";
+import { useCreateDesignationsMutation } from "../../../../redux/api/finance/designationsApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  designationName: "",
+  name: "",
 };
 
 const CreateDesignationModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [status, setStatus] = useState("Active");
+
+  const [createDesignation] = useCreateDesignationsMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating designation...");
+    try {
+      const designationData = {
+        name: data.name,
+        status: status,
+      };
+
+      const res = await createDesignation(designationData).unwrap();
+
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create designation", { id: toastId });
+    }
   };
 
   return (
@@ -24,12 +47,7 @@ const CreateDesignationModal = ({ open, setOpen }) => {
               width: "500px",
             }}
           >
-            <DPInput
-              name={"designationName"}
-              label={"Designation name"}
-              fullWidth
-              size="medium"
-            />
+            <DPInput name={"name"} label={"Designation name"} />
 
             {/* Status toggle */}
             <Box
@@ -39,7 +57,15 @@ const CreateDesignationModal = ({ open, setOpen }) => {
               }}
             >
               <Typography component={"p"}>Status</Typography>
-              <Switch defaultChecked size="medium" />
+              <Switch
+                checked={status === "Active"}
+                size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
+              />
             </Box>
           </Stack>
 

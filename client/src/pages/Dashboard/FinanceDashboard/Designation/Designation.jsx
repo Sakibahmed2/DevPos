@@ -25,35 +25,44 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateDesignationModal from "./CreateDesignationModal";
 import EditDesignationModal from "./EditDesignationModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    designationName: "Manager",
-    members: ["https://images.unsplash.com/photo"],
-    totalMember: 20,
-    status: "Active",
-    createdAt: "25 May 2023",
-  },
-  {
-    id: 2,
-    designationName: "Developer",
-    members: ["https://images.unsplash.com/photo"],
-    totalMember: 20,
-    status: "Inactive",
-    createdAt: "25 May 2023",
-  },
-];
+import {
+  useDeleteDesignationsMutation,
+  useGetAllDesignationsQuery,
+} from "../../../../redux/api/finance/designationsApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const Stores = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
-  // const itemsPerPage = 3 ;
+  const { data: designationData, isLoading } = useGetAllDesignationsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteDesignation] = useDeleteDesignationsMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(designationData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting designation...");
+
+    try {
+      await deleteDesignation(id).unwrap();
+      toast.success("Designation deleted successfully", { id: toastId });
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete designation", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -84,32 +93,40 @@ const Stores = () => {
       renderCell: ({ row }) => {
         console.log(row);
         return (
-          <AvatarGroup total={4}>
-            <Avatar
-              alt="Remy Sharp"
-              src="/static/images/avatar/1.jpg"
-              sx={{
-                height: 24,
-                width: 24,
-              }}
-            />
-            <Avatar
-              alt="Remy Sharp"
-              src="/static/images/avatar/1.jpg"
-              sx={{
-                height: 24,
-                width: 24,
-              }}
-            />
-            <Avatar
-              alt="Remy Sharp"
-              src="/static/images/avatar/1.jpg"
-              sx={{
-                height: 24,
-                width: 24,
-              }}
-            />
-          </AvatarGroup>
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <AvatarGroup total={4}>
+              <Avatar
+                alt="Remy Sharp"
+                src="/static/images/avatar/1.jpg"
+                sx={{
+                  height: 24,
+                  width: 24,
+                }}
+              />
+              <Avatar
+                alt="Remy Sharp"
+                src="/static/images/avatar/1.jpg"
+                sx={{
+                  height: 24,
+                  width: 24,
+                }}
+              />
+              <Avatar
+                alt="Remy Sharp"
+                src="/static/images/avatar/1.jpg"
+                sx={{
+                  height: 24,
+                  width: 24,
+                }}
+              />
+            </AvatarGroup>
+          </Box>
         );
       },
     },
@@ -186,6 +203,7 @@ const Stores = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -200,14 +218,14 @@ const Stores = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      designationName: data.designationName,
-      members: data.members,
-      totalMember: data.totalMember,
+      id: data._id,
+      designationName: data.name,
+      members: data.members || 0,
+      totalMember: data.totalMember || 0,
       status: data.status,
-      createdAt: data.createdAt,
+      createdAt: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -259,6 +277,7 @@ const Stores = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -280,7 +299,8 @@ const Stores = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -309,7 +329,7 @@ const Stores = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={designationData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

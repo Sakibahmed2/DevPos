@@ -3,22 +3,50 @@ import { Box, Button, Stack, Switch, Typography } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
-
-const defaultValues = {
-  designationName: "",
-};
+import { useState } from "react";
+import {
+  useGetSingleDesignationsQuery,
+  useUpdateDesignationsMutation,
+} from "../../../../redux/api/finance/designationsApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { toast } from "sonner";
 
 const EditDesignationModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const [status, setStatus] = useState("Active");
+  const { data: singleDesignation, isLoading } =
+    useGetSingleDesignationsQuery(id);
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const [updateDesignation] = useUpdateDesignationsMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating designation...");
+    try {
+      const designationData = {
+        name: data.name,
+        status: status,
+      };
+
+      const res = await updateDesignation({
+        id: id,
+        data: designationData,
+      }).unwrap();
+
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update designation", { id: toastId });
+    }
   };
 
   return (
     <Box>
       <DPModal open={open} setOpen={setOpen} title="Edit designation">
-        <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
+        <DPForm onSubmit={onSubmit} defaultValue={singleDesignation?.data}>
           <Stack
             direction={"column"}
             gap={3}
@@ -27,7 +55,7 @@ const EditDesignationModal = ({ open, setOpen, id }) => {
             }}
           >
             <DPInput
-              name={"designationName"}
+              name={"name"}
               label={"Designation name"}
               fullWidth
               size="medium"
@@ -41,7 +69,15 @@ const EditDesignationModal = ({ open, setOpen, id }) => {
               }}
             >
               <Typography component={"p"}>Status</Typography>
-              <Switch defaultChecked size="medium" />
+              <Switch
+                checked={status === "Active"}
+                size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
+              />
             </Box>
           </Stack>
 

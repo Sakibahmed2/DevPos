@@ -23,37 +23,43 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateShiftModal from "./CreateShiftModal";
 import EditShiftModal from "./EditShiftModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    shiftName: "Fixed",
-    startTime: "8:00 AM",
-    endTime: "6:00 PM",
-    weekOff: "Sunday,Monday",
-    status: "Active",
-    createdAt: "25 May 2023",
-  },
-  {
-    id: 2,
-    shiftName: "Fixed",
-    startTime: "8:00 AM",
-    endTime: "6:00 PM",
-    weekOff: "Sunday,Monday",
-    status: "Inactive",
-    createdAt: "25 May 2023",
-  },
-];
+import {
+  useDeleteShiftsMutation,
+  useGetAllShiftsQuery,
+} from "../../../../redux/api/finance/shiftsApi";
+import { paginateFormateData } from "../../../../utils/pagination";
+import DPLoading from "../../../../components/ui/DPLoading";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const Shifts = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [deleteShift] = useDeleteShiftsMutation();
 
-  // const itemsPerPage = 3 ;
+  const { data: shiftData, isLoading } = useGetAllShiftsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(shiftData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting shift...");
+    try {
+      await deleteShift(id);
+      toast.success("Shift deleted successfully", { id: toastId });
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete shift", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -165,6 +171,7 @@ const Shifts = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -179,15 +186,15 @@ const Shifts = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      shiftName: data.shiftName,
+      id: data._id,
+      shiftName: data.name,
       startTime: data.startTime,
       endTime: data.endTime,
       weekOff: data.weekOff,
       status: data.status,
-      createdAt: data.createdAt,
+      createdAt: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -239,6 +246,7 @@ const Shifts = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -260,7 +268,8 @@ const Shifts = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -289,7 +298,7 @@ const Shifts = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={shiftData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
