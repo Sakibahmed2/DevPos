@@ -1,12 +1,43 @@
 /* eslint-disable react/prop-types */
-import { Box, Typography } from "@mui/material";
-import moreIcon from "../../../../assets/dashboard icons/finance/hrm/more.svg";
+import { Box, Menu, MenuItem, Typography } from "@mui/material";
 import { useState } from "react";
+import moreIcon from "../../../../assets/dashboard icons/finance/hrm/more.svg";
 import EditDepartmentsModal from "../../../../pages/Dashboard/FinanceDashboard/Departments/EditDepartmentsModal";
+import { useDeleteDepartmentsMutation } from "../../../../redux/api/finance/departmentsApi";
+import { toast } from "sonner";
 
 const DepartmentCard = ({ department }) => {
-  const { id, name, img, totalMembers } = department || {};
-  const [open, setOpen] = useState(false);
+  const { _id, name, img } = department || {};
+  const [modalOpen, setModalOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const [deleteDepartment] = useDeleteDepartmentsMutation();
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDelete = async () => {
+    const toastId = toast.loading("Deleting department...");
+    try {
+      const res = await deleteDepartment(_id).unwrap();
+      if (res?.success) {
+        toast.success("Department deleted successfully", { id: toastId });
+        handleClose();
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete department", { id: toastId });
+    }
+  };
+
+  const handleModalOpen = () => {
+    setModalOpen(true);
+    handleClose();
+  };
 
   return (
     <Box
@@ -54,13 +85,34 @@ const DepartmentCard = ({ department }) => {
 
         <Box
           component={"button"}
-          onClick={() => setOpen(true)}
           sx={{
             position: "relative",
             left: 30,
           }}
         >
-          <img src={moreIcon} alt="" className="w-8" />
+          <Box
+            component={"button"}
+            id="fade-button"
+            aria-controls={open ? "fade-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+          >
+            <img src={moreIcon} alt="" className="w-8" />
+          </Box>
+
+          <Menu
+            id="fade-menu"
+            MenuListProps={{
+              "aria-labelledby": "fade-button",
+            }}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={() => handleDelete()}>Delete</MenuItem>
+            <MenuItem onClick={handleModalOpen}>Edit</MenuItem>
+          </Menu>
         </Box>
       </Box>
 
@@ -70,11 +122,12 @@ const DepartmentCard = ({ department }) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          p: "20px 100px",
+          width: "100%",
+          height: "100px",
           borderRadius: 4,
         }}
       >
-        <img src={img} alt="" />
+        <img src={img} alt="" className="object-contain size-20" />
       </Box>
 
       <Box
@@ -83,12 +136,12 @@ const DepartmentCard = ({ department }) => {
         }}
       >
         <Typography variant="p" component={"span"} fontWeight={500}>
-          Total members: {totalMembers}
+          Total members: 10
         </Typography>
       </Box>
 
       {/* Edit department modal */}
-      <EditDepartmentsModal open={open} setOpen={setOpen} id={id} />
+      <EditDepartmentsModal open={modalOpen} setOpen={setModalOpen} id={_id} />
     </Box>
   );
 };

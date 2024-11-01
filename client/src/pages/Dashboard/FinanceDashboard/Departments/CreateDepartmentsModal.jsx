@@ -4,6 +4,9 @@ import DPFileUploader from "../../../../components/form/DPFileUploader";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { toast } from "sonner";
+import { useCreateDepartmentsMutation } from "../../../../redux/api/finance/departmentsApi";
+import convertImgToBase64 from "../../../../utils/convertImgToBase64";
 
 const defaultValues = {
   name: "",
@@ -13,8 +16,29 @@ const defaultValues = {
 };
 
 const CreateDepartmentsModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [createDepartments] = useCreateDepartmentsMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating department...");
+    const base64Img = await convertImgToBase64(data.img);
+    try {
+      const departmentData = {
+        name: data.name,
+        img: base64Img,
+        HOD: data.HOD,
+        description: data.description,
+      };
+
+      const res = await createDepartments(departmentData).unwrap();
+
+      if (res?.success) {
+        toast.success("Department created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create department", { id: toastId });
+    }
   };
 
   return (

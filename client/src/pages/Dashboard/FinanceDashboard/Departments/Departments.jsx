@@ -15,35 +15,32 @@ import { useState } from "react";
 import totalEmployeesIcon from "../../../../assets/dashboard icons/finance/hrm/totalEmployees.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import employeeImg from "../../../../assets/employeesImg.png";
 import DepartmentCard from "../../../../components/dashboard/finance/Departments/DepartmentCard";
+import DPLoading from "../../../../components/ui/DPLoading";
+import PaginationUi from "../../../../components/ui/PaginationUi";
 import SectionTitle from "../../../../components/ui/SectionTitle";
+import { useGetAllDepartmentsQuery } from "../../../../redux/api/finance/departmentsApi";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateDepartmentsModal from "./CreateDepartmentsModal";
 
-const departments = [
-  {
-    id: 1,
-    name: "UI/UX",
-    img: employeeImg,
-    totalMembers: 10,
-  },
-  {
-    id: 2,
-    name: "UI/UX",
-    img: employeeImg,
-    totalMembers: 10,
-  },
-  {
-    id: 3,
-    name: "UI/UX",
-    img: employeeImg,
-    totalMembers: 10,
-  },
-];
-
 const Departments = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [page, setPage] = useState(0);
   const [createDepartmentsModal, setCreateDepartmentModal] = useState(false);
+
+  const { data: departmentData, isLoading } = useGetAllDepartmentsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(departmentData?.data?.result, page);
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   return (
     <Container>
@@ -87,26 +84,41 @@ const Departments = () => {
             sx={{
               display: "flex",
               alignItems: "center",
+              gap: 2,
             }}
           >
             <img src={totalEmployeesIcon} alt="" />
-            <Typography variant="p">
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               {" "}
-              Total departments{" "}
-              <Typography
-                variant="p"
-                component={"span"}
+              <Typography variant="p">Total departments </Typography>
+              <Box
                 sx={{
                   bgcolor: "primary.main",
-                  color: "white",
-                  padding: "3px 5px",
+                  width: "22px",
+                  height: "22px",
                   borderRadius: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                {" "}
-                10{" "}
-              </Typography>
-            </Typography>
+                <Typography
+                  variant="p"
+                  component={"span"}
+                  sx={{
+                    color: "white",
+                  }}
+                >
+                  {departmentData?.data?.meta?.total}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
 
           <TextField
@@ -114,6 +126,7 @@ const Departments = () => {
               width: "250px",
             }}
             label="Search here"
+            onChange={(e) => setSearchTerm(e.target.value)}
             fullWidth
             slotProps={{
               input: {
@@ -135,14 +148,26 @@ const Departments = () => {
               label="Sort by date"
               onChange={(e) => setSortBy(e.target.value)}
             >
-              <MenuItem value={"date"}>date</MenuItem>
+              <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+              <MenuItem value={"-createdAt"}>Newest First</MenuItem>
             </Select>
           </FormControl>
         </Box>
       </Stack>
       {/* Employees card */}
+      {departmentData?.data?.result.length === 0 && (
+        <Stack
+          direction={"row"}
+          justifyContent={"center"}
+          alignItems={"center"}
+        >
+          <Typography variant="h5" fontWeight={600} sx={{ mt: 5 }}>
+            No departments founded
+          </Typography>
+        </Stack>
+      )}
       <Grid2 container spacing={3} sx={{ mt: 5 }}>
-        {departments.map((department) => (
+        {paginateData.map((department) => (
           <Grid2
             item
             size={{
@@ -150,12 +175,19 @@ const Departments = () => {
               sm: 6,
               lg: 4,
             }}
-            key={department.id}
+            key={department._id}
           >
             <DepartmentCard department={department} />
           </Grid2>
         ))}
       </Grid2>
+      <Box>
+        <PaginationUi
+          totalItems={departmentData?.data?.meta?.total}
+          currentPage={page}
+          onPageChange={handlePageChange}
+        />
+      </Box>
       {/* create department modal */}
       <CreateDepartmentsModal
         open={createDepartmentsModal}
