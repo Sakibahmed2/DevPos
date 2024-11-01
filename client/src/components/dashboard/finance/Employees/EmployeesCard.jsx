@@ -1,11 +1,32 @@
 /* eslint-disable react/prop-types */
-import { Box, Chip, Stack, Typography } from "@mui/material";
+import { Box, Chip, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import moreIcon from "../../../../assets/dashboard icons/finance/hrm/more.svg";
 import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import formatDate from "../../../../utils/formateDate";
 
 const EmployeesCard = ({ employee }) => {
-  const { id, name, img, EMP_ID, role, department, joined, status } =
-    employee || {};
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const {
+    id,
+    name,
+    img,
+    employeeCode,
+    designation,
+    department,
+    joiningDate,
+    status,
+  } = employee || {};
+
+  console.log(employee);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <Box
@@ -41,9 +62,33 @@ const EmployeesCard = ({ employee }) => {
             left: 30,
           }}
         >
-          <NavLink to={`/finance/employees/edit-employee/${id}`}>
+          <Box
+            component={"button"}
+            id="fade-button"
+            aria-controls={open ? "fade-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+          >
             <img src={moreIcon} alt="" className="w-8" />
-          </NavLink>
+          </Box>
+
+          <Menu
+            id="fade-menu"
+            MenuListProps={{
+              "aria-labelledby": "fade-button",
+            }}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+          >
+            <MenuItem>Delete</MenuItem>
+            <MenuItem>
+              <NavLink to={`/finance/employees/edit-employee/${id}`}>
+                Edit
+              </NavLink>
+            </MenuItem>
+          </Menu>
         </Box>
       </Box>
 
@@ -79,7 +124,7 @@ const EmployeesCard = ({ employee }) => {
               mt: 1,
             }}
           >
-            EMP ID: {EMP_ID}
+            EMP ID: {employeeCode}
           </Typography>
           <Typography
             component={"span"}
@@ -90,7 +135,7 @@ const EmployeesCard = ({ employee }) => {
           >
             {name}
           </Typography>
-          <Typography component={"span"}>{role}</Typography>
+          <Typography component={"span"}>{designation.name}</Typography>
         </Box>
 
         <Stack
@@ -108,14 +153,16 @@ const EmployeesCard = ({ employee }) => {
             <Typography variant="p" fontWeight={500}>
               Joined
             </Typography>
-            <Typography variant="p">{joined}</Typography>
+            <Typography variant="p">
+              {formatDate(new Date(joiningDate))}
+            </Typography>
           </Stack>
 
           <Stack direction={"column"}>
             <Typography variant="p" fontWeight={500}>
               Department
             </Typography>
-            <Typography variant="p">{department}</Typography>
+            <Typography variant="p">{department.name}</Typography>
           </Stack>
         </Stack>
       </Stack>

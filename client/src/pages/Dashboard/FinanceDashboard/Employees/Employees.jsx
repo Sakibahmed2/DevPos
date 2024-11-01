@@ -16,45 +16,34 @@ import { NavLink } from "react-router-dom";
 import totalEmployeesIcon from "../../../../assets/dashboard icons/finance/hrm/totalEmployees.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import employeeImg from "../../../../assets/employeesImg.png";
 import EmployeesCard from "../../../../components/dashboard/finance/Employees/EmployeesCard";
+import DPLoading from "../../../../components/ui/DPLoading";
+import PaginationUi from "../../../../components/ui/PaginationUi";
 import SectionTitle from "../../../../components/ui/SectionTitle";
-
-const employees = [
-  {
-    id: 1,
-    name: "Jhon doe",
-    img: employeeImg,
-    EMP_ID: "EMP-123",
-    role: "Designer",
-    department: "UI/UX",
-    joined: "23 Jul 2024",
-    status: "Active",
-  },
-  {
-    id: 2,
-    name: "Jhon doe",
-    img: employeeImg,
-    EMP_ID: "EMP-125",
-    role: "Developer",
-    department: "Software",
-    joined: "23 Jul 2024",
-    status: "Inactive",
-  },
-  {
-    id: 3,
-    name: "Jhon doe",
-    img: employeeImg,
-    EMP_ID: "EMP-124",
-    role: "Database administrator",
-    department: "Admin",
-    joined: "23 Jul 2024",
-    status: "Active",
-  },
-];
+import { useGetAllEmployeesQuery } from "../../../../redux/api/finance/employeesApi";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const Employees = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
+  const [page, setPage] = useState(0);
+
+  const { data: employeesData, isLoading } = useGetAllEmployeesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(
+    employeesData?.data?.result,
+    page,
+    3
+  );
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   return (
     <Container>
@@ -127,6 +116,7 @@ const Employees = () => {
               width: "250px",
             }}
             label="Search here"
+            onChange={(e) => setSearchTerm(e.target.value)}
             fullWidth
             slotProps={{
               input: {
@@ -148,14 +138,15 @@ const Employees = () => {
               label="Sort by date"
               onChange={(e) => setSortBy(e.target.value)}
             >
-              <MenuItem value={"date"}>date</MenuItem>
+              <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+              <MenuItem value={"-createdAt"}>Newest First</MenuItem>
             </Select>
           </FormControl>
         </Box>
       </Stack>
       {/* Employees card */}
       <Grid2 container spacing={3} sx={{ mt: 5 }}>
-        {employees.map((employee) => (
+        {paginateData.map((employee) => (
           <Grid2
             item
             size={{
@@ -163,12 +154,19 @@ const Employees = () => {
               sm: 6,
               lg: 4,
             }}
-            key={employee.id}
+            key={employee._id}
           >
             <EmployeesCard employee={employee} />
           </Grid2>
         ))}
       </Grid2>
+      <Box>
+        <PaginationUi
+          totalItems={employeesData?.data?.meta?.total}
+          currentPage={page}
+          onPageChange={handlePageChange}
+        />
+      </Box>
     </Container>
   );
 };

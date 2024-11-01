@@ -18,18 +18,17 @@ const DPDatePicker = ({
     <Controller
       name={name}
       control={control}
-      defaultValue={dayjs(new Date())} // Ensure this is a valid Day.js object
+      defaultValue={dayjs(new Date())}
       render={({ field: { onChange, value, ...field } }) => {
-        const parsedValue = value ? dayjs(value) : null; // Convert value to Day.js if it's not null
+        const parsedValue = value ? dayjs(value) : null;
 
         return (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker
               label={label}
-              disablePast
               onChange={(date) => onChange(date)}
               {...field}
-              value={parsedValue} // Ensure the value passed is a Day.js object
+              value={parsedValue}
               slotProps={{
                 textField: {
                   required: required,
