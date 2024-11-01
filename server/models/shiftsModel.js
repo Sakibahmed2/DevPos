@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { activeStatus } from "../constant/global.js";
 
 const shiftsSchema = new Schema(
   {
@@ -17,6 +18,11 @@ const shiftsSchema = new Schema(
     weekOff: {
       type: String,
       required: true,
+    },
+    status: {
+      type: String,
+      enum: [activeStatus.ACTIVE, activeStatus.INACTIVE],
+      default: activeStatus.ACTIVE,
     },
   },
   {

@@ -4,6 +4,7 @@ import { categoriesRouter } from "../routes/categoriesRoutes.js";
 import { customerRouter } from "../routes/customerRoutes.js";
 import { departmentsRouter } from "../routes/departmentsRoutes.js";
 import { designationRouter } from "../routes/designationRoutes.js";
+import { employeesRouter } from "../routes/employeesRoutes.js";
 import { expenseCategoryRouter } from "../routes/expenseCategoryRoutes.js";
 import { expenseRouter } from "../routes/expensesRoutes.js";
 import { manageStockRouter } from "../routes/manageStockRoutes.js";
@@ -111,6 +112,10 @@ const routes = [
   {
     path: "/shifts",
     routes: shiftsRouter,
+  },
+  {
+    path: "/employees",
+    routes: employeesRouter,
   },
 ];
 

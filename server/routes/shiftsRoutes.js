@@ -3,7 +3,7 @@ import { shiftsControllers } from "../controllers/shiftsControllers.js";
 
 const router = Router();
 
-router.get("/", shiftsControllers.createShifts);
+router.post("/", shiftsControllers.createShifts);
 
 router.get("/", shiftsControllers.getAllShifts);
 

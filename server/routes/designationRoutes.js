@@ -3,7 +3,7 @@ import { designationControllers } from "../controllers/designationControllers.js
 
 const router = Router();
 
-router.get("/", designationControllers.createDesignations);
+router.post("/", designationControllers.createDesignations);
 
 router.get("/", designationControllers.getAllDesignations);
 

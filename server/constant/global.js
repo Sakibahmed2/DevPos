@@ -20,3 +20,9 @@ export const salesReturnStatus = {
   PENDING: "Pending",
   ORDERED: "Ordered",
 };
+
+export const gender = {
+  MALE: "Male",
+  FEMALE: "Female",
+  OTHER: "Other",
+};

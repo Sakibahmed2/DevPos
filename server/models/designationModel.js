@@ -1,18 +1,23 @@
 import mongoose, { Schema } from "mongoose";
 import { activeStatus } from "../constant/global.js";
 
-const designationSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
+const designationSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    status: {
+      type: String,
+      enum: [activeStatus.ACTIVE, activeStatus.INACTIVE],
+      default: activeStatus.ACTIVE,
+    },
   },
-  status: {
-    type: String,
-    enum: [activeStatus.ACTIVE, activeStatus.INACTIVE],
-    default: activeStatus.ACTIVE,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 // check is name already exists
 designationSchema.statics.isDesignationExists = async function (name) {
