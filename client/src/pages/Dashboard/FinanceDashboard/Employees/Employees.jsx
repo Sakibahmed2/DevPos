@@ -35,11 +35,7 @@ const Employees = () => {
 
   if (isLoading) return <DPLoading />;
 
-  const paginateData = paginateFormateData(
-    employeesData?.data?.result,
-    page,
-    3
-  );
+  const paginateData = paginateFormateData(employeesData?.data?.result, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -92,23 +88,29 @@ const Employees = () => {
             }}
           >
             <img src={totalEmployeesIcon} alt="" />
-            <Typography variant="p">
-              {" "}
-              Total Employees{" "}
-              <Typography
-                variant="p"
-                component={"span"}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Typography variant="p">Total Employees</Typography>
+              <Box
                 sx={{
                   bgcolor: "primary.main",
                   color: "white",
-                  padding: "3px 5px",
                   borderRadius: "100%",
+                  height: "22px",
+                  width: "22px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {" "}
-                10{" "}
-              </Typography>
-            </Typography>
+                {employeesData?.data?.meta?.total}
+              </Box>
+            </Box>
           </Box>
 
           <TextField

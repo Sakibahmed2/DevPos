@@ -4,22 +4,24 @@ import moreIcon from "../../../../assets/dashboard icons/finance/hrm/more.svg";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import formatDate from "../../../../utils/formateDate";
+import { useDeleteEmployeesMutation } from "../../../../redux/api/finance/employeesApi";
+import { toast } from "sonner";
 
 const EmployeesCard = ({ employee }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const {
-    id,
-    name,
+    _id,
     img,
     employeeCode,
     designation,
     department,
     joiningDate,
     status,
+    firstName,
+    lastName,
   } = employee || {};
-
-  console.log(employee);
+  const [deleteEmployee] = useDeleteEmployeesMutation();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -28,11 +30,26 @@ const EmployeesCard = ({ employee }) => {
     setAnchorEl(null);
   };
 
+  const handleDelete = async () => {
+    const toastId = toast.loading("Deleting employee...");
+    try {
+      const res = await deleteEmployee(_id).unwrap();
+      if (res.success) {
+        toast.success("Employee deleted successfully", { id: toastId });
+        handleClose();
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete employee", { id: toastId });
+    }
+  };
+
   return (
     <Box
       sx={{
         width: "100%",
         maxWidth: "460px",
+        height: "470px",
         border: "1px solid lightgray",
         borderRadius: 4,
         p: "20px 40px",
@@ -82,9 +99,9 @@ const EmployeesCard = ({ employee }) => {
             open={open}
             onClose={handleClose}
           >
-            <MenuItem>Delete</MenuItem>
+            <MenuItem onClick={() => handleDelete()}>Delete</MenuItem>
             <MenuItem>
-              <NavLink to={`/finance/employees/edit-employee/${id}`}>
+              <NavLink to={`/finance/employees/edit-employee/${_id}`}>
                 Edit
               </NavLink>
             </MenuItem>
@@ -101,7 +118,7 @@ const EmployeesCard = ({ employee }) => {
             gap: 0,
           }}
         >
-          <img src={img} alt="" />
+          <img src={img} alt="" className="w-[170px]" />
 
           <Box
             sx={{
@@ -133,7 +150,7 @@ const EmployeesCard = ({ employee }) => {
               fontSize: "20px",
             }}
           >
-            {name}
+            {firstName} {lastName}
           </Typography>
           <Typography component={"span"}>{designation.name}</Typography>
         </Box>
