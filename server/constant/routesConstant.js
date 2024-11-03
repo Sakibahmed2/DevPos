@@ -1,3 +1,4 @@
+import { attendanceRouter } from "../routes/attendanceRoutes.js";
 import { authRouter } from "../routes/authRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
@@ -116,6 +117,10 @@ const routes = [
   {
     path: "/employees",
     routes: employeesRouter,
+  },
+  {
+    path: "/attendance",
+    routes: attendanceRouter,
   },
 ];
 

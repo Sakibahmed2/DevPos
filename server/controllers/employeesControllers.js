@@ -4,14 +4,22 @@ import sendResponse from "../utils/sendResponse.js";
 
 const createEmployees = async (req, res, next) => {
   try {
-    // Create employee code
-    const employeeCount = await Employees.countDocuments();
-    const newCode = `EMP-${(employeeCount + 1).toString().padStart(4, "0")}`;
+    const lastEmployee = await Employees.findOne({
+      employeeCode: { $regex: /EMP-/ },
+    })
+      .sort({ employeeCode: -1 })
+      .exec();
+
+    // Generate new code
+    const lastCodeNumber = lastEmployee
+      ? parseInt(lastEmployee.employeeCode.split("-")[1], 10)
+      : 0;
+    const newCode = `EMP-${(lastCodeNumber + 1).toString().padStart(4, "0")}`;
 
     const employeeData = { ...req.body, employeeCode: newCode };
-
     const result = await Employees.create(employeeData);
 
+    // Send response
     sendResponse(res, {
       statusCode: 201,
       success: true,
