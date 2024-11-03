@@ -16,52 +16,72 @@ import { useState } from "react";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
+import dayjs from "dayjs";
+import { toast } from "sonner";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
+import {
+  useDeleteAttendanceMutation,
+  useGetAllAttendanceQuery,
+  useUpdateAttendanceApprovalMutation,
+} from "../../../../redux/api/finance/attendanceApi";
+import formatDate from "../../../../utils/formateDate";
+import formatTime from "../../../../utils/formateTime";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateAttendanceModal from "./CreateAttendanceModal";
 import EditAttendanceModal from "./EditAttendanceModal";
 
-// table data
-const tableData = [
-  {
-    id: 1,
-    empName: "John Doe",
-    empDesignation: "Software Engineer",
-    empId: "EMP-001",
-    date: "25 May 2023",
-    shift: "Regular",
-    checkIn: "9:00 AM",
-    production: "9 hours",
-    overTime: "2 hours",
-    totalWorkHour: "8 hours",
-    approval: "Approved",
-  },
-  {
-    id: 2,
-    empName: "John Doe",
-    empDesignation: "Software Engineer",
-    empId: "EMP-001",
-    date: "25 May 2023",
-    shift: "Regular",
-    checkIn: "9:00 AM",
-    production: "9 hours",
-    overTime: "2 hours",
-    totalWorkHour: "8 hours",
-    approval: "Pending",
-  },
-];
-
 const AdminAttendance = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
-  // const itemsPerPage = 3 ;
+  const { data: attendanceData, isLoading } = useGetAllAttendanceQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [updateAttendanceApproval] = useUpdateAttendanceApprovalMutation();
+  const [deleteAttendance] = useDeleteAttendanceMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(attendanceData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting attendance...");
+    try {
+      const res = await deleteAttendance(id).unwrap();
+      if (res?.success) {
+        toast.success("Attendance deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete attendance", { id: toastId });
+    }
+  };
+
+  const handleApproval = async (id) => {
+    const toastId = toast.loading("Approving attendance...");
+    try {
+      const res = await updateAttendanceApproval({
+        id,
+        data: { approved: true },
+      }).unwrap();
+      if (res?.success) {
+        toast.success("Attendance approved successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to approved attendance", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -137,10 +157,10 @@ const AdminAttendance = () => {
       field: "production",
       headerName: "Production",
       flex: 1,
-      renderCell: ({ row }) => {
+      renderCell: () => {
         return (
           <Box>
-            <Typography variant="p">{row.production}</Typography>
+            <Typography variant="p">8 hours</Typography>
           </Box>
         );
       },
@@ -152,7 +172,7 @@ const AdminAttendance = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.overTime}</Typography>
+            <Typography variant="p">{row.overTime || "0"}</Typography>
           </Box>
         );
       },
@@ -174,17 +194,15 @@ const AdminAttendance = () => {
       headerName: "Approval",
       flex: 1,
       renderCell: ({ row }) => {
-        console.log(row.approval);
-
         return (
           <Box>
             <Chip
-              component={"button"}
               variant="filled"
-              label={row.approval}
+              label={"Approved"}
+              onClick={() => handleApproval(row.id)}
               sx={{
                 color: "white",
-                bgcolor: row.approval === "Approved" ? "primary.main" : "red",
+                bgcolor: row.isApproved ? "primary.main" : "red",
                 fontWeight: 500,
                 borderRadius: 1,
                 cursor: "pointer",
@@ -223,6 +241,7 @@ const AdminAttendance = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -237,19 +256,19 @@ const AdminAttendance = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      empName: data.empName,
-      empId: data.empId,
-      empDesignation: data.empDesignation,
-      checkIn: data.checkIn,
+      id: data._id,
+      empName: `${data.employee?.firstName} ${data.employee?.lastName}`,
+      empId: data.employee.employeeCode,
+      checkIn: formatTime(dayjs(data.checkIn)),
       production: data.production,
       overTime: data.overTime,
-      totalWorkHour: data.totalWorkHour,
-      date: data.date,
-      shift: data.shift,
+      totalWorkHour: data.totalHours,
+      shift: data.employee.shift.name,
       approval: data.approval,
+      isApproved: data.approved,
+      date: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -306,6 +325,7 @@ const AdminAttendance = () => {
             >
               <TextField
                 label="Search here"
+                onChange={(e) => setSearchTerm(e.target.value)}
                 fullWidth
                 slotProps={{
                   input: {
@@ -327,7 +347,8 @@ const AdminAttendance = () => {
                   label="Sort by date"
                   onChange={(e) => setSortBy(e.target.value)}
                 >
-                  <MenuItem value={"date"}>date</MenuItem>
+                  <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                  <MenuItem value={"-createdAt"}>Newest First</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -356,7 +377,7 @@ const AdminAttendance = () => {
 
         <Box>
           <PaginationUi
-            totalItems={tableData.length}
+            totalItems={attendanceData?.data?.meta?.total}
             currentPage={page}
             onPageChange={handlePageChange}
           />

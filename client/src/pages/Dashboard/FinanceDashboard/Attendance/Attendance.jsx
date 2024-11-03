@@ -52,8 +52,6 @@ const Attendance = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
-
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };

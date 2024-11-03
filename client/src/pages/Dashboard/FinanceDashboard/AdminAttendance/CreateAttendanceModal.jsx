@@ -1,19 +1,50 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
-import DPInput from "../../../../components/form/DPInput";
+import DPSelect from "../../../../components/form/DPSelect";
 import DPTimePicker from "../../../../components/form/DPTimePicker";
 import DPModal from "../../../../components/modal/DPModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useGetAllEmployeesQuery } from "../../../../redux/api/finance/employeesApi";
+import { useCreateAttendanceMutation } from "../../../../redux/api/finance/attendanceApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  empName: "",
+  employee: "",
   checkIn: "",
   checkOut: "",
 };
 
 const CreateAttendanceModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const { data: allEmployee, isLoading } = useGetAllEmployeesQuery({});
+  const [createAttendance] = useCreateAttendanceMutation();
+
+  if (isLoading) return <DPLoading />;
+  const employeeDataForGenerateSelect = allEmployee?.data?.result.map(
+    (employee) => ({
+      value: employee._id,
+      name: `${employee.firstName} ${employee.lastName}`,
+    })
+  );
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating attendance...");
+    try {
+      const attendanceData = {
+        employee: data.employee,
+        checkIn: data.checkIn,
+        checkOut: data.checkOut,
+      };
+
+      const res = await createAttendance(attendanceData).unwrap();
+      if (res?.success) {
+        toast.success("Attendance created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create attendance", { id: toastId });
+    }
   };
 
   return (
@@ -27,11 +58,15 @@ const CreateAttendanceModal = ({ open, setOpen }) => {
               width: "500px",
             }}
           >
-            <DPInput name={"empName"} label={"Employee name"} />
+            <DPSelect
+              name={"employee"}
+              label={"Employee name"}
+              items={employeeDataForGenerateSelect}
+            />
 
             <Stack direction={"row"} gap={3}>
               <DPTimePicker name={"checkIn"} label={"Check in"} />
-              <DPTimePicker name={"checkIn"} label={"Check out"} />
+              <DPTimePicker name={"checkOut"} label={"Check out"} />
             </Stack>
           </Stack>
 

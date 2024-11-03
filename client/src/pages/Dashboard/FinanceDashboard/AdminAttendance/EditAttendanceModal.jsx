@@ -1,21 +1,60 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
-import DPInput from "../../../../components/form/DPInput";
+import DPSelect from "../../../../components/form/DPSelect";
 import DPTimePicker from "../../../../components/form/DPTimePicker";
 import DPModal from "../../../../components/modal/DPModal";
-
-const defaultValues = {
-  empName: "",
-  checkIn: "",
-  checkOut: "",
-};
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useGetSingleAttendanceQuery,
+  useUpdateAttendanceMutation,
+} from "../../../../redux/api/finance/attendanceApi";
+import { useGetAllEmployeesQuery } from "../../../../redux/api/finance/employeesApi";
+import dayjs from "dayjs";
+import { toast } from "sonner";
 
 const EditAttendanceModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const { data: singleAttendance } = useGetSingleAttendanceQuery(id);
+  const { data: allEmployee, isLoading } = useGetAllEmployeesQuery({});
+  const [updateAttendance] = useUpdateAttendanceMutation();
 
-  const onSubmit = (data) => {
+  const employeeDataForGenerateSelect = allEmployee?.data?.result.map(
+    (employee) => ({
+      value: employee._id,
+      name: `${employee.firstName} ${employee.lastName}`,
+    })
+  );
+  if (isLoading) return <DPLoading />;
+
+  const defaultValues = {
+    employee: singleAttendance?.data?.employee?._id,
+    checkIn: singleAttendance?.data?.checkIn
+      ? dayjs(singleAttendance.data.checkIn)
+      : null, // Convert checkIn to Day.js
+    checkOut: singleAttendance?.data?.checkOut
+      ? dayjs(singleAttendance.data.checkOut)
+      : null, // Convert checkOut to Day.js
+  };
+
+  const onSubmit = async (data) => {
     console.log(data);
+    const toastId = toast.loading("Updating attendance...");
+    try {
+      const attendanceData = {
+        employee: data.employee,
+        checkIn: data.checkIn,
+        checkOut: data.checkOut,
+      };
+
+      const res = await updateAttendance({ id, data: attendanceData }).unwrap();
+      if (res?.success) {
+        toast.success("Attendance updated successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update attendance", { id: toastId });
+    }
   };
 
   return (
@@ -29,11 +68,15 @@ const EditAttendanceModal = ({ open, setOpen, id }) => {
               width: "500px",
             }}
           >
-            <DPInput name={"empName"} label={"Employee name"} />
+            <DPSelect
+              name={"employee"}
+              label={"Employee name"}
+              items={employeeDataForGenerateSelect}
+            />
 
             <Stack direction={"row"} gap={3}>
               <DPTimePicker name={"checkIn"} label={"Check in"} />
-              <DPTimePicker name={"checkIn"} label={"Check out"} />
+              <DPTimePicker name={"checkOut"} label={"Check out"} />
             </Stack>
           </Stack>
 
