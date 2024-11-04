@@ -1,6 +1,6 @@
+/* eslint-disable no-undef */
 import {
   Box,
-  Button,
   Chip,
   Container,
   FormControl,
@@ -13,57 +13,53 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useState } from "react";
+import PaginationUi from "../../../../components/ui/PaginationUi";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
-import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
-import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import PaginationUi from "../../../../components/ui/PaginationUi";
-import EditLeaveModal from "./EditLeaveModal";
-import CreateLeaveModal from "./CreateLeaveModal";
+import formatDate from "../../../../utils/formateDate";
 
-// table data
 const tableData = [
   {
     id: 1,
-    name: "Sick Leave",
-    leaveQuota: 5,
-    status: "Active",
-    createdAt: "02 Aug 2023",
-  },
-  {
-    id: 2,
-    name: "Sick Leave",
-    leaveQuota: 5,
-    status: "Active",
-    createdAt: "02 Aug 2023",
+    employeeName: "John Doe",
+    employeeCode: "EMP-001",
+    from: "2021-10-10",
+    to: "2021-10-15",
+    leaveType: "Casual",
+    duration: "5 days",
+    shift: "Morning",
+    createdAt: "2021-10-10",
+    status: "Approved",
   },
 ];
 
-const Leaves = () => {
+const AdminLeaves = () => {
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [createModal, setCreateModal] = useState(false);
-  const [productId, setProductId] = useState(null);
 
-  // const itemsPerPage = 3 ;
+  //   const handleDelete = async (id) => {
+  //     const toastId = toast.loading("Deleting unit...");
+  //     try {
+  //       const res = await deleteUnit(id).unwrap();
+  //       if (res.success) {
+  //         toast.success(res.message, { id: toastId });
+  //       }
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
 
-  const handleModal = (productId) => {
-    setOpen(true);
-    setProductId(productId);
-  };
-
   const columns = [
     {
       field: "name",
-      headerName: "Name",
+      headerName: "Emp name",
       flex: 1,
       renderCell: ({ row }) => {
         return (
@@ -74,20 +70,80 @@ const Leaves = () => {
       },
     },
     {
-      field: "leaveQuota",
-      headerName: "Leave Quota",
+      field: "code",
+      headerName: "Emp id",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.leaveQuota}</Typography>
+            <Typography variant="p">{row.code}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "from",
+      headerName: "From",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.from}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "to",
+      headerName: "To",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.to}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "leaveType",
+      headerName: "Type",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.leaveType}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "duration",
+      headerName: "duration",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.duration}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "shift",
+      headerName: "shift",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.shift}</Typography>
           </Box>
         );
       },
     },
     {
       field: "createdAt",
-      headerName: "Created on",
+      headerName: "createdAt",
       flex: 1,
       renderCell: ({ row }) => {
         return (
@@ -97,6 +153,7 @@ const Leaves = () => {
         );
       },
     },
+
     {
       field: "status",
       headerName: "Status",
@@ -104,17 +161,19 @@ const Leaves = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Chip
-              variant="outlined"
-              label={row.status}
-              sx={{
-                borderColor: row.status === "Active" ? "primary.main" : "red",
-                color: row.status === "Active" ? "primary.main" : "red",
-                borderRadius: 1,
-                fontWeight: 500,
-                px: 2,
-              }}
-            />
+            {
+              <Chip
+                variant="outlined"
+                size="small"
+                sx={{
+                  color: row.status === "Approved" ? "primary.main" : "red",
+                  borderColor:
+                    row.status === "Approved" ? "primary.main" : "red",
+                  borderRadius: 1,
+                }}
+                label={row.status}
+              ></Chip>
+            }
           </Box>
         );
       },
@@ -122,12 +181,12 @@ const Leaves = () => {
     {
       field: "id",
       headerName: "Action",
-      renderCell: ({ row }) => {
+      flex: 1,
+      renderCell: () => {
         return (
           <Stack
             direction={"row"}
             gap={1}
-            justifyContent={"center"}
             alignItems={"center"}
             sx={{
               height: "100%",
@@ -135,19 +194,8 @@ const Leaves = () => {
             }}
           >
             <Box
-              onClick={() => handleModal(row.id)}
               component={"button"}
-              sx={{
-                border: "1px solid gray",
-                borderRadius: 1,
-                p: "5px 3px",
-              }}
-            >
-              <img src={editIcons} alt="" className="w-5 h-5" />
-            </Box>
-
-            <Box
-              component={"button"}
+              //   onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -165,10 +213,15 @@ const Leaves = () => {
   const rows = tableData.map((data) => {
     return {
       id: data.id,
-      name: data.name,
-      leaveQuota: data.leaveQuota,
+      name: data.employeeName,
+      code: data.employeeCode,
+      from: data.from,
+      to: data.to,
+      leaveType: data.leaveType,
+      duration: data.duration,
+      shift: data.shift,
+      createdAt: formatDate(new Date(data.createdAt)),
       status: data.status,
-      createdAt: data.createdAt,
     };
   });
 
@@ -179,23 +232,7 @@ const Leaves = () => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <SectionTitle
-          title={"Leaves"}
-          description={"Manage your leaves type"}
-        />
-
-        <Button
-          onClick={() => setCreateModal(true)}
-          startIcon={
-            <img
-              src={plusIcon}
-              alt="plus icon"
-              style={{ width: 30, height: 30 }}
-            />
-          }
-        >
-          Add leave type
-        </Button>
+        <SectionTitle title={"Leaves"} description={"Manage your leaves"} />
       </Stack>
 
       <Box
@@ -204,6 +241,7 @@ const Leaves = () => {
           border: "1px solid lightgray",
         }}
       >
+        {/* search fields */}
         <Stack
           direction={"row"}
           justifyContent={"space-between"}
@@ -220,6 +258,7 @@ const Leaves = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -241,7 +280,8 @@ const Leaves = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -275,14 +315,8 @@ const Leaves = () => {
           onPageChange={handlePageChange}
         />
       </Box>
-
-      {/* Edit leave */}
-      <EditLeaveModal open={open} setOpen={setOpen} id={productId} />
-
-      {/* Add leave */}
-      <CreateLeaveModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
 
-export default Leaves;
+export default AdminLeaves;

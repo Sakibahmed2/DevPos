@@ -312,8 +312,22 @@ export const sidebarItems = (role) => {
             },
             {
               title: "Leaves",
-              path: "finance/leaves",
+              path: "finance/leave/admin",
               icon: leavesIcon,
+              children: [
+                {
+                  title: "Admin leaves",
+                  path: "finance/leave/admin",
+                },
+                {
+                  title: "Employee leaves",
+                  path: "finance/leave/employee",
+                },
+                {
+                  title: "Leave types",
+                  path: "finance/leave-types",
+                },
+              ],
             },
             {
               title: "Holidays",

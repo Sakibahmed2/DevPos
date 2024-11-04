@@ -1,5 +1,6 @@
 import SettingLayout from "../components/layouts/SettingLayout/SettingLayout";
 import AdminAttendance from "../pages/Dashboard/FinanceDashboard/AdminAttendance/AdminAttendance";
+import AdminLeaves from "../pages/Dashboard/FinanceDashboard/AdminLeaves/AdminLeaves";
 import AppSetting from "../pages/Dashboard/FinanceDashboard/AppSetting/AppSetting";
 import Attendance from "../pages/Dashboard/FinanceDashboard/Attendance/Attendance";
 import CustomerReport from "../pages/Dashboard/FinanceDashboard/CustomerReport/CustomerReport";
@@ -7,6 +8,7 @@ import Customers from "../pages/Dashboard/FinanceDashboard/Customers/Customers";
 import DeleteAccountRequest from "../pages/Dashboard/FinanceDashboard/DeleteAccountRequest/DeleteAccountRequest";
 import Departments from "../pages/Dashboard/FinanceDashboard/Departments/Departments";
 import Designation from "../pages/Dashboard/FinanceDashboard/Designation/Designation";
+import EmployeeLeaves from "../pages/Dashboard/FinanceDashboard/EmployeeLeaves/EmployeeLeaves";
 import AddNewEmployee from "../pages/Dashboard/FinanceDashboard/Employees/AddNewEmployee";
 import EditEmployee from "../pages/Dashboard/FinanceDashboard/Employees/EditEmployee";
 import Employees from "../pages/Dashboard/FinanceDashboard/Employees/Employees";
@@ -21,7 +23,7 @@ import Holidays from "../pages/Dashboard/FinanceDashboard/Holidays/Holidays";
 import IncomeReport from "../pages/Dashboard/FinanceDashboard/IncomeReport/IncomeReport";
 import InventoryReport from "../pages/Dashboard/FinanceDashboard/InventoryReport/InventoryReport";
 import InvoiceReport from "../pages/Dashboard/FinanceDashboard/InvoiceReport/InvoiceReport";
-import Leaves from "../pages/Dashboard/FinanceDashboard/Leaves/Leaves";
+import LeaveTypes from "../pages/Dashboard/FinanceDashboard/LeaveTypes/LeaveTypes";
 import OtherSetting from "../pages/Dashboard/FinanceDashboard/OtherSetting/OtherSetting";
 import Payrolls from "../pages/Dashboard/FinanceDashboard/Payrolls/Payrolls";
 import Payslip from "../pages/Dashboard/FinanceDashboard/Payrolls/Payslip";
@@ -111,8 +113,16 @@ const financeRoutes = [
     element: <AdminAttendance />,
   },
   {
-    path: "finance/leaves",
-    element: <Leaves />,
+    path: "finance/leave/admin",
+    element: <AdminLeaves />,
+  },
+  {
+    path: "finance/leave/employee",
+    element: <EmployeeLeaves />,
+  },
+  {
+    path: "finance/leave-types",
+    element: <LeaveTypes />,
   },
   {
     path: "finance/holidays",

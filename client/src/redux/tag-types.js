@@ -21,6 +21,8 @@ export const tagTypes = {
   designations: "designations",
   shifts: "shifts",
   attendance: "attendance",
+  leaveType: "leaveType",
+  leaveApply: "leaveApply",
 };
 
 export const tagTypesList = [
@@ -46,4 +48,6 @@ export const tagTypesList = [
   tagTypes.designations,
   tagTypes.shifts,
   tagTypes.attendance,
+  tagTypes.leaveType,
+  tagTypes.leaveApply,
 ];
