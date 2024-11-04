@@ -21,4 +21,4 @@ const leaveTypesSchema = new Schema(
   }
 );
 
-export const LeaveTypes = mongoose.model("Leaves", leaveTypesSchema);
+export const LeaveTypes = mongoose.model("LeaveTypes", leaveTypesSchema);

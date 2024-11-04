@@ -26,3 +26,9 @@ export const gender = {
   FEMALE: "Female",
   OTHER: "Other",
 };
+
+export const leaveStatus = {
+  APPROVED: "Approved",
+  PENDING: "Pending",
+  REJECTED: "Rejected",
+};
