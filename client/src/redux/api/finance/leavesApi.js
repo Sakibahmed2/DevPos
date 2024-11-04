@@ -45,7 +45,7 @@ const leavesApi = baseApi.injectEndpoints({
         return {
           url: `/leaves/${id}/approval`,
           method: "PATCH",
-          body: status,
+          body: { status },
         };
       },
       invalidatesTags: [tagTypes.leaveApply],

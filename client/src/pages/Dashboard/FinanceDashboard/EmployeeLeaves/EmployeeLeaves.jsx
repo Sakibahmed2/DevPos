@@ -162,16 +162,19 @@ const EmployeeLeaves = () => {
           <Box>
             {
               <Chip
-                variant="outlined"
+                label={row.status}
                 size="small"
                 sx={{
-                  color: row.status === "Approved" ? "primary.main" : "red",
-                  borderColor:
-                    row.status === "Approved" ? "primary.main" : "red",
+                  color: "white",
+                  bgcolor:
+                    row.status === "Approved"
+                      ? "primary.main"
+                      : row.status === "Pending"
+                      ? "darkorange"
+                      : "red",
                   borderRadius: 1,
                 }}
-                label={row.status}
-              ></Chip>
+              />
             }
           </Box>
         );

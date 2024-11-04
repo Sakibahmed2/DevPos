@@ -5,6 +5,7 @@ import {
   Container,
   FormControl,
   InputLabel,
+  Menu,
   MenuItem,
   Select,
   Stack,
@@ -20,37 +21,65 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import formatDate from "../../../../utils/formateDate";
-
-const tableData = [
-  {
-    id: 1,
-    employeeName: "John Doe",
-    employeeCode: "EMP-001",
-    from: "2021-10-10",
-    to: "2021-10-15",
-    leaveType: "Casual",
-    duration: "5 days",
-    shift: "Morning",
-    createdAt: "2021-10-10",
-    status: "Approved",
-  },
-];
+import {
+  useDeleteLeavesMutation,
+  useGetAllLeavesQuery,
+  useUpdateLeaveApprovalMutation,
+} from "../../../../redux/api/finance/leavesApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import { toast } from "sonner";
 
 const AdminLeaves = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
+  const { data: allLeave, isLoading } = useGetAllLeavesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [updateApproval] = useUpdateLeaveApprovalMutation();
+  const [deleteLeave] = useDeleteLeavesMutation();
 
-  //   const handleDelete = async (id) => {
-  //     const toastId = toast.loading("Deleting unit...");
-  //     try {
-  //       const res = await deleteUnit(id).unwrap();
-  //       if (res.success) {
-  //         toast.success(res.message, { id: toastId });
-  //       }
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(allLeave?.data?.result, page);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const updateLeaveApproval = async (id, status) => {
+    const toastId = toast.loading("Updating leave status...");
+    try {
+      const res = await updateApproval({ id: id, status: status }).unwrap();
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
+        handleClose();
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update leave status", { id: toastId });
+    }
+  };
+
+  const handleDeleteLeave = async (id) => {
+    const toastId = toast.loading("Deleting leave...");
+    try {
+      const res = await deleteLeave(id).unwrap();
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete leave", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -63,9 +92,18 @@ const AdminLeaves = () => {
       flex: 1,
       renderCell: ({ row }) => {
         return (
-          <Box>
-            <Typography variant="p">{row.name}</Typography>
-          </Box>
+          <Stack
+            direction="column"
+            spacing={0}
+            sx={{
+              mt: 2,
+            }}
+          >
+            <Typography variant="body2">{row.name}</Typography>
+            <Typography variant="body2" color="textSecondary">
+              {row.designation}
+            </Typography>
+          </Stack>
         );
       },
     },
@@ -124,7 +162,10 @@ const AdminLeaves = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.duration}</Typography>
+            <Typography variant="p">
+              {row.duration.days} days{" "}
+              {row.duration.hours > 0 && row.duration.hours + " hours"}
+            </Typography>
           </Box>
         );
       },
@@ -161,19 +202,46 @@ const AdminLeaves = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            {
+            <Box
+              component={"button"}
+              id="fade-button"
+              aria-controls={open ? "fade-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              onClick={handleClick}
+            >
               <Chip
-                variant="outlined"
+                label={row.status}
                 size="small"
                 sx={{
-                  color: row.status === "Approved" ? "primary.main" : "red",
-                  borderColor:
-                    row.status === "Approved" ? "primary.main" : "red",
+                  color: "white",
+                  bgcolor:
+                    row.status === "Approved"
+                      ? "primary.main"
+                      : row.status === "Pending"
+                      ? "darkorange"
+                      : "red",
                   borderRadius: 1,
                 }}
-                label={row.status}
-              ></Chip>
-            }
+              />
+            </Box>
+
+            <Menu
+              id="fade-menu"
+              MenuListProps={{
+                "aria-labelledby": "fade-button",
+              }}
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+            >
+              <MenuItem onClick={() => updateLeaveApproval(row.id, "Approved")}>
+                Approved
+              </MenuItem>
+              <MenuItem onClick={() => updateLeaveApproval(row.id, "Rejected")}>
+                Rejected
+              </MenuItem>
+            </Menu>
           </Box>
         );
       },
@@ -182,7 +250,7 @@ const AdminLeaves = () => {
       field: "id",
       headerName: "Action",
       flex: 1,
-      renderCell: () => {
+      renderCell: ({ row }) => {
         return (
           <Stack
             direction={"row"}
@@ -195,7 +263,7 @@ const AdminLeaves = () => {
           >
             <Box
               component={"button"}
-              //   onClick={() => handleDelete(row.id)}
+              onClick={() => handleDeleteLeave(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -210,17 +278,18 @@ const AdminLeaves = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      name: data.employeeName,
-      code: data.employeeCode,
-      from: data.from,
-      to: data.to,
-      leaveType: data.leaveType,
+      id: data._id,
+      name: `${data.employee.firstName} ${data.employee.lastName}`,
+      code: data.employee.employeeCode,
+      from: formatDate(new Date(data.startDate)),
+      to: formatDate(new Date(data.endDate)),
+      leaveType: data.leaveType.name,
       duration: data.duration,
-      shift: data.shift,
+      shift: data.employee.shift.name,
       createdAt: formatDate(new Date(data.createdAt)),
+      designation: data.employee.designation.name,
       status: data.status,
     };
   });
@@ -310,7 +379,7 @@ const AdminLeaves = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={allLeave?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
