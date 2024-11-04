@@ -19,6 +19,12 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
+import { useGetAllAttendanceQuery } from "../../../../redux/api/finance/attendanceApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import formatTime from "../../../../utils/formateTime";
+import dayjs from "dayjs";
 
 // table data
 const tableData = [
@@ -49,8 +55,18 @@ const tableData = [
 ];
 
 const Attendance = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
+
+  const { data: allAttendance, isLoading } = useGetAllAttendanceQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) <DPLoading />;
+
+  const paginateData = paginateFormateData(allAttendance?.data?.result, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -100,23 +116,12 @@ const Attendance = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.production}</Typography>
+            <Typography variant="p">{row.production || "8 hours"}</Typography>
           </Box>
         );
       },
     },
-    {
-      field: "breakTime",
-      headerName: "Break",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.breakTime}</Typography>
-          </Box>
-        );
-      },
-    },
+
     {
       field: "overTime",
       headerName: "Over time",
@@ -124,7 +129,7 @@ const Attendance = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.overTime}</Typography>
+            <Typography variant="p">{row.overTime || 0}</Typography>
           </Box>
         );
       },
@@ -134,23 +139,25 @@ const Attendance = () => {
       headerName: "Progress",
       flex: 1,
       renderCell: ({ row }) => {
+        const hours = parseInt(row.totalWorkHour);
+        const progress = Math.min((hours / 8) * 100, 100);
+
         return (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <LinearProgress
-              variant="determinate"
-              value={row.progress}
+          <Box display="flex" alignItems="center" gap={1} width="100%">
+            <Box
               sx={{
-                width: "80%",
-                bgcolor: "red",
+                width: "100%",
+                mt: 4,
               }}
-            />
+            >
+              <LinearProgress
+                variant="determinate"
+                value={progress}
+                sx={{
+                  backgroundColor: progress < 100 ? "red" : "inherit",
+                }}
+              />
+            </Box>
           </Box>
         );
       },
@@ -164,12 +171,11 @@ const Attendance = () => {
           <Box>
             <Chip
               variant="outlined"
-              label={row.status}
+              label={row.status ? "Present" : "Absent"}
               sx={{
-                borderColor: row.status === "Present" ? "green" : "red",
-                color: row.status === "Present" ? "green" : "red",
+                borderColor: row.status ? "primary.main" : "red",
+                color: row.status ? "primary.main" : "red",
                 fontWeight: 600,
-
                 borderRadius: 1,
               }}
             />
@@ -191,18 +197,16 @@ const Attendance = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      date: data.date,
-      checkIn: data.checkIn,
-      checkOut: data.checkOut,
-      production: data.production,
-      breakTime: data.breakTime,
+      id: data._id,
+      date: formatDate(new Date(data.createdAt)),
+      checkIn: formatTime(dayjs(data.checkIn)),
+      checkOut: formatTime(dayjs(data.checkOut)),
       overTime: data.overTime,
       progress: data.progress,
-      totalWorkHour: data.totalWorkHour,
-      status: data.status,
+      totalWorkHour: data.totalHours,
+      status: data.approved,
     };
   });
 
@@ -480,6 +484,7 @@ const Attendance = () => {
             >
               <TextField
                 label="Search here"
+                onChange={(e) => setSearchTerm(e.target.value)}
                 fullWidth
                 slotProps={{
                   input: {
@@ -501,7 +506,8 @@ const Attendance = () => {
                   label="Sort by date"
                   onChange={(e) => setSortBy(e.target.value)}
                 >
-                  <MenuItem value={"date"}>date</MenuItem>
+                  <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                  <MenuItem value={"-createdAt"}>Newest First</MenuItem>
                 </Select>
               </FormControl>
             </Box>
