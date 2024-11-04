@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import {
   Box,
   Button,
@@ -22,41 +21,49 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteLeavesMutation,
+  useGetAllLeavesQuery,
+} from "../../../../redux/api/finance/leavesApi";
 import formatDate from "../../../../utils/formateDate";
-import CreateUnitsModal from "../../AdminDashboard/Units/CreateUnitsModal";
-import EditUnitsModal from "../../AdminDashboard/Units/EditUnitsModal";
-
-const tableData = [
-  {
-    id: 1,
-    employeeName: "John Doe",
-    employeeCode: "EMP-001",
-    leaveType: "Casual",
-    date: "2021-10-10",
-    duration: "5 days",
-    createdAt: "2021-10-10",
-    status: "Approved",
-  },
-];
+import { paginateFormateData } from "../../../../utils/pagination";
+import CreateEmployeeLeaveModal from "./CreateEmployeeLeaveModal";
+import EditEmployeeLeaveModal from "./EditEmployeeLeaveModal";
+import { toast } from "sonner";
 
 const EmployeeLeaves = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createUnitsModal, setCreateUnitsModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
-  //   const handleDelete = async (id) => {
-  //     const toastId = toast.loading("Deleting unit...");
-  //     try {
-  //       const res = await deleteUnit(id).unwrap();
-  //       if (res.success) {
-  //         toast.success(res.message, { id: toastId });
-  //       }
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
+  const { data: allLeave, isLoading } = useGetAllLeavesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  const [deleteLeave] = useDeleteLeavesMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(allLeave?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting leave...");
+
+    try {
+      const res = await deleteLeave(id).unwrap();
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete leave", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -68,18 +75,6 @@ const EmployeeLeaves = () => {
   };
 
   const columns = [
-    {
-      field: "name",
-      headerName: "Emp name",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.name}</Typography>
-          </Box>
-        );
-      },
-    },
     {
       field: "code",
       headerName: "Emp id",
@@ -105,20 +100,35 @@ const EmployeeLeaves = () => {
       },
     },
     {
+      field: "date",
+      headerName: "Date",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.date}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
       field: "duration",
       headerName: "duration",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.duration}</Typography>
+            <Typography variant="p">
+              {row.duration.days} days{" "}
+              {row.duration.hours > 0 && row.duration.hours + " hours"}
+            </Typography>
           </Box>
         );
       },
     },
     {
       field: "createdAt",
-      headerName: "createdAt",
+      headerName: "Applied on",
       flex: 1,
       renderCell: ({ row }) => {
         return (
@@ -128,10 +138,24 @@ const EmployeeLeaves = () => {
         );
       },
     },
+    {
+      field: "reason",
+      headerName: "Reason",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">
+              {row.reason ? row.reason : "N/A"}
+            </Typography>
+          </Box>
+        );
+      },
+    },
 
     {
       field: "status",
-      headerName: "Status",
+      headerName: "Approval",
       flex: 1,
       renderCell: ({ row }) => {
         return (
@@ -157,7 +181,7 @@ const EmployeeLeaves = () => {
       field: "id",
       headerName: "Action",
       flex: 1,
-      renderCell: () => {
+      renderCell: ({ row }) => {
         return (
           <Stack
             direction={"row"}
@@ -181,7 +205,7 @@ const EmployeeLeaves = () => {
             </Box>
             <Box
               component={"button"}
-              //   onClick={() => handleDelete(row.id)}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -196,15 +220,17 @@ const EmployeeLeaves = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      name: data.employeeName,
-      code: data.employeeCode,
-      leaveType: data.leaveType,
+      id: data._id,
+      name: `${data.employee.firstName} ${data.employee.lastName}`,
+      code: data.employee.employeeCode,
+      leaveType: data.leaveType.name,
       duration: data.duration,
       createdAt: formatDate(new Date(data.createdAt)),
+      date: formatDate(new Date(data.startDate)),
       status: data.status,
+      reason: data.reason,
     };
   });
 
@@ -227,7 +253,7 @@ const EmployeeLeaves = () => {
             />
           }
         >
-          Add new employee
+          Apply for leave
         </Button>
       </Stack>
 
@@ -306,17 +332,20 @@ const EmployeeLeaves = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={allLeave?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
       </Box>
 
       {/* Edit units modal */}
-      <EditUnitsModal open={open} setOpen={setOpen} id={productId} />
+      <EditEmployeeLeaveModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Create units modal */}
-      <CreateUnitsModal open={createUnitsModal} setOpen={setCreateUnitsModal} />
+      <CreateEmployeeLeaveModal
+        open={createUnitsModal}
+        setOpen={setCreateUnitsModal}
+      />
     </Container>
   );
 };
