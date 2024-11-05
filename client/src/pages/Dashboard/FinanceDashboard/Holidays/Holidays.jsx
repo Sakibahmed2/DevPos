@@ -23,35 +23,46 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateHolidayModal from "./CreateHolidayModal";
 import EditHolidayModal from "./EditHolidayModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    name: "Eid leave",
-    date: "01 Jan 2024",
-    duration: "1 day",
-    status: "Active",
-    createdAt: "02 Aug 2023",
-  },
-  {
-    id: 2,
-    name: "Eid leave",
-    date: "01 Jan 2024",
-    duration: "1 day",
-    status: "Active",
-    createdAt: "02 Aug 2023",
-  },
-];
+import {
+  useDeleteHolidaysMutation,
+  useGetAllHolidaysQuery,
+} from "../../../../redux/api/finance/holidaysApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const Holidays = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
-  // const itemsPerPage = 3 ;
+  const { data: holidaysData, isLoading } = useGetAllHolidaysQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteHoliday] = useDeleteHolidaysMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(holidaysData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting holiday...");
+    try {
+      const res = await deleteHoliday(id).unwrap();
+
+      if (res?.success) {
+        toast.success("Holiday deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete holiday", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -94,7 +105,7 @@ const Holidays = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.duration}</Typography>
+            <Typography variant="p">{row.duration} Days</Typography>
           </Box>
         );
       },
@@ -162,6 +173,7 @@ const Holidays = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -176,14 +188,14 @@ const Holidays = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       name: data.name,
-      date: data.date,
+      date: formatDate(new Date(data.startDate)),
       duration: data.duration,
       status: data.status,
-      createdAt: data.createdAt,
+      createdAt: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -232,6 +244,7 @@ const Holidays = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -253,7 +266,8 @@ const Holidays = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -282,7 +296,7 @@ const Holidays = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={holidaysData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

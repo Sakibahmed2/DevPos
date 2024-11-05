@@ -33,6 +33,7 @@ import DPLoading from "../../../../components/ui/DPLoading";
 import { paginateFormateData } from "../../../../utils/pagination";
 import formatDate from "../../../../utils/formateDate";
 import { toast } from "sonner";
+import { useGetAllEmployeesQuery } from "../../../../redux/api/finance/employeesApi";
 
 const Stores = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,6 +42,8 @@ const Stores = () => {
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
+  const { data: allEmployee, isLoading: employeeLoading } =
+    useGetAllEmployeesQuery({});
 
   const { data: designationData, isLoading } = useGetAllDesignationsQuery({
     searchTerm: searchTerm,
@@ -48,10 +51,10 @@ const Stores = () => {
   });
   const [deleteDesignation] = useDeleteDesignationsMutation();
 
-  if (isLoading) return <DPLoading />;
+  if (isLoading || employeeLoading) return <DPLoading />;
 
+  const employeeData = allEmployee?.data?.result;
   const paginateData = paginateFormateData(designationData?.data?.result, page);
-
   const handleDelete = async (id) => {
     const toastId = toast.loading("Deleting designation...");
 
@@ -91,7 +94,10 @@ const Stores = () => {
       headerName: "Members",
       flex: 1,
       renderCell: ({ row }) => {
-        console.log(row);
+        const employee = row.allEmployee.filter(
+          (employee) => employee.designation._id === row.id
+        );
+
         return (
           <Box
             sx={{
@@ -100,31 +106,18 @@ const Stores = () => {
               alignItems: "center",
             }}
           >
-            <AvatarGroup total={4}>
-              <Avatar
-                alt="Remy Sharp"
-                src="/static/images/avatar/1.jpg"
-                sx={{
-                  height: 24,
-                  width: 24,
-                }}
-              />
-              <Avatar
-                alt="Remy Sharp"
-                src="/static/images/avatar/1.jpg"
-                sx={{
-                  height: 24,
-                  width: 24,
-                }}
-              />
-              <Avatar
-                alt="Remy Sharp"
-                src="/static/images/avatar/1.jpg"
-                sx={{
-                  height: 24,
-                  width: 24,
-                }}
-              />
+            <AvatarGroup total={row.allEmployee.length}>
+              {employee?.map((emp) => (
+                <Avatar
+                  key={emp._id}
+                  alt="Remy Sharp"
+                  src={emp.img}
+                  sx={{
+                    height: 24,
+                    width: 24,
+                  }}
+                />
+              ))}
             </AvatarGroup>
           </Box>
         );
@@ -149,7 +142,7 @@ const Stores = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.totalMember}</Typography>
+            <Typography variant="p">{row.allEmployee.length}</Typography>
           </Box>
         );
       },
@@ -226,6 +219,7 @@ const Stores = () => {
       totalMember: data.totalMember || 0,
       status: data.status,
       createdAt: formatDate(new Date(data.createdAt)),
+      allEmployee: employeeData,
     };
   });
 

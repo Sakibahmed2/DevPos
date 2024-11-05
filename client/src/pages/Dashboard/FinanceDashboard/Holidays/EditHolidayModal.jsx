@@ -5,24 +5,55 @@ import DPDatePicker from "../../../../components/form/DPDatePicker";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import {
+  useGetSingleHolidaysQuery,
+  useUpdateHolidaysMutation,
+} from "../../../../redux/api/finance/holidaysApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { toast } from "sonner";
 
-const defaultValues = {
-  name: "",
-  startDate: "",
-  endDate: "",
-  status: "",
-};
-
-const EditHolidayModal = ({ open, setOpen }) => {
+const EditHolidayModal = ({ open, setOpen, id }) => {
   const [toggleStatus, setToggleStatus] = useState("Active");
+
+  const { data: singleHoliday, isLoading } = useGetSingleHolidaysQuery(id);
+  const [updateHoliday] = useUpdateHolidaysMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const defaultValues = {
+    name: singleHoliday?.data?.name,
+    startDate: null,
+    endDate: null,
+  };
 
   const handleToggle = (event) => {
     setToggleStatus(event.target.checked ? "Active" : "Inactive");
   };
 
-  const onSubmit = (data) => {
-    data.status = toggleStatus;
-    console.log(data);
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating holiday...");
+    try {
+      const updatedData = {
+        name: data.name,
+        startDate: data.startDate
+          ? data.startDate.toISOString()
+          : singleHoliday.data.startDate,
+        endDate: data.endDate
+          ? data.endDate.toISOString()
+          : singleHoliday.data.endDate,
+        status: toggleStatus,
+      };
+
+      const res = await updateHoliday({ id, data: updatedData }).unwrap();
+
+      if (res?.success) {
+        toast.success("Holiday updated successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update holiday", { id: toastId });
+    }
   };
 
   return (

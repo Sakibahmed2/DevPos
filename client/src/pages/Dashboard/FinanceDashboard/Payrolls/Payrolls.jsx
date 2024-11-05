@@ -22,6 +22,7 @@ import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import EditPayrollsModal from "./EditPayrollsModal";
+import CreatePayrollsModal from "./CreatePayrollsModal";
 
 // table data
 const tableData = [
@@ -50,6 +51,7 @@ const Payrolls = () => {
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
+  const [createModal, setCreateModal] = useState(false);
 
   // const itemsPerPage = 3 ;
 
@@ -212,6 +214,7 @@ const Payrolls = () => {
         <SectionTitle title={"Payrolls"} description={"Manage your payrolls"} />
 
         <Button
+          onClick={() => setCreateModal(true)}
           startIcon={
             <img
               src={plusIcon}
@@ -304,6 +307,9 @@ const Payrolls = () => {
 
       {/* Edit payrolls */}
       <EditPayrollsModal open={open} setOpen={setOpen} id={productId} />
+
+      {/* Create modal */}
+      <CreatePayrollsModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };

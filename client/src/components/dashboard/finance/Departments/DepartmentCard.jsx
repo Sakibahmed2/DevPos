@@ -5,6 +5,8 @@ import moreIcon from "../../../../assets/dashboard icons/finance/hrm/more.svg";
 import EditDepartmentsModal from "../../../../pages/Dashboard/FinanceDashboard/Departments/EditDepartmentsModal";
 import { useDeleteDepartmentsMutation } from "../../../../redux/api/finance/departmentsApi";
 import { toast } from "sonner";
+import { useGetAllEmployeesQuery } from "../../../../redux/api/finance/employeesApi";
+import DPLoading from "../../../ui/DPLoading";
 
 const DepartmentCard = ({ department }) => {
   const { _id, name, img } = department || {};
@@ -12,6 +14,15 @@ const DepartmentCard = ({ department }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [deleteDepartment] = useDeleteDepartmentsMutation();
+  const { data: allEmployee, isLoading } = useGetAllEmployeesQuery({});
+
+  if (isLoading) return <DPLoading />;
+
+  const employeeData = allEmployee?.data?.result;
+
+  const totalEmployeeByDepartment = employeeData?.filter(
+    (employee) => employee.department._id === _id
+  );
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -136,7 +147,7 @@ const DepartmentCard = ({ department }) => {
         }}
       >
         <Typography variant="p" component={"span"} fontWeight={500}>
-          Total members: 10
+          Total members: {totalEmployeeByDepartment?.length}
         </Typography>
       </Box>
 

@@ -5,24 +5,43 @@ import DPDatePicker from "../../../../components/form/DPDatePicker";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { useCreateHolidaysMutation } from "../../../../redux/api/finance/holidaysApi";
+import { toast } from "sonner";
 
 const defaultValues = {
   name: "",
   startDate: "",
   endDate: "",
-  status: "",
 };
 
 const CreateHolidayModal = ({ open, setOpen }) => {
   const [toggleStatus, setToggleStatus] = useState("Active");
+  const [createHolidays] = useCreateHolidaysMutation();
 
   const handleToggle = (event) => {
     setToggleStatus(event.target.checked ? "Active" : "Inactive");
   };
 
-  const onSubmit = (data) => {
-    data.status = toggleStatus;
-    console.log(data);
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating holiday...");
+    try {
+      const holidayData = {
+        name: data.name,
+        startDate: data.startDate.toISOString(),
+        endDate: data.endDate.toISOString(),
+        status: toggleStatus,
+      };
+
+      const res = await createHolidays(holidayData).unwrap();
+
+      if (res?.success) {
+        toast.success("Holiday created successfully", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create holiday", { id: toastId });
+    }
   };
 
   return (
