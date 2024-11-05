@@ -144,9 +144,8 @@ const approveLeave = async (req, res, next) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    console.log({ id, status });
     const updatedLeave = await Leaves.findByIdAndUpdate(
-      { _id: id },
+      id,
       { status },
       { new: true }
     );

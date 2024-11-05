@@ -8,6 +8,7 @@ import { designationRouter } from "../routes/designationRoutes.js";
 import { employeesRouter } from "../routes/employeesRoutes.js";
 import { expenseCategoryRouter } from "../routes/expenseCategoryRoutes.js";
 import { expenseRouter } from "../routes/expensesRoutes.js";
+import { holidaysRouter } from "../routes/holidaysRoutes.js";
 import { leavesRouter } from "../routes/leavesRoutes.js";
 import { leaveTypesRouter } from "../routes/leaveTypesRoutes.js";
 import { manageStockRouter } from "../routes/manageStockRoutes.js";
@@ -131,6 +132,10 @@ const routes = [
   {
     path: "/leaves",
     routes: leavesRouter,
+  },
+  {
+    path: "/holidays",
+    routes: holidaysRouter,
   },
 ];
 
