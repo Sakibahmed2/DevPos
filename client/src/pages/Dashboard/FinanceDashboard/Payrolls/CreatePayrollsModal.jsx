@@ -4,13 +4,18 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  Grid2,
   Stack,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
+import { toast } from "sonner";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
+import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useGetAllEmployeesQuery } from "../../../../redux/api/finance/employeesApi";
+import { useCreatePayrollsMutation } from "../../../../redux/api/finance/payrollsApi";
 
 const defaultValues = {
   employee: "",
@@ -20,14 +25,58 @@ const defaultValues = {
   medical: "",
   bonus: "",
   other: "",
-  totalAllowance: "",
   totalDeduction: "",
-  netSalary: "",
 };
 
 const CreatePayrollsModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [isPaid, setIsPaid] = useState(false);
+  const { data: allEmployee, isLoading } = useGetAllEmployeesQuery({});
+  const [createPayrolls] = useCreatePayrollsMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const employeeForSelect = allEmployee?.data?.result?.map((employee) => ({
+    value: employee._id,
+    name: `${employee.firstName} ${employee.lastName}`,
+  }));
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating payroll...");
+    // Covert to number
+    const basicSalary = Number(data.basicSalary);
+    const allowance = Number(data.allowance);
+    const conveyance = Number(data.conveyance);
+    const medical = Number(data.medical);
+    const bonus = Number(data.bonus);
+    const other = Number(data.other);
+    const totalDeduction = Number(data.totalDeduction);
+
+    const totalAllowance = allowance + conveyance + medical + bonus + other;
+    const netSalary = basicSalary + totalAllowance - totalDeduction;
+    try {
+      const payrollsData = {
+        employee: data.employee,
+        basicSalary,
+        totalAllowance,
+        hraAllowance: allowance,
+        conveyance,
+        medical,
+        bonus,
+        other,
+        totalDeduction,
+        netSalary,
+        isPaid,
+      };
+
+      const res = await createPayrolls(payrollsData).unwrap();
+      if (res?.success) {
+        toast.success("Payroll created", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create payroll", { id: toastId });
+    }
   };
 
   return (
@@ -46,11 +95,11 @@ const CreatePayrollsModal = ({ open, setOpen }) => {
               width: "900px",
             }}
           >
-            <Grid2 container gap={3}>
-              <Grid2 item size={6}>
-                <DPInput label="Employee" name="employee" />
-              </Grid2>
-            </Grid2>
+            <DPSelect
+              label="Employee"
+              name="employee"
+              items={employeeForSelect}
+            />
 
             <Typography variant="h6" fontWeight={600}>
               Salary Information
@@ -70,19 +119,28 @@ const CreatePayrollsModal = ({ open, setOpen }) => {
               <Typography variant="p">Status</Typography>
               <Stack direction={"row"}>
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  control={
+                    <Checkbox
+                      checked={isPaid}
+                      onChange={() => setIsPaid(!isPaid)}
+                    />
+                  }
                   label="Paid"
                 />
-
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  control={
+                    <Checkbox
+                      checked={!isPaid}
+                      onChange={() => setIsPaid(!isPaid)}
+                    />
+                  }
                   label="Unpaid"
                 />
               </Stack>
             </Box>
 
             <Typography variant="h6" fontWeight={600}>
-              Salary Information
+              Allowances
             </Typography>
             <Stack direction={"row"} gap={3}>
               <DPInput name="allowance" label="HRA allowance" />
@@ -99,9 +157,7 @@ const CreatePayrollsModal = ({ open, setOpen }) => {
               Deductions
             </Typography>
             <Stack direction={"row"} gap={3}>
-              <DPInput name="totalAllowance" label="Total Allowance" />
               <DPInput name="totalDeduction" label="Total Deduction" />
-              <DPInput name="netSalary" label="Net Salary" />
             </Stack>
           </Stack>
 

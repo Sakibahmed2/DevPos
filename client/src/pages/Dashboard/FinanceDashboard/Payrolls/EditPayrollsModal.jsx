@@ -4,32 +4,81 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
-  Grid2,
   Stack,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
+import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
-
-const defaultValues = {
-  employee: "",
-  basicSalary: "",
-  allowance: "",
-  conveyance: "",
-  medical: "",
-  bonus: "",
-  other: "",
-  totalAllowance: "",
-  totalDeduction: "",
-  netSalary: "",
-};
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useGetAllEmployeesQuery } from "../../../../redux/api/finance/employeesApi";
+import {
+  useGetSinglePayrollsQuery,
+  useUpdatePayrollsMutation,
+} from "../../../../redux/api/finance/payrollsApi";
+import { toast } from "sonner";
 
 const EditPayrollsModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const [isPaid, setIsPaid] = useState(false);
+  const { data: allEmployee, isLoading } = useGetAllEmployeesQuery({});
+  const { data: singlePayroll, isLoading: payrollsLoading } =
+    useGetSinglePayrollsQuery(id);
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const [updatePayrolls] = useUpdatePayrollsMutation();
+
+  if (isLoading || payrollsLoading) return <DPLoading />;
+
+  const employeeForSelect = allEmployee?.data?.result?.map((employee) => ({
+    value: employee._id,
+    name: `${employee.firstName} ${employee.lastName}`,
+  }));
+
+  const defaultValues = {
+    employee: singlePayroll?.data?.employee?._id,
+    basicSalary: singlePayroll?.data?.basicSalary,
+    allowance: singlePayroll?.data?.hraAllowance,
+    conveyance: singlePayroll?.data?.conveyance,
+    medical: singlePayroll?.data?.medical,
+    bonus: singlePayroll?.data?.bonus,
+    other: singlePayroll?.data?.other,
+    totalDeduction: singlePayroll?.data?.totalDeduction,
+  };
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating payroll...");
+    const totalAllowance =
+      data.allowance + data.conveyance + data.medical + data.bonus + data.other;
+    const netSalary = data.basicSalary + totalAllowance - data.totalDeduction;
+
+    try {
+      const payrollsData = {
+        employee: data.employee,
+        basicSalary: data.basicSalary,
+        totalDeduction: data.totalDeduction,
+        allowance: data.allowance,
+        conveyance: data.conveyance,
+        medical: data.medical,
+        bonus: data.bonus,
+        other: data.other,
+        totalAllowance,
+        netSalary,
+        isPaid,
+      };
+
+      console.log(payrollsData);
+
+      const res = await updatePayrolls({ id, data: payrollsData }).unwrap();
+
+      if (res?.success) {
+        toast.success("Payroll updated", { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.err("Failed to update payroll", { id: toastId });
+    }
   };
 
   return (
@@ -48,11 +97,11 @@ const EditPayrollsModal = ({ open, setOpen, id }) => {
               width: "900px",
             }}
           >
-            <Grid2 container gap={3}>
-              <Grid2 item size={6}>
-                <DPInput label="Employee" name="employee" />
-              </Grid2>
-            </Grid2>
+            <DPSelect
+              label="Employee"
+              name="employee"
+              items={employeeForSelect}
+            />
 
             <Typography variant="h6" fontWeight={600}>
               Salary Information
@@ -72,19 +121,28 @@ const EditPayrollsModal = ({ open, setOpen, id }) => {
               <Typography variant="p">Status</Typography>
               <Stack direction={"row"}>
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  control={
+                    <Checkbox
+                      checked={isPaid}
+                      onChange={() => setIsPaid(!isPaid)}
+                    />
+                  }
                   label="Paid"
                 />
-
                 <FormControlLabel
-                  control={<Checkbox defaultChecked />}
+                  control={
+                    <Checkbox
+                      checked={!isPaid}
+                      onChange={() => setIsPaid(!isPaid)}
+                    />
+                  }
                   label="Unpaid"
                 />
               </Stack>
             </Box>
 
             <Typography variant="h6" fontWeight={600}>
-              Salary Information
+              Allowances
             </Typography>
             <Stack direction={"row"} gap={3}>
               <DPInput name="allowance" label="HRA allowance" />
@@ -101,9 +159,7 @@ const EditPayrollsModal = ({ open, setOpen, id }) => {
               Deductions
             </Typography>
             <Stack direction={"row"} gap={3}>
-              <DPInput name="totalAllowance" label="Total Allowance" />
               <DPInput name="totalDeduction" label="Total Deduction" />
-              <DPInput name="netSalary" label="Net Salary" />
             </Stack>
           </Stack>
 

@@ -23,37 +23,45 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import EditPayrollsModal from "./EditPayrollsModal";
 import CreatePayrollsModal from "./CreatePayrollsModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    employeeName: "John Doe",
-    employeeRole: "Software Engineer",
-    employeeId: "EMP-001",
-    email: "email@gmail.com",
-    salary: 20000,
-    status: "Paid",
-  },
-  {
-    id: 2,
-    employeeName: "John Doe",
-    employeeRole: "Software Engineer",
-    employeeId: "EMP-001",
-    email: "email@gmail.com",
-    salary: 20000,
-    status: "Unpaid",
-  },
-];
+import {
+  useDeletePayrollsMutation,
+  useGetAllPayrollsQuery,
+} from "../../../../redux/api/finance/payrollsApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import { toast } from "sonner";
 
 const Payrolls = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
 
-  // const itemsPerPage = 3 ;
+  const { data: payrollsData, isLoading } = useGetAllPayrollsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deletePayrolls] = useDeletePayrollsMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(payrollsData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting payroll...");
+    try {
+      const res = await deletePayrolls(id).unwrap();
+
+      if (res?.success) {
+        toast.success("Payroll deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete payroll", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -128,7 +136,7 @@ const Payrolls = () => {
       },
     },
     {
-      field: "status",
+      field: "isPaid",
       headerName: "Status",
       flex: 1,
       renderCell: ({ row }) => {
@@ -136,10 +144,10 @@ const Payrolls = () => {
           <Box>
             <Chip
               variant="outlined"
-              label={row.status}
+              label={row.isPaid ? "Paid" : "Unpaid"}
               sx={{
-                borderColor: row.status === "Paid" ? "primary.main" : "red",
-                color: row.status === "Paid" ? "primary.main" : "red",
+                borderColor: row.isPaid ? "primary.main" : "red",
+                color: row.isPaid ? "primary.main" : "red",
                 borderRadius: 1,
                 fontWeight: 500,
                 px: 2,
@@ -178,6 +186,7 @@ const Payrolls = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -192,15 +201,15 @@ const Payrolls = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      employeeName: data.employeeName,
-      employeeRole: data.employeeRole,
-      employeeId: data.employeeId,
-      email: data.email,
-      salary: data.salary,
-      status: data.status,
+      id: data._id,
+      employeeName: `${data.employee.firstName} ${data.employee.lastName}`,
+      employeeRole: data.employee.designation.name,
+      employeeId: data.employee.employeeCode,
+      email: data.employee.email,
+      salary: data.netSalary,
+      isPaid: data.isPaid,
     };
   });
 
@@ -249,6 +258,7 @@ const Payrolls = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -270,7 +280,8 @@ const Payrolls = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -299,7 +310,7 @@ const Payrolls = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={payrollsData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
