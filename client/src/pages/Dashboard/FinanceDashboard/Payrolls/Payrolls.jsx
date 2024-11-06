@@ -18,6 +18,7 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 // icons
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
+import eyeIcon from "../../../../assets/dashboard icons/visibility-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
@@ -30,6 +31,7 @@ import {
 import DPLoading from "../../../../components/ui/DPLoading";
 import { paginateFormateData } from "../../../../utils/pagination";
 import { toast } from "sonner";
+import { NavLink } from "react-router-dom";
 
 const Payrolls = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -160,18 +162,30 @@ const Payrolls = () => {
     {
       field: "id",
       headerName: "Action",
+      flex: 1,
       renderCell: ({ row }) => {
         return (
           <Stack
             direction={"row"}
             gap={1}
-            justifyContent={"center"}
             alignItems={"center"}
             sx={{
               height: "100%",
               width: "100%",
             }}
           >
+            <Box
+              component={NavLink}
+              to={`/finance/payroll/payslip/${row.id}`}
+              sx={{
+                border: "1px solid gray",
+                borderRadius: 1,
+                p: "5px 3px",
+              }}
+            >
+              <img src={eyeIcon} alt="" className="w-5 h-5" />
+            </Box>
+
             <Box
               onClick={() => handleModal(row.id)}
               component={"button"}

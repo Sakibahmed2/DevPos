@@ -133,7 +133,7 @@ const financeRoutes = [
     element: <Payrolls />,
   },
   {
-    path: "finance/payroll/payslip",
+    path: "finance/payroll/payslip/:id",
     element: <Payslip />,
   },
 

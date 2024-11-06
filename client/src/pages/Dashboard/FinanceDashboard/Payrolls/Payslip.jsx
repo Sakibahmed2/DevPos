@@ -12,25 +12,48 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toWords } from "number-to-words";
+import { useRef } from "react";
+import { useParams } from "react-router-dom";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import SectionTitle from "../../../../components/ui/SectionTitle";
+import { useGetSinglePayrollsQuery } from "../../../../redux/api/finance/payrollsApi";
+import formatDate from "../../../../utils/formateDate";
 
 const Payslip = () => {
-  const earningsData = [
-    { type: "Basic Salary", amount: 32000 },
-    { type: "HRA Allowance", amount: 0 },
-    { type: "Conveyance", amount: 0 },
-    { type: "Medical Allowance", amount: 0 },
-    { type: "Bonus", amount: 0 },
+  const { id } = useParams();
+  const { data: singlePayrolls, isLoading } = useGetSinglePayrollsQuery(id);
+  const payslipRef = useRef(); // Reference to the payslip content
+
+  if (isLoading) return <DPLoading />;
+
+  const earningData = [
+    { type: "Basic Salary", amount: singlePayrolls?.data?.basicSalary },
+    { type: "HRA Allowance", amount: singlePayrolls?.data?.hraAllowance },
+    { type: "Conveyance", amount: singlePayrolls?.data?.conveyance },
+    { type: "Medical Allowance", amount: singlePayrolls?.data?.medical },
+    { type: "Bonus", amount: singlePayrolls?.data?.bonus },
   ];
 
   const deductionsData = [
-    { type: "PF", amount: 0 },
-    { type: "Professional Tax", amount: 0 },
-    { type: "TDS", amount: 0 },
-    { type: "Loans & Others", amount: 0 },
-    { type: "Bonus", amount: 0 },
+    { type: "Total deductions", amount: singlePayrolls?.data?.totalDeduction },
   ];
+
+  // Function to handle download
+  const handleDownload = async () => {
+    const element = payslipRef.current;
+    const canvas = await html2canvas(element);
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF();
+    const imgWidth = 190; // Adjust for margins
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+    pdf.save("payslip.pdf");
+  };
 
   return (
     <Container>
@@ -40,9 +63,9 @@ const Payslip = () => {
           justifyContent={"space-between"}
           alignItems={"center"}
         >
-          <SectionTitle title={"Payrolls"} />
-
+          <SectionTitle title={"Payslips"} />
           <Button
+            onClick={handleDownload} // Trigger download on click
             startIcon={
               <img
                 src={plusIcon}
@@ -51,12 +74,13 @@ const Payslip = () => {
               />
             }
           >
-            Add new payrolls
+            Download
           </Button>
         </Stack>
       </Box>
 
       <Paper
+        ref={payslipRef} // Set the reference here
         elevation={3}
         sx={{
           padding: 3,
@@ -65,7 +89,8 @@ const Payslip = () => {
       >
         <Stack spacing={3}>
           <Typography variant="h5" fontWeight={600}>
-            Payslip for the Month of Sep 2024
+            Payslip for the{" "}
+            {formatDate(new Date(singlePayrolls?.data?.createdAt))}
           </Typography>
 
           <Stack
@@ -74,12 +99,18 @@ const Payslip = () => {
             spacing={2}
           >
             <Stack>
-              <Typography variant="body1">Emp Name: Md Tanjid</Typography>
-              <Typography variant="body1">Emp Id: POS1234</Typography>
+              <Typography variant="body1">
+                Emp Name: {singlePayrolls?.data?.employee?.firstName}{" "}
+                {singlePayrolls?.data?.employee?.lastName}
+              </Typography>
+              <Typography variant="body1">
+                Emp Id: {singlePayrolls?.data?.employee?.employeeCode}
+              </Typography>
             </Stack>
             <Stack>
-              <Typography variant="body1">Location: Bangladesh</Typography>
-              <Typography variant="body1">Pay Period: Sep 2024</Typography>
+              <Typography variant="body1">
+                Pay in: {formatDate(new Date(singlePayrolls?.data?.createdAt))}
+              </Typography>
             </Stack>
           </Stack>
 
@@ -97,7 +128,7 @@ const Payslip = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {earningsData.map((row) => (
+                    {earningData.map((row) => (
                       <TableRow key={row.type}>
                         <TableCell>{row.type}</TableCell>
                         <TableCell align="right">{row.amount}</TableCell>
@@ -108,7 +139,7 @@ const Payslip = () => {
                         <strong>Total Earnings</strong>
                       </TableCell>
                       <TableCell align="right">
-                        <strong>32,000</strong>
+                        <strong>${singlePayrolls?.data?.netSalary}</strong>
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -139,7 +170,7 @@ const Payslip = () => {
                         <strong>Total Deductions</strong>
                       </TableCell>
                       <TableCell align="right">
-                        <strong>0.00</strong>
+                        <strong>{singlePayrolls?.data?.totalDeduction}</strong>
                       </TableCell>
                     </TableRow>
                   </TableBody>
@@ -149,9 +180,11 @@ const Payslip = () => {
           </Stack>
 
           <Stack>
-            <Typography variant="h6">Net Salary: $32,000</Typography>
+            <Typography variant="h6">
+              Net Salary: ${singlePayrolls?.data?.netSalary}
+            </Typography>
             <Typography variant="body1">
-              In words: Thirty Two Thousand Only
+              In words: {toWords(singlePayrolls?.data?.netSalary)}
             </Typography>
           </Stack>
         </Stack>
