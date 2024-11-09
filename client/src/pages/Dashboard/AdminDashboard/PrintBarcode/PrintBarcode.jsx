@@ -35,6 +35,8 @@ const PrintBarcode = () => {
     useGetAllProductsQuery({
       searchTerm: searchTerm,
     });
+
+  console.log(productData?.data?.result);
   const contentRef = useRef();
 
   const handlePrint = useReactToPrint({ contentRef });

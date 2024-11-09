@@ -37,8 +37,6 @@ const Invoices = () => {
 
   const paginateData = paginateFormateData(saleData?.data?.result, page);
 
-  console.log(paginateData);
-
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };

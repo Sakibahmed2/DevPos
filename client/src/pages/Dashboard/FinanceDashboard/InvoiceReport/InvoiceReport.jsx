@@ -17,35 +17,26 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    invoiceNo: "INV-123",
-    customerName: "John Doe",
-    dueDate: "09 Sep 2024",
-    amount: 1000,
-    paid: 1000,
-    amountDue: 0,
-    status: "Paid",
-  },
-  {
-    id: 2,
-    invoiceNo: "INV-123",
-    customerName: "John Doe",
-    dueDate: "09 Sep 2024",
-    amount: 1000,
-    paid: 1000,
-    amountDue: 0,
-    status: "Unpaid",
-  },
-];
+import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
+import { paginateFormateData } from "../../../../utils/pagination";
+import DPLoading from "../../../../components/ui/DPLoading";
+import formatDate from "../../../../utils/formateDate";
 
 const InvoiceReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
-  // const itemsPerPage = 3 ;
+
+  const { data: saleData, isLoading } = useGetAllSalesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
+
+  const paginateData = paginateFormateData(saleData?.data?.result, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -79,7 +70,7 @@ const InvoiceReport = () => {
 
     {
       field: "dueDate",
-      headerName: "Due date",
+      headerName: "Date",
       flex: 1,
       renderCell: ({ row }) => {
         return (
@@ -96,7 +87,7 @@ const InvoiceReport = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.amount}</Typography>
+            <Typography variant="p">${row.amount}</Typography>
           </Box>
         );
       },
@@ -108,7 +99,7 @@ const InvoiceReport = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.paid}</Typography>
+            <Typography variant="p">${row.paid}</Typography>
           </Box>
         );
       },
@@ -120,7 +111,7 @@ const InvoiceReport = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.amountDue}</Typography>
+            <Typography variant="p">${row.amountDue}</Typography>
           </Box>
         );
       },
@@ -148,16 +139,16 @@ const InvoiceReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      invoiceNo: data.invoiceNo,
+      id: data._id,
+      invoiceNo: data.refNo,
       customerName: data.customerName,
-      dueDate: data.dueDate,
+      dueDate: formatDate(new Date(data.createdAt)),
       amount: data.amount,
       paid: data.paid,
-      amountDue: data.amountDue,
-      status: data.status,
+      amountDue: data.due,
+      status: data.paymentTypeStatus,
     };
   });
 
@@ -196,6 +187,7 @@ const InvoiceReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -217,7 +209,8 @@ const InvoiceReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -246,7 +239,7 @@ const InvoiceReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={saleData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

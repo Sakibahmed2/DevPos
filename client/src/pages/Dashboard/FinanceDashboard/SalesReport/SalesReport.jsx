@@ -14,9 +14,11 @@ import { useState } from "react";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
-import laptopImg from "../../../../assets/laptopPng.png";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import laptopImg from "../../../../assets/laptopPng.png";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
+import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
 
 // table data
 const tableData = [
@@ -31,24 +33,38 @@ const tableData = [
     soldAmount: 10000,
     inStockQty: 20,
   },
-  {
-    id: 2,
-    productImg: laptopImg,
-    productName: "Laptop",
-    stockKeepingUnit: "SKU-123",
-    category: "Electronics",
-    brand: "Apple",
-    soldQty: 10,
-    soldAmount: 10000,
-    inStockQty: 20,
-  },
 ];
 
 const SalesReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: allSale, isLoading } = useGetAllSalesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  if (isLoading) return <DPLoading />;
+
+  function groupProductsByName(products) {
+    const productCount = {};
+
+    products.forEach((product) => {
+      if (productCount[product.name]) {
+        productCount[product.name].soldQuantity += 1;
+      } else {
+        productCount[product.name] = { ...product, soldQuantity: 1 };
+      }
+    });
+
+    return Object.values(productCount);
+  }
+
+  const allProducts = allSale?.data?.result.reduce((acc, curr) => {
+    return acc.concat(curr.products);
+  }, []);
+
+  const groupedProducts = groupProductsByName(allProducts);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -70,7 +86,11 @@ const SalesReport = () => {
               width: "100%",
             }}
           >
-            <img src={row.productImg} alt="laptop" className="w-12" />
+            <img
+              src={row.productImg}
+              alt="laptop"
+              className="w-12 object-contain"
+            />
           </Box>
         );
       },
@@ -140,7 +160,7 @@ const SalesReport = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.soldAmount}</Typography>
+            <Typography variant="p">${row.soldAmount}</Typography>
           </Box>
         );
       },
@@ -159,17 +179,17 @@ const SalesReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = groupedProducts.map((data) => {
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
-      stockKeepingUnit: data.stockKeepingUnit,
-      category: data.category,
-      brand: data.brand,
-      soldQty: data.soldQty,
-      soldAmount: data.soldAmount,
-      inStockQty: data.inStockQty,
+      id: data._id,
+      productImg: data.img,
+      productName: data.name,
+      stockKeepingUnit: data.productInfo.stockKeepingUnit,
+      category: data.productInfo.category,
+      brand: data.productInfo.brand,
+      soldQty: data.soldQuantity,
+      soldAmount: data.soldQuantity * data.pricingAndStock.price,
+      inStockQty: data.pricingAndStock.quantity - data.soldQuantity,
     };
   });
 
@@ -208,6 +228,7 @@ const SalesReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -229,7 +250,8 @@ const SalesReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>

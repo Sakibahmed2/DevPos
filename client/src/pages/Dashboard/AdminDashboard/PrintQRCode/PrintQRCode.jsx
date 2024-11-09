@@ -1,35 +1,193 @@
 import {
   Box,
   Button,
+  Chip,
   Container,
-  Grid2,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { useRef, useState } from "react";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import DPForm from "../../../../components/form/DPForm";
-import DPSelect from "../../../../components/form/DPSelect";
+import DPLoading from "../../../../components/ui/DPLoading";
 import SectionTitle from "../../../../components/ui/SectionTitle";
-import PrintQRCodeTable from "./PrintQRCodeTable";
+import { useGetAllStoresQuery } from "../../../../redux/api/finance/storeApi";
+import { useGetAllWarehousesQuery } from "../../../../redux/api/finance/warehouseApi";
 
-const defaultValues = {
-  warehouse: "",
-  store: "",
-  product: "",
-  paperSize: "",
-};
+import QRCode from "react-qr-code";
+import { useReactToPrint } from "react-to-print";
+import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
 
 const PrintQRCode = () => {
-  const handlePrint = (data) => {
-    console.log(data);
-  };
+  const [sortBy, setSortBy] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [productId, setProductId] = useState("");
+  const { data: warehouseData, isLoading: warehouseLoading } =
+    useGetAllWarehousesQuery({});
+  const { data: storeData, isLoading: storeLoading } = useGetAllStoresQuery({});
+
+  const { data: productData, isLoading: productLoading } =
+    useGetAllProductsQuery({
+      searchTerm: searchTerm,
+    });
+
+  const contentRef = useRef();
+
+  const handlePrint = useReactToPrint({ contentRef });
+
+  if (warehouseLoading || storeLoading || productLoading) return <DPLoading />;
+
+  const columns = [
+    {
+      field: "img",
+      headerName: "Products",
+      width: 150,
+      renderCell: ({ row }) => {
+        return (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <img src={row.img} alt="laptop" className="object-contain w-16 " />
+          </Box>
+        );
+      },
+    },
+    {
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography
+              variant="p"
+              sx={{
+                fontSize: "20px",
+              }}
+            >
+              {row.name}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "stockKeepingUnit",
+      headerName: "SKU",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography
+              variant="p"
+              sx={{
+                fontSize: "20px",
+              }}
+            >
+              {row.stockKeepingUnit}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "code",
+      headerName: "Code",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography
+              variant="p"
+              sx={{
+                fontSize: "20px",
+              }}
+            >
+              {row.code}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "quantity",
+      headerName: "QTY",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography
+              variant="p"
+              sx={{
+                fontSize: "20px",
+              }}
+            >
+              {row.quantity}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+
+    {
+      field: "id",
+      headerName: "Action",
+      renderCell: ({ row }) => {
+        return (
+          <Stack
+            direction={"row"}
+            gap={1}
+            justifyContent={"center"}
+            alignItems={"center"}
+            sx={{
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <Chip
+              onClick={() => setProductId(row.id)}
+              component={"button"}
+              label="Generate"
+              variant="outlined"
+              sx={{
+                color: "black",
+                borderColor: "black",
+                borderRadius: 1,
+                cursor: "pointer",
+              }}
+            ></Chip>
+          </Stack>
+        );
+      },
+    },
+  ];
+
+  const rows = productData?.data?.result.map((data) => {
+    return {
+      id: data._id,
+      name: data.name,
+      img: data.img,
+      stockKeepingUnit: data.productInfo.stockKeepingUnit,
+      code: data.productInfo.itemCode,
+      quantity: data.pricingAndStock.quantity,
+    };
+  });
 
   return (
     <Container>
       <Box>
         <SectionTitle
-          title={"Print QR code"}
-          description={"Manage your QR code"}
+          title={"Print qr code"}
+          description={"Manage your barcode"}
         />
 
         {/* print barcode form & table */}
@@ -41,126 +199,139 @@ const PrintQRCode = () => {
             mt: 5,
           }}
         >
-          <DPForm onSubmit={handlePrint} defaultValue={defaultValues}>
-            <Grid2 container spacing={2}>
-              <Grid2
-                item
-                size={{
-                  xs: 12,
-                  md: 4,
-                }}
-              >
-                <DPSelect
-                  name={"warehouse"}
-                  label={"Warehouse"}
-                  items={["Warehouse 1", "Warehouse 2"]}
-                  fullWidth
-                  size="medium"
-                />
-              </Grid2>
-
-              <Grid2
-                item
-                size={{
-                  xs: 12,
-                  md: 4,
-                }}
-              >
-                <DPSelect
-                  name={"store"}
-                  label={"Store"}
-                  items={["Store 1", "Store 2"]}
-                  fullWidth
-                  size="medium"
-                />
-              </Grid2>
-            </Grid2>
-
-            <Grid2
-              container
-              spacing={2}
+          {/* Sort and search product */}
+          <Stack>
+            <Stack
+              direction={"row"}
               sx={{
-                mt: 6,
+                alignItems: "center",
+                width: "50%",
+                gap: 3,
               }}
             >
-              <Grid2
-                item
-                size={{
-                  xs: 12,
-                  md: 6,
-                }}
-              >
-                <Box>
-                  <TextField
-                    label="Products"
-                    fullWidth
-                    slotProps={{
-                      input: {
-                        endAdornment: <img src={searchIcon} />,
-                      },
-                    }}
-                  />
-                </Box>
-              </Grid2>
-            </Grid2>
-
-            {/* products table */}
-            <PrintQRCodeTable />
-
-            <Grid2
-              container
-              spacing={2}
-              sx={{
-                mt: 9,
-              }}
-            >
-              <Grid2
-                item
-                size={{
-                  xs: 12,
-                  md: 4,
-                }}
-              >
-                <Typography
-                  component={"p"}
-                  sx={{
-                    mt: 3,
-                    mb: 2,
-                    fontSize: "25px",
-                    fontWeight: "500",
-                  }}
+              <FormControl fullWidth>
+                <InputLabel>Warehouse</InputLabel>
+                <Select
+                  value={sortBy}
+                  label="Warehouse"
+                  onChange={(e) => setSortBy(e.target.value)}
                 >
-                  Paper size
-                </Typography>
+                  {warehouseData?.data?.result.map((warehouse) => (
+                    <MenuItem key={warehouse.name} value={warehouse.name}>
+                      {warehouse.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-                <DPSelect
-                  name={"paperSize"}
-                  label={"Paper size"}
-                  items={["A4", "A5"]}
-                  fullWidth
-                  size="medium"
-                />
-              </Grid2>
-            </Grid2>
+              <FormControl fullWidth>
+                <InputLabel>Store</InputLabel>
+                <Select
+                  value={sortBy}
+                  label="Store"
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  {storeData?.data?.result.map((store, idx) => (
+                    <MenuItem key={idx} value={store.name}>
+                      {store.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
 
-            <Box
+            <Stack
               sx={{
-                mt: 5,
-                display: "flex",
-                justifyContent: "center",
-                gap: 4,
+                mt: 3,
+                width: "50%",
               }}
             >
-              <Button type="submit">Print Barcode</Button>
-              <Button
-                sx={{
-                  bgcolor: "black",
+              <TextField
+                label="Search here"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                fullWidth
+                slotProps={{
+                  input: {
+                    endAdornment: <img src={searchIcon} />,
+                  },
                 }}
-              >
-                Reset
-              </Button>
+              />
+            </Stack>
+          </Stack>
+
+          {/* products table */}
+          <Box
+            sx={{
+              mt: 5,
+            }}
+          >
+            <Stack
+              direction={"row"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+              sx={{
+                mb: 2,
+              }}
+            >
+              <Typography variant="h5" component={"p"} fontWeight={"500"}>
+                Products
+              </Typography>
+            </Stack>
+
+            <Box>
+              <DataGrid
+                sx={{
+                  border: 0,
+                  borderTop: "1px solid lightgray",
+                }}
+                rows={rows}
+                columns={columns}
+                rowHeight={80}
+                hideFooter
+              />
             </Box>
-          </DPForm>
+          </Box>
+
+          {/* print barcode button */}
+
+          <Box
+            ref={contentRef}
+            sx={{
+              mt: 5,
+              display: "flex",
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            {productId && (
+              <QRCode
+                size={100}
+                style={{ height: "auto", maxWidth: "20%", width: "20%" }}
+                value={`http://localhost:5173/admin/products/${productId}`}
+                title="QR Code"
+              />
+            )}
+          </Box>
+
+          <Box
+            sx={{
+              mt: 5,
+              display: "flex",
+              justifyContent: "center",
+              gap: 4,
+            }}
+          >
+            <Button onClick={handlePrint}>Print QR Code</Button>
+
+            <Button
+              onClick={() => setProductId("")}
+              sx={{
+                bgcolor: "black",
+              }}
+            >
+              Reset
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Container>
