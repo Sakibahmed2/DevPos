@@ -1,13 +1,15 @@
 /* eslint-disable react/prop-types */
 import { Box, Button, Stack, Switch, Typography } from "@mui/material";
+import { useState } from "react";
+import { toast } from "sonner";
+import DPFileUploader from "../../../../components/form/DPFileUploader";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
-import DPFileUploader from "../../../../components/form/DPFileUploader";
-import { useState } from "react";
+import DPLoading from "../../../../components/ui/DPLoading";
 import { useCreateUserMutation } from "../../../../redux/api/auth/authApi";
-import { toast } from "sonner";
+import { useGetAllRolesQuery } from "../../../../redux/api/finance/roleApi";
 import convertImgToBase64 from "../../../../utils/convertImgToBase64";
 
 const defaultValues = {
@@ -23,6 +25,11 @@ const defaultValues = {
 const CreateUserModal = ({ open, setOpen }) => {
   const [status, setStatus] = useState("Active");
   const [createUser] = useCreateUserMutation();
+  const { data: roleData, isLoading } = useGetAllRolesQuery({});
+
+  if (isLoading) return <DPLoading />;
+
+  const roleForSelect = roleData?.data?.result.map((item) => item.name);
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating user...");
@@ -71,11 +78,7 @@ const CreateUserModal = ({ open, setOpen }) => {
 
             <Stack direction={"row"} gap={3}>
               <DPInput name={"email"} label={"Email"} />
-              <DPSelect
-                name={"role"}
-                label={"Role"}
-                items={["finance", "Sales", "Marketing"]}
-              />
+              <DPSelect name={"role"} label={"Role"} items={roleForSelect} />
             </Stack>
 
             <DPInput name={"password"} label={"Password"} />

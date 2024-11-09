@@ -3,16 +3,41 @@ import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
-
-const defaultValues = {
-  role: "",
-};
+import {
+  useGetSingleRolesQuery,
+  useUpdateRolesMutation,
+} from "../../../../redux/api/finance/roleApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { toast } from "sonner";
 
 const EditRoleModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const { data: singleRole, isLoading } = useGetSingleRolesQuery(id);
+  const [updateRole] = useUpdateRolesMutation();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  if (isLoading) return <DPLoading />;
+
+  const defaultValues = {
+    name: singleRole?.data?.name,
+  };
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating role...");
+
+    try {
+      const updatedData = {
+        name: data.name,
+      };
+
+      const res = await updateRole({ id: id, data: updatedData }).unwrap();
+
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update role", { id: toastId });
+    }
   };
 
   return (
@@ -26,7 +51,7 @@ const EditRoleModal = ({ open, setOpen, id }) => {
               width: "500px",
             }}
           >
-            <DPInput name={"role"} label={"Role name"} />
+            <DPInput name={"name"} label={"Role name"} />
           </Stack>
 
           <Box

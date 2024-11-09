@@ -13,13 +13,16 @@ import DPLoading from "../../../../components/ui/DPLoading";
 import { useState } from "react";
 import convertImgToBase64 from "../../../../utils/convertImgToBase64";
 import { toast } from "sonner";
+import { useGetAllRolesQuery } from "../../../../redux/api/finance/roleApi";
 
 const EditUserModal = ({ open, setOpen, id }) => {
   const [status, setStatus] = useState("Active");
   const { data: singleUser, isLoading } = useGetSingleUsersQuery(id);
   const [updateUser] = useUpdateUserMutation();
+  const { data: roleData, isLoading: roleLoading } = useGetAllRolesQuery({});
 
-  if (isLoading) return <DPLoading />;
+  if (isLoading || roleLoading) return <DPLoading />;
+  const roleForSelect = roleData?.data?.result.map((item) => item.name);
 
   const defaultValues = {
     name: singleUser?.data?.name,
@@ -80,11 +83,7 @@ const EditUserModal = ({ open, setOpen, id }) => {
 
             <Stack direction={"row"} gap={3}>
               <DPInput name={"email"} label={"Email"} />
-              <DPSelect
-                name={"role"}
-                label={"Role"}
-                items={["finance", "Sales", "Marketing"]}
-              />
+              <DPSelect name={"role"} label={"Role"} items={roleForSelect} />
             </Stack>
 
             <DPInput

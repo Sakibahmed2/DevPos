@@ -22,29 +22,45 @@ import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    role: "Admin",
-    createdAt: "25 May 2023",
-  },
-  {
-    id: 2,
-    role: "Finance",
-    createdAt: "25 May 2023",
-  },
-];
+import {
+  useDeleteRolesMutation,
+  useGetAllRolesQuery,
+} from "../../../../redux/api/finance/roleApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
+import { toast } from "sonner";
 
 const RolesAndPermissions = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
-  // const itemsPerPage = 3 ;
+  const { data: roleData, isLoading } = useGetAllRolesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteRole] = useDeleteRolesMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(roleData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    try {
+      const toastId = toast.loading("Deleting role...");
+      const res = await deleteRole(id).unwrap();
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete role");
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -109,6 +125,7 @@ const RolesAndPermissions = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -123,11 +140,11 @@ const RolesAndPermissions = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      role: data.role,
-      createdAt: data.createdAt,
+      id: data._id,
+      role: data.name,
+      createdAt: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -179,6 +196,7 @@ const RolesAndPermissions = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -200,7 +218,8 @@ const RolesAndPermissions = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -229,7 +248,7 @@ const RolesAndPermissions = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={roleData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

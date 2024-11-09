@@ -3,14 +3,32 @@ import { Box, Button, Stack } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPModal from "../../../../components/modal/DPModal";
+import { useCreateRolesMutation } from "../../../../redux/api/finance/roleApi";
+import { toast } from "sonner";
 
 const defaultValues = {
-  role: "",
+  name: "",
 };
 
 const CreateRoleModal = ({ open, setOpen }) => {
-  const onSubmit = (data) => {
-    console.log(data);
+  const [createRole] = useCreateRolesMutation();
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Creating role...");
+    try {
+      const roleData = {
+        name: data.name,
+      };
+
+      const res = await createRole(roleData).unwrap();
+      if (res?.success) {
+        toast.success(res?.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to create role", { id: toastId });
+    }
   };
 
   return (
@@ -24,7 +42,7 @@ const CreateRoleModal = ({ open, setOpen }) => {
               width: "500px",
             }}
           >
-            <DPInput name={"role"} label={"Role name"} />
+            <DPInput name={"name"} label={"Role name"} />
           </Stack>
 
           <Box
@@ -35,7 +53,7 @@ const CreateRoleModal = ({ open, setOpen }) => {
               marginTop: 5,
             }}
           >
-            <Button type="submit">Save</Button>
+            <Button type="submit">SUbmit</Button>
             <Button
               sx={{
                 backgroundColor: "black",
