@@ -2,7 +2,7 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { useCreateOrderMutation } from "../../redux/api/admin/paymentApi";
 import { removeProduct } from "../../redux/features/admin/paymentSlice";
@@ -18,6 +18,9 @@ const PaymentForm = ({ setOpen, note, totalPrice }) => {
   const userInfo = getUserInfo();
   const [createPayment] = useCreateOrderMutation();
   const dispatch = useDispatch();
+  const products = useSelector((state) => state.products.product);
+
+  const productsIds = products.map((product) => product.id);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/v1/payments/create-payment-intent", {
@@ -82,6 +85,7 @@ const PaymentForm = ({ setOpen, note, totalPrice }) => {
 
         const payment = {
           transactionId: paymentIntent.id,
+          products: productsIds,
           customerName: name,
           amount: totalPrice,
           paid: paymentIntent.amount / 100,

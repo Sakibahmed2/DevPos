@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
 import { Box, Typography } from "@mui/material";
-import DPModal from "../../../../components/modal/DPModal";
-import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import DPModal from "../../../../components/modal/DPModal";
 import DuePaymentForm from "../../../../components/paymentForm/DuePaymentForm";
-import { useGetSingleSaleQuery } from "../../../../redux/api/admin/paymentApi";
 import DPLoading from "../../../../components/ui/DPLoading";
+import { useGetSingleSaleQuery } from "../../../../redux/api/admin/paymentApi";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -13,7 +13,11 @@ const EditSalesModal = ({ open, setOpen, id }) => {
   const { data: singleSale, isLoading } = useGetSingleSaleQuery(id);
   if (isLoading) return <DPLoading />;
 
-  const amountDue = Number(singleSale?.data?.due).toFixed(2);
+  console.log(singleSale);
+
+  const amountDue = (singleSale?.data?.amount - singleSale?.data?.paid).toFixed(
+    2
+  );
 
   return (
     <Box>
@@ -29,19 +33,23 @@ const EditSalesModal = ({ open, setOpen, id }) => {
           alignItems: "center",
         }}
       >
-        <Box
-          sx={{
-            mb: 2,
-            display: "flex",
-            justifyContent: "end",
-            gap: 1,
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6">You have to pay:</Typography>
-          <Typography variant="h6" fontWeight={600}>
-            ${amountDue}
-          </Typography>
+        <Box>
+          {amountDue >= 0 && (
+            <Box
+              sx={{
+                mb: 2,
+                display: "flex",
+                justifyContent: "end",
+                gap: 1,
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6">You have to pay:</Typography>
+              <Typography variant="h6" fontWeight={600}>
+                ${amountDue || singleSale?.data?.amount}
+              </Typography>
+            </Box>
+          )}
         </Box>
         <Box>
           <Elements stripe={stripePromise}>
