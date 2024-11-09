@@ -1,4 +1,5 @@
 export const tagTypes = {
+  users: "users",
   products: "products",
   categories: "categories",
   subCategories: "subCategories",
@@ -28,6 +29,7 @@ export const tagTypes = {
 };
 
 export const tagTypesList = [
+  tagTypes.users,
   tagTypes.products,
   tagTypes.categories,
   tagTypes.subCategories,

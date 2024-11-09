@@ -27,8 +27,6 @@ const CreateUnitsModal = ({ open, setOpen }) => {
 
       const res = await createUnits(unitData).unwrap();
 
-      console.log(res);
-
       if (res.success) {
         toast.success(res.message, { id: toastId });
         setOpen(false);

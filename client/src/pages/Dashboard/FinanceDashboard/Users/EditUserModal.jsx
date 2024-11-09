@@ -1,25 +1,62 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Stack } from "@mui/material";
+import { Box, Button, Stack, Switch, Typography } from "@mui/material";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
 import DPFileUploader from "../../../../components/form/DPFileUploader";
-
-const defaultValues = {
-  name: "",
-  img: "",
-  phone: "",
-  email: "",
-  role: "",
-  description: "",
-};
+import {
+  useGetSingleUsersQuery,
+  useUpdateUserMutation,
+} from "../../../../redux/api/auth/authApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useState } from "react";
+import convertImgToBase64 from "../../../../utils/convertImgToBase64";
+import { toast } from "sonner";
 
 const EditUserModal = ({ open, setOpen, id }) => {
-  console.log(id);
+  const [status, setStatus] = useState("Active");
+  const { data: singleUser, isLoading } = useGetSingleUsersQuery(id);
+  const [updateUser] = useUpdateUserMutation();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  if (isLoading) return <DPLoading />;
+
+  const defaultValues = {
+    name: singleUser?.data?.name,
+    img: singleUser?.data?.img,
+    phone: singleUser?.data?.phone,
+    email: singleUser?.data?.email,
+    role: singleUser?.data?.role,
+    description: singleUser?.data?.description,
+  };
+
+  const onSubmit = async (data) => {
+    const toastId = toast.loading("Updating user...");
+    let base64Img = singleUser?.data?.img;
+
+    if (data.img instanceof Blob) {
+      base64Img = await convertImgToBase64(data.img);
+    }
+    try {
+      const userData = {
+        name: data.name,
+        img: base64Img,
+        phone: data.phone,
+        email: data.email,
+        role: data.role,
+        description: data.description,
+        status: status,
+      };
+
+      const res = await updateUser({ id: id, data: userData }).unwrap();
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
+        setOpen(false);
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to update user", { id: toastId });
+    }
   };
 
   return (
@@ -46,7 +83,7 @@ const EditUserModal = ({ open, setOpen, id }) => {
               <DPSelect
                 name={"role"}
                 label={"Role"}
-                items={["Finance", "Sales", "Marketing"]}
+                items={["finance", "Sales", "Marketing"]}
               />
             </Stack>
 
@@ -56,6 +93,24 @@ const EditUserModal = ({ open, setOpen, id }) => {
               multiline
               rows={4}
             />
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography component={"p"}>Status</Typography>
+              <Switch
+                checked={status === "Active"}
+                size="medium"
+                onChange={() =>
+                  setStatus((prev) =>
+                    prev === "Active" ? "Inactive" : "Active"
+                  )
+                }
+              />
+            </Box>
           </Stack>
 
           <Box

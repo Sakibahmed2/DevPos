@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Chip,
@@ -20,43 +21,48 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import userImg from "../../../../assets/userImg.png";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
+import {
+  useDeleteUserMutation,
+  useGetAllUsersQuery,
+} from "../../../../redux/api/auth/authApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateUserModal from "./CreateUserModal";
 import EditUserModal from "./EditUserModal";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    img: userImg,
-    name: "John Doe",
-    phone: "123456789",
-    email: "email@gmail.com",
-    role: "Admin",
-    status: "Active",
-    createdAt: "25 May 2023",
-  },
-  {
-    id: 2,
-    img: userImg,
-    name: "John Doe",
-    phone: "123456789",
-    email: "email@gmail.com",
-    role: "Admin",
-    status: "Inactive",
-    createdAt: "25 May 2023",
-  },
-];
+import { toast } from "sonner";
 
 const Users = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [productId, setProductId] = useState(null);
 
-  // const itemsPerPage = 3 ;
+  const { data: usersData, isLoading } = useGetAllUsersQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteUser] = useDeleteUserMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(usersData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting user...");
+    try {
+      const res = await deleteUser(id).unwrap();
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete user", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -83,7 +89,7 @@ const Users = () => {
               width: "100%",
             }}
           >
-            <img src={row.img} alt="user" />
+            <Avatar src={row.img} alt={row.name} variant="square" />
           </Box>
         );
       },
@@ -196,6 +202,7 @@ const Users = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -210,16 +217,16 @@ const Users = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
+      id: data._id,
       img: data.img,
       name: data.name,
-      phone: data.phone,
+      phone: data.phone || "N/A",
       email: data.email,
       role: data.role,
       status: data.status,
-      createdAt: data.createdAt,
+      createdAt: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -268,6 +275,7 @@ const Users = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -289,7 +297,8 @@ const Users = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -318,7 +327,7 @@ const Users = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={usersData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
