@@ -3,24 +3,47 @@ import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Avatar,
-  Badge,
   Box,
   Container,
   IconButton,
+  Menu,
+  MenuItem,
   Stack,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
 // icons
-import bellIcon from "../../../assets/dashboard icons/bell.svg";
-import messageIcon from "../../../assets/dashboard icons/message.svg";
-import settingIcon from "../../../assets/dashboard icons/red-setting.svg";
+import { useState } from "react";
+import { useGetSingleUsersQuery } from "../../../redux/api/auth/authApi";
 import { getUserInfo } from "../../../utils/getUserInfo";
+import { removeTokenFromLocalStorage } from "../../../utils/local-storage";
 import DPClock from "../../ui/DPClock";
+import DPLoading from "../../ui/DPLoading";
 
 const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
+  const [anchorElUser, setAnchorElUser] = useState(null);
   const userInfo = getUserInfo();
+
+  const { data: singleUser, isLoading } = useGetSingleUsersQuery(userInfo.id);
+
+  if (isLoading) return <DPLoading />;
+
+  console.log(singleUser?.data?.img);
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLogout = () => {
+    removeTokenFromLocalStorage();
+    handleCloseUserMenu();
+  };
 
   return (
     <AppBar
@@ -61,7 +84,7 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
               sx={{
                 width: {
                   xs: "100%",
-                  lg: "70%",
+                  lg: "80%",
                 },
               }}
             >
@@ -88,15 +111,15 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
             <Stack
               direction={"row"}
               gap={2}
-              justifyContent={"center"}
+              justifyContent={"end"}
               sx={{
                 width: {
                   xs: "100%",
-                  lg: "30%",
+                  lg: "20%",
                 },
               }}
             >
-              <Stack direction={"row"}>
+              {/* <Stack direction={"row"}>
                 <IconButton>
                   <Badge color="info" badgeContent={"21"}>
                     <img
@@ -126,7 +149,7 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
                     />
                   </Badge>
                 </IconButton>
-              </Stack>
+              </Stack> */}
 
               <Box
                 sx={{
@@ -135,12 +158,48 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
                   display: "flex",
                   alignItems: "center",
                   gap: 2,
+                  width: "100%",
                 }}
               >
                 <Typography component={"p"} color="text.secondary">
-                  Hello, Sir
+                  Hello, {singleUser?.data?.name}
                 </Typography>
-                <Avatar alt="User img" src="/static/images/avatar/1.jpg" />
+                <Box sx={{ flexGrow: 0 }}>
+                  <Tooltip title="Open settings">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar
+                        src={singleUser?.data?.img && singleUser?.data?.img}
+                        alt={singleUser?.data?.name}
+                        imgProps={{
+                          loading: "eager",
+                        }}
+                      />
+                      <img src={singleUser?.data?.img} loading="eager" alt="" />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    sx={{ mt: "45px" }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    <MenuItem onClick={handleLogout}>
+                      <Typography sx={{ textAlign: "center", color: "red" }}>
+                        Logout
+                      </Typography>
+                    </MenuItem>
+                  </Menu>
+                </Box>
               </Box>
             </Stack>
           </Stack>

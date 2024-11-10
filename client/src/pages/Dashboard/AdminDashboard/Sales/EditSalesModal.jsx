@@ -3,9 +3,9 @@ import { Box, Typography } from "@mui/material";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import DPModal from "../../../../components/modal/DPModal";
-import DuePaymentForm from "../../../../components/paymentForm/DuePaymentForm";
 import DPLoading from "../../../../components/ui/DPLoading";
 import { useGetSingleSaleQuery } from "../../../../redux/api/admin/paymentApi";
+import DuePaymentForm from "../../../../components/paymentForm/SalePaymentForm/DuePaymentForm";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 

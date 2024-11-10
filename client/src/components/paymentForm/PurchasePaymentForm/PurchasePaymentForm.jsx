@@ -4,11 +4,11 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { useCreateOrderMutation } from "../../redux/api/admin/paymentApi";
-import { removeProduct } from "../../redux/features/admin/paymentSlice";
-import { getUserInfo } from "../../utils/getUserInfo";
+import { useCreatePurchaseMutation } from "../../../redux/api/admin/purchaseApi";
+import { removeProduct } from "../../../redux/features/admin/paymentSlice";
+import { getUserInfo } from "../../../utils/getUserInfo";
 
-const PaymentForm = ({ setOpen, note, totalPrice }) => {
+const PurchasePaymentForm = ({ setOpen, note, totalPrice, supplierId }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState("");
@@ -16,14 +16,14 @@ const PaymentForm = ({ setOpen, note, totalPrice }) => {
   const [clientSecret, setClientSecret] = useState("");
   const [amount, setAmount] = useState(totalPrice);
   const userInfo = getUserInfo();
-  const [createPayment] = useCreateOrderMutation();
+  const [createPurchase] = useCreatePurchaseMutation();
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products.product);
 
   const productsIds = products.map((product) => product.id);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/v1/payments/create-payment-intent", {
+    fetch("http://localhost:5000/api/v1/purchase/create-payment-intent", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,7 +32,8 @@ const PaymentForm = ({ setOpen, note, totalPrice }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        setClientSecret(data.data.clientSecret);
+        console.log(data);
+        setClientSecret(data.data.client_secret);
       });
   }, [amount]);
 
@@ -86,14 +87,17 @@ const PaymentForm = ({ setOpen, note, totalPrice }) => {
         const payment = {
           transactionId: paymentIntent.id,
           products: productsIds,
-          customerName: name,
+          supplier: supplierId,
+          name: name,
           amount: totalPrice,
           paid: paymentIntent.amount / 100,
           biller: userInfo.id,
           note: note || "",
         };
 
-        const res = await createPayment(payment).unwrap();
+        const res = await createPurchase(payment).unwrap();
+
+        console.log(res);
 
         if (res.success) {
           toast.success("Payment created successfully");
@@ -173,4 +177,4 @@ const PaymentForm = ({ setOpen, note, totalPrice }) => {
   );
 };
 
-export default PaymentForm;
+export default PurchasePaymentForm;

@@ -2,15 +2,13 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import {
-  useGetSingleSaleQuery,
-  useUpdateSaleMutation,
-} from "../../redux/api/admin/paymentApi";
-import { getUserInfo } from "../../utils/getUserInfo";
-import DPLoading from "../ui/DPLoading";
+import { useCreateOrderMutation } from "../../../redux/api/admin/paymentApi";
+import { removeProduct } from "../../../redux/features/admin/paymentSlice";
+import { getUserInfo } from "../../../utils/getUserInfo";
 
-const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
+const PaymentForm = ({ setOpen, note, totalPrice }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState("");
@@ -18,8 +16,11 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
   const [clientSecret, setClientSecret] = useState("");
   const [amount, setAmount] = useState(totalPrice);
   const userInfo = getUserInfo();
-  const [updatePayment] = useUpdateSaleMutation();
-  const { data: singleSale, isLoading } = useGetSingleSaleQuery(id);
+  const [createPayment] = useCreateOrderMutation();
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.products.product);
+
+  const productsIds = products.map((product) => product.id);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/v1/payments/create-payment-intent", {
@@ -31,14 +32,9 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setClientSecret(data.data.clientSecret);
       });
   }, [amount]);
-
-  if (isLoading) {
-    return <DPLoading />;
-  }
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -88,21 +84,20 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
         toast.success("Payment successful");
 
         const payment = {
+          transactionId: paymentIntent.id,
+          products: productsIds,
           customerName: name,
-          amount: Number(totalPrice),
+          amount: totalPrice,
           paid: paymentIntent.amount / 100,
           biller: userInfo.id,
+          note: note || "",
         };
 
-        const res = await updatePayment({
-          saleId: id,
-          saleData: payment,
-        }).unwrap();
-
-        console.log(res);
+        const res = await createPayment(payment).unwrap();
 
         if (res.success) {
           toast.success("Payment created successfully");
+          dispatch(removeProduct());
           setOpen(false);
         }
       }
@@ -118,7 +113,6 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
       <TextField
         label="Name"
         value={name}
-        defaultValue={singleSale?.customerName}
         onChange={(e) => setName(e.target.value)}
         fullWidth
         margin="normal"
@@ -179,4 +173,4 @@ const DuePaymentForm = ({ setOpen, totalPrice, id }) => {
   );
 };
 
-export default DuePaymentForm;
+export default PaymentForm;

@@ -1,28 +1,46 @@
 /* eslint-disable react/prop-types */
-import { Box, Chip, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import DPModal from "../../../../components/modal/DPModal";
 import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../../../redux/features/admin/paymentSlice";
-import PaymentForm from "../../../../components/paymentForm/SalePaymentForm/PaymentForm";
+import { useGetAllSuppliersQuery } from "../../../../redux/api/finance/suppliersApi";
+import PurchasePaymentForm from "../../../../components/paymentForm/PurchasePaymentForm/PurchasePaymentForm";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const CreateSaleModal = ({ open, setOpen }) => {
+const CreatePurchasesModal = ({ open, setOpen }) => {
+  const [supplierId, setSupplierId] = useState("");
   const [orderTax, setOrderTax] = useState("");
   const [discount, setDiscount] = useState("");
   const [shipping, setShipping] = useState("");
   const [note, setNote] = useState("");
+
   const [searchTerm, setSearchTerm] = useState("");
-  const { data: tableData } = useGetAllProductsQuery({
+  const { data: tableData, isLoading } = useGetAllProductsQuery({
     searchTerm: searchTerm,
   });
+  const { data: supplierData } = useGetAllSuppliersQuery({});
   const dispatch = useDispatch();
   const selectedProduct = useSelector((state) => state.products.product);
+
+  if (isLoading) return <DPLoading />;
 
   const allPrice = selectedProduct.reduce((total, product) => {
     return total + product.price;
@@ -93,18 +111,6 @@ const CreateSaleModal = ({ open, setOpen }) => {
       },
     },
     {
-      field: "discount",
-      headerName: "Discount",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.discount}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
       field: "unitCost",
       headerName: "Unit cost",
       flex: 1,
@@ -139,6 +145,7 @@ const CreateSaleModal = ({ open, setOpen }) => {
               onClick={() => dispatch(addProduct(row))}
               label="Add"
               variant="outlined"
+              component={Button}
               sx={{
                 color: "primary.main",
                 borderColor: "primary.main",
@@ -159,7 +166,6 @@ const CreateSaleModal = ({ open, setOpen }) => {
       productImg: data.img,
       quantity: data.pricingAndStock.quantity,
       price: data.pricingAndStock.price,
-      discount: data.pricingAndStock.discountValue,
       unitCost:
         data.pricingAndStock.price - data.pricingAndStock.discountValue || 0,
       totalCost:
@@ -170,7 +176,7 @@ const CreateSaleModal = ({ open, setOpen }) => {
   return (
     <Box>
       <DPModal
-        title="Create sale"
+        title="Add purchases"
         open={open}
         setOpen={setOpen}
         fullWidth
@@ -189,16 +195,35 @@ const CreateSaleModal = ({ open, setOpen }) => {
           }}
         >
           <Stack direction={"row"} gap={2}>
+            <FormControl fullWidth>
+              <InputLabel>Supplier</InputLabel>
+              <Select
+                value={supplierId}
+                label="Sort by date"
+                onChange={(e) => setSupplierId(e.target.value)}
+              >
+                {supplierData?.data?.result.map((supplier) => (
+                  <MenuItem key={supplier._id} value={supplier._id}>
+                    {supplier.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <TextField
               label="Order tax in (%)"
               onChange={(e) => setOrderTax(e.target.value)}
               fullWidth
             />
+          </Stack>
+
+          <Stack direction={"row"} gap={2}>
             <TextField
               label="Discount in (%)"
               onChange={(e) => setDiscount(e.target.value)}
               fullWidth
             />
+
             <TextField
               label="Shipping charge"
               onChange={(e) => setShipping(e.target.value)}
@@ -213,82 +238,82 @@ const CreateSaleModal = ({ open, setOpen }) => {
             rows={4}
             fullWidth
           />
-        </Stack>
 
-        <Box
-          sx={{
-            mt: 5,
-            mb: 2,
-          }}
-        >
-          <TextField
-            label="Search here"
-            onChange={(e) => setSearchTerm(e.target.value)}
-            fullWidth
-          />
-        </Box>
-
-        <Box
-          sx={{
-            borderBottom: "1px solid lightgray",
-          }}
-        >
-          <DataGrid
+          <Box
             sx={{
-              border: 0,
-              borderTop: "1px solid lightgray",
-            }}
-            rows={rows}
-            columns={columns}
-            hideFooter
-          />
-        </Box>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            mt: 2,
-          }}
-        >
-          <Stack
-            sx={{
-              width: "300px",
-              color: "black",
-              border: "1px solid lightgray",
-              borderRadius: 2,
-              p: "5px 10px",
-              gap: 1,
+              mt: 5,
+              mb: 2,
             }}
           >
-            <Stack direction={"row"} justifyContent={"space-between"}>
-              <Stack>
-                <Typography variant="p">
-                  Tax: ${taxAmount.toFixed(2)}
-                </Typography>
-                <Typography variant="p">
-                  Discount: ${discountAmount.toFixed(2)}
-                </Typography>
-              </Stack>
-              <Stack>
-                <Typography variant="p">Shipping: ${shipping}</Typography>
-                <Typography variant="p">Total: ${allPrice}</Typography>
-              </Stack>
-            </Stack>
-            <Typography variant="h6">
-              Grand total: ${totalPrice.toFixed(2)}
-            </Typography>
-          </Stack>
-        </Box>
+            <TextField
+              label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              fullWidth
+            />
+          </Box>
 
-        {/* Payment form */}
+          {/* Sale table */}
+          <Box
+            sx={{
+              borderBottom: "1px solid lightgray",
+            }}
+          >
+            <DataGrid
+              sx={{
+                border: 0,
+                borderTop: "1px solid lightgray",
+              }}
+              rows={rows}
+              columns={columns}
+              hideFooter
+            />
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              mt: 2,
+            }}
+          >
+            <Stack
+              sx={{
+                width: "300px",
+                color: "black",
+                border: "1px solid lightgray",
+                borderRadius: 2,
+                p: "5px 10px",
+                gap: 1,
+              }}
+            >
+              <Stack direction={"row"} justifyContent={"space-between"}>
+                <Stack>
+                  <Typography variant="p">
+                    Tax: ${taxAmount.toFixed(2)}
+                  </Typography>
+                  <Typography variant="p">
+                    Discount: ${discountAmount.toFixed(2)}
+                  </Typography>
+                </Stack>
+                <Stack>
+                  <Typography variant="p">Shipping: ${shipping}</Typography>
+                  <Typography variant="p">Total: ${allPrice}</Typography>
+                </Stack>
+              </Stack>
+              <Typography variant="h6">
+                Grand total: ${totalPrice.toFixed(2)}
+              </Typography>
+            </Stack>
+          </Box>
+        </Stack>
 
         <Box>
           <Elements stripe={stripePromise}>
-            <PaymentForm
+            <PurchasePaymentForm
               setOpen={setOpen}
               note={note}
               totalPrice={totalPrice}
+              supplierId={supplierId}
             />
           </Elements>
         </Box>
@@ -297,4 +322,4 @@ const CreateSaleModal = ({ open, setOpen }) => {
   );
 };
 
-export default CreateSaleModal;
+export default CreatePurchasesModal;

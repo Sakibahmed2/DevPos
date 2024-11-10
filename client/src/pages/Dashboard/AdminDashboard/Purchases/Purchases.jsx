@@ -21,7 +21,7 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import CreateWarrantyModal from "../Warranties/CreateWarrantyModal";
+import CreatePurchasesModal from "./CreatePurchasesModal";
 import EditPurchasesModal from "./EditPurchasesModal";
 
 const tableData = [
@@ -379,7 +379,7 @@ const Purchases = () => {
       <EditPurchasesModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add warranty modal */}
-      <CreateWarrantyModal open={createModal} setOpen={setCreateModal} />
+      <CreatePurchasesModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };
