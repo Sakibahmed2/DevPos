@@ -5,31 +5,55 @@ import totalExpanse from "../../../assets/dashboard icons/total-expense.svg";
 import totalAmount from "../../../assets/dashboard icons/total-amount.svg";
 import ReactApexChart from "react-apexcharts";
 import RecentProducts from "../../../components/dashboard/admin/AdminDashboard/RecentProducts";
-
-const cardData = [
-  {
-    title: "Total Purchase Due",
-    value: 253.32,
-    icon: totalPurchase,
-  },
-  {
-    title: "Total Sales Due",
-    value: 253.32,
-    icon: totalSales,
-  },
-  {
-    title: "Total Sale Amount",
-    value: 253.32,
-    icon: totalAmount,
-  },
-  {
-    title: "Total Expense Amount",
-    value: 253.32,
-    icon: totalExpanse,
-  },
-];
+import { useGetAllPurchaseQuery } from "../../../redux/api/admin/purchaseApi";
+import DPLoading from "../../../components/ui/DPLoading";
+import { useGetAllSalesQuery } from "../../../redux/api/admin/paymentApi";
 
 const DashboardHome = () => {
+  const { data: purchaseData, isLoading: purchaseLoading } =
+    useGetAllPurchaseQuery({});
+  const { data: saleData, isLoading: saleLoading } = useGetAllSalesQuery({});
+
+  if (purchaseLoading || saleLoading) return <DPLoading />;
+
+  const totalPurchaseDue = purchaseData?.data?.result?.reduce(
+    (acc, item) => acc + item.due,
+    0
+  );
+
+  const totalSalesDue = saleData?.data?.result?.reduce(
+    (acc, item) => acc + item.due,
+    0
+  );
+
+  const totalSaleAmount = saleData?.data?.result?.reduce(
+    (acc, item) => acc + item.amount,
+    0
+  );
+
+  const cardData = [
+    {
+      title: "Total Purchase Due",
+      value: totalPurchaseDue,
+      icon: totalPurchase,
+    },
+    {
+      title: "Total Sales Due",
+      value: totalSalesDue.toFixed(2),
+      icon: totalSales,
+    },
+    {
+      title: "Total Sale Amount",
+      value: totalSaleAmount.toFixed(2),
+      icon: totalAmount,
+    },
+    {
+      title: "Total Expense Amount",
+      value: 253.32,
+      icon: totalExpanse,
+    },
+  ];
+
   const lineChartOptions = {
     chart: {
       type: "line",
@@ -150,7 +174,7 @@ const DashboardHome = () => {
         </Typography>
       </Box>
 
-      <Stack direction={"row"} gap={3}>
+      <Stack direction={"row"} gap={3} justifyContent={"center"}>
         {cardData.map((item, index) => (
           <Box
             key={index}

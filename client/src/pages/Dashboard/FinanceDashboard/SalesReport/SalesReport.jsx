@@ -19,6 +19,7 @@ import laptopImg from "../../../../assets/laptopPng.png";
 import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
+import groupProductsById from "../../../../utils/groupProductsById";
 
 // table data
 const tableData = [
@@ -46,25 +47,11 @@ const SalesReport = () => {
   });
   if (isLoading) return <DPLoading />;
 
-  function groupProductsByName(products) {
-    const productCount = {};
-
-    products.forEach((product) => {
-      if (productCount[product.name]) {
-        productCount[product.name].soldQuantity += 1;
-      } else {
-        productCount[product.name] = { ...product, soldQuantity: 1 };
-      }
-    });
-
-    return Object.values(productCount);
-  }
-
   const allProducts = allSale?.data?.result.reduce((acc, curr) => {
     return acc.concat(curr.products);
   }, []);
 
-  const groupedProducts = groupProductsByName(allProducts);
+  const groupedProducts = groupProductsById(allProducts);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);

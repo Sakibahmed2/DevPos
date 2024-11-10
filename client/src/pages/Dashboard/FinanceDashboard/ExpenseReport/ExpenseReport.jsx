@@ -16,30 +16,26 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    date: "09 Sep 2024",
-    expanseCategory: "Printing",
-    userName: "John Doe",
-    amount: 1000,
-  },
-  {
-    id: 2,
-    date: "09 Sep 2024",
-    expanseCategory: "Printing",
-    userName: "John Doe",
-    amount: 1000,
-  },
-];
+import { useGetAllExpensesQuery } from "../../../../redux/api/finance/expensesApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
+import formatDate from "../../../../utils/formateDate";
 
 const ExpenseReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: allExpenses, isLoading } = useGetAllExpensesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(allExpenses?.data?.result, page);
+
+  console.log(paginateData);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -72,13 +68,13 @@ const ExpenseReport = () => {
     },
 
     {
-      field: "userName",
-      headerName: "User",
+      field: "refNo",
+      headerName: "Ref No",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">${row.userName}</Typography>
+            <Typography variant="p">{row.refNo}</Typography>
           </Box>
         );
       },
@@ -97,13 +93,13 @@ const ExpenseReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      date: data.date,
-      userName: data.userName,
+      id: data._id,
+      date: formatDate(new Date(data.date)),
+      refNo: data.refNo,
       amount: data.amount,
-      expanseCategory: data.expanseCategory,
+      expanseCategory: data.expenseCategory.name,
     };
   });
 
@@ -142,6 +138,7 @@ const ExpenseReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -163,7 +160,8 @@ const ExpenseReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -192,7 +190,7 @@ const ExpenseReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={allExpenses?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

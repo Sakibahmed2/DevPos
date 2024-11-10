@@ -15,41 +15,26 @@ import { useState } from "react";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
-import laptopImg from "../../../../assets/laptopPng.png";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    productName: "Laptop",
-    purchaseDate: "09 Sep 2024",
-    purchaseAmount: 1500,
-    purchaseQty: 10,
-    paid: 1500,
-    due: 0,
-    status: "Received",
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    productName: "Laptop",
-    purchaseDate: "09 Sep 2024",
-    purchaseAmount: 1500,
-    purchaseQty: 10,
-    paid: 1500,
-    due: 0,
-    status: "Received",
-  },
-];
+import { useGetAllPurchaseQuery } from "../../../../redux/api/admin/purchaseApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const SupplierReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: allPurchase, isLoading } = useGetAllPurchaseQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(allPurchase?.data?.result, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -69,31 +54,13 @@ const SupplierReport = () => {
       },
     },
     {
-      field: "productImg",
-      headerName: "Product Name",
-      width: 90,
-      renderCell: ({ row }) => {
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            <img src={row.productImg} alt="laptop" className="w-12" />
-          </Box>
-        );
-      },
-    },
-    {
+      field: "supplierName",
+      headerName: "Supplier Name",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.productName}</Typography>
+            <Typography variant="p">{row.supplierName}</Typography>
           </Box>
         );
       },
@@ -157,7 +124,7 @@ const SupplierReport = () => {
               label={row.status}
               sx={{
                 color: "white",
-                bgcolor: row.status === "Received" ? "primary.main" : "red",
+                bgcolor: row.status === "Completed" ? "primary.main" : "red",
                 borderRadius: 1,
                 fontWeight: 600,
               }}
@@ -168,14 +135,13 @@ const SupplierReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
-      purchaseDate: data.purchaseDate,
-      purchaseAmount: data.purchaseAmount,
-      purchaseQty: data.purchaseQty,
+      id: data._id,
+      supplierName: data.supplier.name,
+      purchaseDate: formatDate(new Date(data.date)),
+      purchaseAmount: data.amount.toFixed(2),
+      purchaseQty: data.products.length,
       paid: data.paid,
       due: data.due,
       status: data.status,
@@ -217,6 +183,7 @@ const SupplierReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -238,7 +205,8 @@ const SupplierReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -267,7 +235,7 @@ const SupplierReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={allPurchase?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

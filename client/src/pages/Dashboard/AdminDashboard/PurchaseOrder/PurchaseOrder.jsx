@@ -16,40 +16,30 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import shoeImg from "../../../../assets/shoeImg.svg";
-
-const tableData = [
-  {
-    id: 1,
-    productImg: shoeImg,
-    productName: "Nike Air Max",
-    purchaseAmount: 40000,
-    purchaseQuantity: 20,
-    inStockQuantity: 20,
-  },
-  {
-    id: 2,
-    productImg: shoeImg,
-    productName: "Nike Air Max",
-    purchaseAmount: 40000,
-    purchaseQuantity: 20,
-    inStockQuantity: 20,
-  },
-  {
-    id: 3,
-    productImg: shoeImg,
-    productName: "Nike Air Max",
-    purchaseAmount: 40000,
-    purchaseQuantity: 20,
-    inStockQuantity: 20,
-  },
-];
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useGetAllPurchaseQuery } from "../../../../redux/api/admin/purchaseApi";
+import groupProductsById from "../../../../utils/groupProductsById";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const PurchaseOrder = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: purchaseData, isLoading } = useGetAllPurchaseQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const allProducts = purchaseData?.data?.result.reduce((acc, curr) => {
+    return acc.concat(curr.products);
+  }, []);
+
+  const productData = groupProductsById(allProducts);
+
+  const paginatedData = paginateFormateData(productData, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -71,7 +61,11 @@ const PurchaseOrder = () => {
               width: "100%",
             }}
           >
-            <img src={row.productImg} alt="laptop" className="h-8 w-12" />
+            <img
+              src={row.productImg}
+              alt="laptop"
+              className="size-12 object-contain"
+            />
           </Box>
         );
       },
@@ -93,7 +87,7 @@ const PurchaseOrder = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.purchaseAmount}</Typography>
+            <Typography variant="p">${row.purchaseAmount}</Typography>
           </Box>
         );
       },
@@ -118,21 +112,21 @@ const PurchaseOrder = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">${row.inStockQuantity}</Typography>
+            <Typography variant="p">{row.inStockQuantity}</Typography>
           </Box>
         );
       },
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginatedData.map((data) => {
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
-      purchaseAmount: data.purchaseAmount,
-      purchaseQuantity: data.purchaseQuantity,
-      inStockQuantity: data.inStockQuantity,
+      id: data._id,
+      productImg: data.img,
+      productName: data.name,
+      purchaseAmount: data.pricingAndStock.price * data.soldQuantity,
+      purchaseQuantity: data.soldQuantity,
+      inStockQuantity: data.pricingAndStock.quantity - data.soldQuantity,
     };
   });
 
@@ -172,6 +166,7 @@ const PurchaseOrder = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -193,7 +188,8 @@ const PurchaseOrder = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -222,7 +218,7 @@ const PurchaseOrder = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={productData.length}
           currentPage={page}
           onPageChange={handlePageChange}
         />

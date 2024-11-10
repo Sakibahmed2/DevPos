@@ -14,35 +14,32 @@ import { useState } from "react";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
-import laptopImg from "../../../../assets/laptopPng.png";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    productName: "Laptop",
-    purchaseAmount: 10000,
-    purchaseQty: 10,
-    inStockQty: 5,
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    productName: "Laptop",
-    purchaseAmount: 10000,
-    purchaseQty: 10,
-    inStockQty: 5,
-  },
-];
+import { useGetAllPurchaseQuery } from "../../../../redux/api/admin/purchaseApi";
+import groupProductsById from "../../../../utils/groupProductsById";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const PurchaseReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: allPurchaseData, isLoading } = useGetAllPurchaseQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const allProducts = allPurchaseData?.data?.result.reduce((acc, curr) => {
+    return acc.concat(curr.products);
+  }, []);
+
+  const purchaseData = groupProductsById(allProducts);
+
+  const paginateData = paginateFormateData(purchaseData, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -117,14 +114,14 @@ const PurchaseReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
-      purchaseAmount: data.purchaseAmount,
-      purchaseQty: data.purchaseQty,
-      inStockQty: data.inStockQty,
+      id: data._id,
+      productImg: data.img,
+      productName: data.name,
+      purchaseAmount: data.pricingAndStock.price * data.soldQuantity,
+      purchaseQty: data.soldQuantity,
+      inStockQty: data.pricingAndStock.quantity - data.soldQuantity,
     };
   });
 
@@ -163,6 +160,7 @@ const PurchaseReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -184,7 +182,8 @@ const PurchaseReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -213,7 +212,7 @@ const PurchaseReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={paginateData.length}
           currentPage={page}
           onPageChange={handlePageChange}
         />

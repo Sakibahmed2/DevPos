@@ -21,16 +21,16 @@ import { getUserInfo } from "../../../utils/getUserInfo";
 import { removeTokenFromLocalStorage } from "../../../utils/local-storage";
 import DPClock from "../../ui/DPClock";
 import DPLoading from "../../ui/DPLoading";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const userInfo = getUserInfo();
+  const navigate = useNavigate();
 
   const { data: singleUser, isLoading } = useGetSingleUsersQuery(userInfo.id);
 
   if (isLoading) return <DPLoading />;
-
-  console.log(singleUser?.data?.img);
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -43,6 +43,7 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
   const handleLogout = () => {
     removeTokenFromLocalStorage();
     handleCloseUserMenu();
+    navigate("/login");
   };
 
   return (
