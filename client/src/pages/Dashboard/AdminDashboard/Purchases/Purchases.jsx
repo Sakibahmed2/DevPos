@@ -21,8 +21,12 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { useGetAllPurchaseQuery } from "../../../../redux/api/admin/purchaseApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreatePurchasesModal from "./CreatePurchasesModal";
-import EditPurchasesModal from "./EditPurchasesModal";
+import EditPurchaseModal from "./EditPurchasesModal";
 
 const tableData = [
   {
@@ -61,13 +65,21 @@ const tableData = [
 ];
 
 const Purchases = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
 
-  // const itemsPerPage = 3 ;
+  const { data: purchaseData, isLoading } = useGetAllPurchaseQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(purchaseData?.data?.result, page);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -194,14 +206,14 @@ const Purchases = () => {
                   color:
                     row.payment === "Paid"
                       ? "primary.main"
-                      : row.payment === "Unpaid"
+                      : row.payment === "Due"
                       ? "red"
                       : "orange",
                   borderRadius: 1,
                   border:
                     row.payment === "Paid"
                       ? "1px solid lightgreen"
-                      : row.payment === "Unpaid"
+                      : row.payment === "Due"
                       ? "1px solid red"
                       : "1px solid orange",
                   px: 1,
@@ -256,17 +268,17 @@ const Purchases = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      supplierName: data.supplierName,
-      reference: data.reference,
-      date: data.date,
+      id: data._id,
+      supplierName: data.supplier.name,
+      reference: data.refNo,
+      date: formatDate(new Date(data.date)),
       status: data.status,
-      grandTotal: data.grandTotal,
+      grandTotal: data.amount,
       paid: data.paid,
       due: data.due,
-      payment: data.payment,
+      payment: data.paymentTypeStatus,
     };
   });
 
@@ -319,6 +331,7 @@ const Purchases = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -340,7 +353,8 @@ const Purchases = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -376,7 +390,7 @@ const Purchases = () => {
       </Box>
 
       {/* Edit warranty modal */}
-      <EditPurchasesModal open={open} setOpen={setOpen} id={productId} />
+      <EditPurchaseModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add warranty modal */}
       <CreatePurchasesModal open={createModal} setOpen={setCreateModal} />

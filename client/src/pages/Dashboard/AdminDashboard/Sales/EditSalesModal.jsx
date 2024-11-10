@@ -13,8 +13,6 @@ const EditSalesModal = ({ open, setOpen, id }) => {
   const { data: singleSale, isLoading } = useGetSingleSaleQuery(id);
   if (isLoading) return <DPLoading />;
 
-  console.log(singleSale);
-
   const amountDue = (singleSale?.data?.amount - singleSale?.data?.paid).toFixed(
     2
   );

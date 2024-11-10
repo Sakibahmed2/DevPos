@@ -174,7 +174,6 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
                           loading: "eager",
                         }}
                       />
-                      <img src={singleUser?.data?.img} loading="eager" alt="" />
                     </IconButton>
                   </Tooltip>
                   <Menu

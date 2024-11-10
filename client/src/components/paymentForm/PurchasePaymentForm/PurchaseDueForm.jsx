@@ -1,26 +1,23 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { useCreatePurchaseMutation } from "../../../redux/api/admin/purchaseApi";
-import { removeProduct } from "../../../redux/features/admin/paymentSlice";
-import { getUserInfo } from "../../../utils/getUserInfo";
+import {
+  useGetSinglePurchaseQuery,
+  useUpdatePurchaseMutation,
+} from "../../../redux/api/admin/purchaseApi";
+import DPLoading from "../../ui/DPLoading";
 
-const PurchasePaymentForm = ({ setOpen, note, totalPrice, supplierId }) => {
+const PurchaseDueForm = ({ setOpen, id, supplierIds, note }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [clientSecret, setClientSecret] = useState("");
-  const [amount, setAmount] = useState(totalPrice);
-  const userInfo = getUserInfo();
-  const [createPurchase] = useCreatePurchaseMutation();
-  const dispatch = useDispatch();
-  const products = useSelector((state) => state.products.product);
-
-  const productsIds = products.map((product) => product.id);
+  const [amount, setAmount] = useState(0);
+  const [updatePurchase] = useUpdatePurchaseMutation();
+  const { data: singlePurchase, isLoading } = useGetSinglePurchaseQuery(id);
 
   useEffect(() => {
     fetch("http://localhost:5000/api/v1/purchase/create-payment-intent", {
@@ -36,6 +33,10 @@ const PurchasePaymentForm = ({ setOpen, note, totalPrice, supplierId }) => {
         setClientSecret(data.data.client_secret);
       });
   }, [amount]);
+
+  if (isLoading) {
+    return <DPLoading />;
+  }
 
   const handlePayment = async (e) => {
     e.preventDefault();
@@ -85,23 +86,21 @@ const PurchasePaymentForm = ({ setOpen, note, totalPrice, supplierId }) => {
         toast.success("Payment successful");
 
         const payment = {
-          transactionId: paymentIntent.id,
-          products: productsIds,
-          supplier: supplierId,
-          name: name,
-          amount: totalPrice.toFixed(2),
+          supplier: supplierIds,
+          note: note,
+          amount: Number(amount).toFixed(2),
           paid: paymentIntent.amount / 100,
-          biller: userInfo.id,
-          note: note || "",
         };
 
-        const res = await createPurchase(payment).unwrap();
+        const res = await updatePurchase({
+          id: id,
+          data: payment,
+        }).unwrap();
 
         console.log(res);
 
         if (res.success) {
-          toast.success("Payment created successfully");
-          dispatch(removeProduct());
+          toast.success("Purchase updated successfully");
           setOpen(false);
         }
       }
@@ -110,13 +109,26 @@ const PurchasePaymentForm = ({ setOpen, note, totalPrice, supplierId }) => {
 
   return (
     <form onSubmit={handlePayment} className="w-[500px] mx-auto">
-      <Typography variant="h6" gutterBottom>
-        Payment Gateway
-      </Typography>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Typography variant="h6" gutterBottom>
+          Payment Details
+        </Typography>
+
+        {singlePurchase?.data?.due > 0 ? (
+          <Typography variant="h6" gutterBottom>
+            You have to pay: ${singlePurchase?.data?.due}
+          </Typography>
+        ) : null}
+      </Stack>
 
       <TextField
         label="Name"
         value={name}
+        defaultValue={singlePurchase?.data?.name}
         onChange={(e) => setName(e.target.value)}
         fullWidth
         margin="normal"
@@ -177,4 +189,4 @@ const PurchasePaymentForm = ({ setOpen, note, totalPrice, supplierId }) => {
   );
 };
 
-export default PurchasePaymentForm;
+export default PurchaseDueForm;
