@@ -80,7 +80,12 @@ const createOrder = async (req, res, next) => {
 const getAllSales = async (req, res, next) => {
   try {
     const saleQuery = new QueryBuilder(
-      Sales.find().populate("biller", "name email"),
+      Sales.find()
+        .populate("biller", "name email")
+        .populate(
+          "products",
+          "name img pricingAndStock.price pricingAndStock.quantity productInfo.category productInfo.stockKeepingUnit productInfo.brand"
+        ),
       req.query
     )
       .search(["refNo", "customerName"])
@@ -109,7 +114,12 @@ const getSingleSale = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const result = await Sales.findById(id).populate("biller", "name email");
+    const result = await Sales.findById(id)
+      .populate("biller", "name email")
+      .populate(
+        "products",
+        "name img pricingAndStock.price pricingAndStock.quantity productInfo.category productInfo.unit"
+      );
 
     sendResponse(res, {
       success: true,

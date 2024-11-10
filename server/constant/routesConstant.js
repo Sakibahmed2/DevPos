@@ -16,6 +16,7 @@ import { paymentRouter } from "../routes/paymentRoutes.js";
 import { payrollsRouter } from "../routes/payrollsRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
 import { promoRouter } from "../routes/promoRoutes.js";
+import { purchaseRouter } from "../routes/purchaseRoutes.js";
 import { roleRouter } from "../routes/roleRoutes.js";
 import { shiftsRouter } from "../routes/shiftsRoutes.js";
 import { stockTransferRouter } from "../routes/stockTransferRoutes.js";
@@ -76,6 +77,10 @@ const routes = [
   {
     path: "/payments",
     routes: paymentRouter,
+  },
+  {
+    path: "/purchase",
+    routes: purchaseRouter,
   },
   {
     path: "/promo",

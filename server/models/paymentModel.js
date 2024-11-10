@@ -3,9 +3,18 @@ import { paymentStatus, paymentType } from "../constant/global.js";
 
 const paymentSchema = new Schema(
   {
+    transactionId: {
+      type: String,
+    },
     customerName: {
       type: String,
     },
+    products: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Products",
+      },
+    ],
     refNo: {
       type: String,
       required: true,
