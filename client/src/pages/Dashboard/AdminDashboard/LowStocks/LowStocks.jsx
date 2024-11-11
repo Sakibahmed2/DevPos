@@ -25,6 +25,7 @@ import {
 } from "../../../../redux/api/admin/productApi";
 import EditLowStockModal from "./EditLowStockModal";
 import { toast } from "sonner";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const LowStocks = () => {
   const [sortBy, setSortBy] = useState("");
@@ -185,7 +186,7 @@ const LowStocks = () => {
   ];
 
   // Calculate paginated data
-  const paginatedData = productData?.slice(page * limit, (page + 1) * limit);
+  const paginatedData = paginateFormateData(productData, page);
 
   // Prepare rows for the DataGrid
   const rows = paginatedData?.map((data) => ({
@@ -193,7 +194,7 @@ const LowStocks = () => {
     name: data.name,
     productImg: data.img,
     stockKeepingUnit: data.productInfo.stockKeepingUnit,
-    category: data.productInfo.category,
+    category: data.productInfo.category.name,
     warehouse: data.productInfo.warehouse,
     store: data.productInfo.store,
     quantity: data.pricingAndStock.quantity,

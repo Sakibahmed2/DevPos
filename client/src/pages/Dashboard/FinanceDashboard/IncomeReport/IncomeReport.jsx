@@ -15,33 +15,27 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    date: "09 Sep 2024",
-    incomeCategory: "Sale",
-    userName: "John Doe",
-    amount: 1000,
-    paymentMethod: "Paypal",
-  },
-  {
-    id: 2,
-    date: "09 Sep 2024",
-    incomeCategory: "Sale",
-    userName: "John Doe",
-    amount: 1000,
-    paymentMethod: "Paytm",
-  },
-];
+import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const IncomeReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: saleData, isLoading } = useGetAllSalesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(saleData?.data?.result, page);
+
+  console.log(paginateData);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -61,45 +55,38 @@ const IncomeReport = () => {
       },
     },
     {
-      field: "incomeCategory",
-      headerName: "Income Category",
+      field: "totalItem",
+      headerName: "Total items",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.incomeCategory}</Typography>
+            <Typography variant="p">{row.totalItem}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "userName",
-      headerName: "User",
+      field: "customerName",
+      headerName: "Customer Name",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">${row.userName}</Typography>
+            <Typography variant="p">{row.customerName}</Typography>
           </Box>
         );
       },
     },
     {
-      field: "paymentMethod",
-      headerName: "Payment method",
+      field: "biller",
+      headerName: "Biller",
       flex: 1,
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography
-              variant="p"
-              component={"p"}
-              sx={{
-                fontSize: "20px",
-                fontWeight: "600",
-              }}
-            >
-              {row.paymentMethod}
+            <Typography variant="p" component={"p"}>
+              {row.biller}
             </Typography>
           </Box>
         );
@@ -119,14 +106,14 @@ const IncomeReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      date: data.date,
-      userName: data.userName,
+      id: data._id,
+      date: formatDate(new Date(data.date)),
+      customerName: data.customerName,
       amount: data.amount,
-      paymentMethod: data.paymentMethod,
-      incomeCategory: data.incomeCategory,
+      biller: data.biller.name,
+      totalItem: data.products.length,
     };
   });
 
@@ -165,6 +152,7 @@ const IncomeReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -186,7 +174,8 @@ const IncomeReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -215,7 +204,7 @@ const IncomeReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={saleData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

@@ -1,4 +1,4 @@
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Container, Grid2, Stack, Typography } from "@mui/material";
 import totalPurchase from "../../../assets/dashboard icons/total-purchase.svg";
 import totalSales from "../../../assets/dashboard icons/total-sales.svg";
 import totalExpanse from "../../../assets/dashboard icons/total-expense.svg";
@@ -8,13 +8,28 @@ import RecentProducts from "../../../components/dashboard/admin/AdminDashboard/R
 import { useGetAllPurchaseQuery } from "../../../redux/api/admin/purchaseApi";
 import DPLoading from "../../../components/ui/DPLoading";
 import { useGetAllSalesQuery } from "../../../redux/api/admin/paymentApi";
+import { useGetAllExpensesQuery } from "../../../redux/api/finance/expensesApi";
+import { useGetAllEmployeesQuery } from "../../../redux/api/finance/employeesApi";
+import { useGetAllUsersQuery } from "../../../redux/api/auth/authApi";
 
 const DashboardHome = () => {
   const { data: purchaseData, isLoading: purchaseLoading } =
     useGetAllPurchaseQuery({});
   const { data: saleData, isLoading: saleLoading } = useGetAllSalesQuery({});
+  const { data: expenseData, isLoading: expenseLoading } =
+    useGetAllExpensesQuery({});
+  const { data: employeesData, isLoading: employeeLoading } =
+    useGetAllEmployeesQuery({});
+  const { data: usersData, isLoading: userLoading } = useGetAllUsersQuery({});
 
-  if (purchaseLoading || saleLoading) return <DPLoading />;
+  if (
+    purchaseLoading ||
+    saleLoading ||
+    expenseLoading ||
+    employeeLoading ||
+    userLoading
+  )
+    return <DPLoading />;
 
   const totalPurchaseDue = purchaseData?.data?.result?.reduce(
     (acc, item) => acc + item.due,
@@ -27,6 +42,11 @@ const DashboardHome = () => {
   );
 
   const totalSaleAmount = saleData?.data?.result?.reduce(
+    (acc, item) => acc + item.amount,
+    0
+  );
+
+  const totalExpenseAmount = expenseData?.data?.result?.reduce(
     (acc, item) => acc + item.amount,
     0
   );
@@ -49,8 +69,30 @@ const DashboardHome = () => {
     },
     {
       title: "Total Expense Amount",
-      value: 253.32,
+      value: totalExpenseAmount.toFixed(2),
       icon: totalExpanse,
+    },
+  ];
+
+  const formateSaleDataForChart = Array(12).fill({ sales: 0, view: 0 });
+
+  saleData?.data?.result?.forEach((item) => {
+    const month = new Date(item.createdAt).getMonth();
+    formateSaleDataForChart[month] = {
+      sales: (formateSaleDataForChart[month]?.sales || 0) + item.amount,
+      view: (formateSaleDataForChart[month]?.view || 0) + 1,
+    };
+  });
+
+  // Update chart series with formatted data
+  const lineChartSeries = [
+    {
+      name: "Sales",
+      data: formateSaleDataForChart.map((data) => data.sales),
+    },
+    {
+      name: "Views",
+      data: formateSaleDataForChart.map((data) => data.view),
     },
   ];
 
@@ -102,24 +144,6 @@ const DashboardHome = () => {
     },
   };
 
-  const lineChartSeries = [
-    {
-      name: "2023",
-      data: [
-        12000, 19000, 18000, 22000, 32000, 39000, 36000, 28000, 25000, 24000,
-        25000, 24000,
-      ],
-    },
-    {
-      name: "2024",
-      data: [
-        15000, 30000, 16000, 20000, 28000, 32000, 36000, 34000, 30000, 18000,
-        28000, 36000,
-      ],
-    },
-  ];
-
-  // Data for the pie chart
   const pieChartOptions = {
     chart: {
       type: "donut",
@@ -161,7 +185,10 @@ const DashboardHome = () => {
     ],
   };
 
-  const pieChartSeries = [81, 19];
+  const pieChartSeries = [
+    employeesData?.data?.meta?.total,
+    usersData?.data?.meta?.total,
+  ];
 
   return (
     <Container>
@@ -174,47 +201,58 @@ const DashboardHome = () => {
         </Typography>
       </Box>
 
-      <Stack direction={"row"} gap={3} justifyContent={"center"}>
+      <Grid2 container spacing={2}>
         {cardData.map((item, index) => (
-          <Box
-            key={index}
-            sx={{
-              display: "flex",
-              gap: "1rem",
-              alignItems: "center",
-              padding: "30px 20px",
-              marginBottom: 2,
-              borderRadius: 3,
-              border: "1px solid lightgray",
-              width: "100%",
-              maxWidth: "335px",
+          <Grid2
+            item
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 6,
+              lg: 3,
+              xl: 3,
             }}
-            className="shadow-sm"
+            key={index}
           >
             <Box
               sx={{
-                p: 2,
-                bgcolor: "rgba(0, 176, 117, 0.09)",
-                borderRadius: "100%",
-                width: "80px",
-                height: "80px",
                 display: "flex",
-                justifyContent: "center",
+                gap: "1rem",
                 alignItems: "center",
+                padding: "30px 20px",
+                marginBottom: 2,
+                borderRadius: 3,
+                border: "1px solid lightgray",
+                width: "100%",
+                maxWidth: "335px",
               }}
+              className="shadow-sm"
             >
-              <img src={item.icon} alt="icon" className="" />
-            </Box>
+              <Box
+                sx={{
+                  p: 2,
+                  bgcolor: "rgba(0, 176, 117, 0.09)",
+                  borderRadius: "100%",
+                  width: "80px",
+                  height: "80px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img src={item.icon} alt="icon" className="" />
+              </Box>
 
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: "700" }}>
-                ${item.value}
-              </Typography>
-              <Typography component={"p"}>{item.title}</Typography>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: "700" }}>
+                  ${item.value}
+                </Typography>
+                <Typography component={"p"}>{item.title}</Typography>
+              </Box>
             </Box>
-          </Box>
+          </Grid2>
         ))}
-      </Stack>
+      </Grid2>
 
       <Stack
         direction={"row"}

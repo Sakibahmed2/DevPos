@@ -19,31 +19,36 @@ import { useCreateProductMutation } from "../../../../redux/api/admin/productApi
 import { toast } from "sonner";
 import { useState } from "react";
 import { getUserInfo } from "../../../../utils/getUserInfo";
+import { useGetAllCategoriesQuery } from "../../../../redux/api/admin/categoriesApi";
+import { useGetAllSubCategoriesQuery } from "../../../../redux/api/admin/subCategoriesApi";
+import { useGetAllBrandsQuery } from "../../../../redux/api/admin/brandApi";
+import { useGetAllUnitsQuery } from "../../../../redux/api/admin/unitsApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
 
 const defaultValues = {
-  name: "Laptop Pro 15",
+  name: "",
   img: "",
   productInfo: {
-    slug: "laptop-pro-15",
-    stockKeepingUnit: "SKU67890",
-    category: "laptop",
-    subCategory: "tablet",
-    brand: "Apple",
-    unit: "piece",
-    sellingType: "retail",
-    barcodeSymbology: "code128",
-    itemCode: "123456",
-    description:
-      "A powerful laptop for professionals, offering high performance and a sleek design.",
+    slug: "",
+    stockKeepingUnit: "",
+    category: "",
+    subCategory: "",
+    brand: "",
+    unit: "",
+    sellingType: "",
+    barcodeSymbology: "",
+    itemCode: "",
+    description: "",
   },
   pricingAndStock: {
-    productType: "single",
-    price: 1599.99,
-    taxType: "VAT",
-    discountType: "fixed",
-    discountValue: 10,
-    quantityAlert: 10,
-    quantity: 100,
+    productType: "",
+    price: 0,
+    taxType: "",
+    discountType: "",
+    discountValue: 0,
+    quantityAlert: 0,
+    quantity: 0,
   },
 };
 
@@ -51,6 +56,28 @@ const CreateProduct = () => {
   const [createProduct] = useCreateProductMutation();
   const [productType, setProductType] = useState("single");
   const userInfo = getUserInfo();
+  console.log(productType);
+
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetAllCategoriesQuery({});
+
+  const { data: subCategoriesData, isLoading: subCategoriesLoading } =
+    useGetAllSubCategoriesQuery({});
+
+  const { data: brandData, isLoading: brandLoading } = useGetAllBrandsQuery({});
+
+  const { data: unitsData, isLoading: unitLoading } = useGetAllUnitsQuery({});
+  if (categoriesLoading || subCategoriesLoading || brandLoading || unitLoading)
+    return <DPLoading />;
+
+  const categoriesDataForSelect = convertDataForSelect(
+    categoriesData?.data?.result
+  );
+  const subCategoriesDataForSelect = convertDataForSelect(
+    subCategoriesData?.data?.result
+  );
+  const brandDataForSelect = convertDataForSelect(brandData?.data?.result);
+  const unitsDataForSelect = convertDataForSelect(unitsData?.data?.result);
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Creating product...");
@@ -155,8 +182,6 @@ const CreateProduct = () => {
                       name={"productInfo.slug"}
                       label={"Slug"}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
@@ -172,8 +197,6 @@ const CreateProduct = () => {
                       name={"productInfo.stockKeepingUnit"}
                       label={"Stock keeping unit"}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
                 </Grid2>
@@ -197,7 +220,7 @@ const CreateProduct = () => {
                     <DPSelect
                       name={"productInfo.category"}
                       label={"Category"}
-                      items={["laptop", "mobile"]}
+                      items={categoriesDataForSelect}
                       size="medium"
                     />
                   </Grid2>
@@ -213,7 +236,7 @@ const CreateProduct = () => {
                     <DPSelect
                       name={"productInfo.subCategory"}
                       label={"Sub category"}
-                      items={["tablet", "accessories"]}
+                      items={subCategoriesDataForSelect}
                       size="medium"
                     />
                   </Grid2>
@@ -229,7 +252,7 @@ const CreateProduct = () => {
                     <DPSelect
                       name={"productInfo.brand"}
                       label={"Brand"}
-                      items={["Apple", "Samsung"]}
+                      items={brandDataForSelect}
                       size="medium"
                     />
                   </Grid2>
@@ -254,7 +277,7 @@ const CreateProduct = () => {
                     <DPSelect
                       name={"productInfo.unit"}
                       label={"Unit"}
-                      items={["piece", "kg"]}
+                      items={unitsDataForSelect}
                       size="medium"
                     />
                   </Grid2>
@@ -283,11 +306,9 @@ const CreateProduct = () => {
                       lg: 3,
                     }}
                   >
-                    <DPSelect
+                    <DPInput
                       name={"productInfo.barcodeSymbology"}
                       label={"Barcode symbology"}
-                      items={["code128", "code39"]}
-                      size="medium"
                     />
                   </Grid2>
 
@@ -299,11 +320,9 @@ const CreateProduct = () => {
                       lg: 3,
                     }}
                   >
-                    <DPSelect
+                    <DPInput
                       name={"productInfo.itemCode"}
                       label={"Item code"}
-                      items={["123456", "789123"]}
-                      size="medium"
                     />
                   </Grid2>
                 </Grid2>
@@ -320,8 +339,6 @@ const CreateProduct = () => {
                     <DPInput
                       name={"productInfo.description"}
                       label={"Description"}
-                      fullWidth
-                      size="medium"
                       multiline
                       rows={6}
                     />
@@ -410,8 +427,6 @@ const CreateProduct = () => {
                       name={"pricingAndStock.price"}
                       label={"Price"}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
@@ -427,8 +442,6 @@ const CreateProduct = () => {
                       name={"pricingAndStock.taxType"}
                       label={"Tax type"}
                       items={["VAT", "GST"]}
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
                 </Grid2>
@@ -453,8 +466,6 @@ const CreateProduct = () => {
                       name={"pricingAndStock.discountType"}
                       label={"Discount type"}
                       items={["percentage", "fixed"]}
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
@@ -466,13 +477,10 @@ const CreateProduct = () => {
                     }}
                     item
                   >
-                    <DPSelect
+                    <DPInput
                       name={"pricingAndStock.discountValue"}
                       label={"Discount value (%) "}
-                      items={[10, 20]}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 

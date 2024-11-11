@@ -157,9 +157,13 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
                   borderLeft: "2px solid gray",
                   pl: 2,
                   display: "flex",
+                  justifyContent: {
+                    xs: "center",
+                    xl: "end",
+                  },
                   alignItems: "center",
                   gap: 2,
-                  width: "100%",
+                  width: "180px",
                 }}
               >
                 <Typography component={"p"} color="text.secondary">

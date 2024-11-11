@@ -14,39 +14,35 @@ import { useState } from "react";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
-import laptopImg from "../../../../assets/laptopPng.png";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    productName: "Laptop",
-    stockKeepingUnit: "SKU-123",
-    category: "Electronics",
-    brand: "Apple",
-    unit: "pcs",
-    inStockQty: 20,
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    productName: "Laptop",
-    stockKeepingUnit: "SKU-123",
-    category: "Electronics",
-    brand: "Apple",
-    unit: "pcs",
-    inStockQty: 20,
-  },
-];
+import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
+import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const InventoryReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: productsData, isLoading } = useGetAllProductsQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const { data: saleData, isLoading: saleLoading } = useGetAllSalesQuery({});
+
+  if (isLoading || saleLoading) return <DPLoading />;
+
+  const allProducts = saleData?.data?.result.reduce((acc, curr) => {
+    return acc.concat(curr.products);
+  }, []);
+
+  console.log(allProducts);
+
+  const paginateData = paginateFormateData(productsData?.data?.result, page);
+
+  console.log(paginateData);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -145,16 +141,18 @@ const InventoryReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
-      stockKeepingUnit: data.stockKeepingUnit,
-      category: data.category,
-      brand: data.brand,
-      unit: data.unit,
-      inStockQty: data.inStockQty,
+      id: data._id,
+      productImg: data.img,
+      productName: data.name,
+      stockKeepingUnit: data.productInfo.stockKeepingUnit,
+      category: data.productInfo.category,
+      brand: data.productInfo.brand,
+      unit: data.productInfo.unit,
+      inStockQty:
+        data.pricingAndStock.quantity -
+        allProducts.filter((product) => product._id === data._id).length,
     };
   });
 
@@ -193,6 +191,7 @@ const InventoryReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -214,7 +213,8 @@ const InventoryReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -243,7 +243,7 @@ const InventoryReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={saleData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

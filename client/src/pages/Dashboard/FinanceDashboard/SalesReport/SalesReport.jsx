@@ -15,26 +15,10 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import laptopImg from "../../../../assets/laptopPng.png";
 import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
 import groupProductsById from "../../../../utils/groupProductsById";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    productName: "Laptop",
-    stockKeepingUnit: "SKU-123",
-    category: "Electronics",
-    brand: "Apple",
-    soldQty: 10,
-    soldAmount: 10000,
-    inStockQty: 20,
-  },
-];
 
 const SalesReport = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -267,7 +251,7 @@ const SalesReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={groupedProducts.length}
           currentPage={page}
           onPageChange={handlePageChange}
         />

@@ -251,9 +251,9 @@ const ProductsPage = () => {
       price: data.pricingAndStock.price,
       productImg: data.img,
       stockKeepingUnit: data.productInfo.stockKeepingUnit,
-      category: data.productInfo.category,
-      brand: data.productInfo.brand,
-      unit: data.productInfo.unit,
+      category: data.productInfo.category.name,
+      brand: data.productInfo.brand.name,
+      unit: data.productInfo.unit.name,
       quantity: data.pricingAndStock.quantity,
       createdBy: data.createdBy,
     };

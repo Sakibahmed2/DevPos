@@ -8,124 +8,33 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import DPDatePicker from "../../../../components/form/DPDatePicker";
-import DPForm from "../../../../components/form/DPForm";
+import DPLoading from "../../../../components/ui/DPLoading";
 import SectionTitle from "../../../../components/ui/SectionTitle";
-
-const defaultValues = {
-  from: new Date(),
-  to: new Date(),
-};
+import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
+import { useGetAllExpensesQuery } from "../../../../redux/api/finance/expensesApi";
+import formatDate from "../../../../utils/formateDate";
 
 const ProfitLoss = () => {
-  const data = [
-    {
-      month: "Jan 2024",
-      income: {
-        sales: "$4,02,124.00",
-        service: "$4,02,124.00",
-        purchaseReturn: "$4,02,124.00",
-        grossProfit: "$4,02,124.00",
-      },
-      expenses: {
-        sales: "$4,02,124.00",
-        service: "$4,02,124.00",
-        purchase: "$4,02,124.00",
-        salesReturn: "$4,02,124.00",
-        totalExpense: "$4,02,124.00",
-        netProfit: "$4,02,124.00",
-      },
-    },
-    {
-      month: "Feb 2024",
-      income: {
-        sales: "$3,05,178.00",
-        service: "$3,05,178.00",
-        purchaseReturn: "$3,05,178.00",
-        grossProfit: "$3,05,178.00",
-      },
-      expenses: {
-        sales: "$3,05,178.00",
-        service: "$3,05,178.00",
-        purchase: "$3,05,178.00",
-        salesReturn: "$3,05,178.00",
-        totalExpense: "$3,05,178.00",
-        netProfit: "$3,05,178.00",
-      },
-    },
-    {
-      month: "Mar 2024",
-      income: {
-        sales: "$5,61,639.00",
-        service: "$5,61,639.00",
-        purchaseReturn: "$5,61,639.00",
-        grossProfit: "$5,61,639.00",
-      },
-      expenses: {
-        sales: "$5,61,639.00",
-        service: "$5,61,639.00",
-        purchase: "$5,61,639.00",
-        salesReturn: "$5,61,639.00",
-        totalExpense: "$5,61,639.00",
-        netProfit: "$5,61,639.00",
-      },
-    },
-    {
-      month: "Apr 2024",
-      income: {
-        sales: "$2,46,123.00",
-        service: "$2,46,123.00",
-        purchaseReturn: "$2,46,123.00",
-        grossProfit: "$2,46,123.00",
-      },
-      expenses: {
-        sales: "$2,46,123.00",
-        service: "$2,46,123.00",
-        purchase: "$2,46,123.00",
-        salesReturn: "$2,46,123.00",
-        totalExpense: "$2,46,123.00",
-        netProfit: "$2,46,123.00",
-      },
-    },
-    {
-      month: "May 2024",
-      income: {
-        sales: "$2,16,836.00",
-        service: "$2,16,836.00",
-        purchaseReturn: "$2,16,836.00",
-        grossProfit: "$2,16,836.00",
-      },
-      expenses: {
-        sales: "$2,16,836.00",
-        service: "$2,16,836.00",
-        purchase: "$2,16,836.00",
-        salesReturn: "$2,16,836.00",
-        totalExpense: "$2,16,836.00",
-        netProfit: "$2,16,836.00",
-      },
-    },
-    {
-      month: "Jun 2023",
-      income: {
-        sales: "$3,40,472.00",
-        service: "$3,40,472.00",
-        purchaseReturn: "$3,40,472.00",
-        grossProfit: "$3,40,472.00",
-      },
-      expenses: {
-        sales: "$3,40,472.00",
-        service: "$3,40,472.00",
-        purchase: "$3,40,472.00",
-        salesReturn: "$3,40,472.00",
-        totalExpense: "$3,40,472.00",
-        netProfit: "$3,40,472.00",
-      },
-    },
-  ];
+  const { data: saleData, isLoading: saleLoading } = useGetAllSalesQuery();
+  const { data: expenseData, isLoading: expenseLoading } =
+    useGetAllExpensesQuery();
 
-  const onSubmit = (e) => {
-    console.log(e);
-  };
+  if (saleLoading || expenseLoading) return <DPLoading />;
+
+  const saleFormattedData = saleData?.data?.result.map((sale) => ({
+    month: formatDate(new Date(sale.createdAt), "MMM yyyy"),
+    income: {
+      saleAmount: sale.amount,
+      itemsSale: sale.products.length,
+      due: sale.due,
+      paid: sale.paid,
+    },
+  }));
+
+  const expenseFormattedData = expenseData?.data?.result.map((expense) => ({
+    month: formatDate(new Date(expense.createdAt), "MMM yyyy"),
+    expenseAmount: expense.amount,
+  }));
 
   return (
     <Box p={4}>
@@ -136,18 +45,10 @@ const ProfitLoss = () => {
         alignItems="center"
         spacing={2}
       >
-        <Stack>
-          <SectionTitle
-            title={"Profit loss"}
-            description={"Manage your profit loss"}
-          />
-        </Stack>
-        <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
-          <Stack direction="row" spacing={2}>
-            <DPDatePicker name={"from"} label={"From"} />
-            <DPDatePicker name={"to"} label={"To"} />
-          </Stack>
-        </DPForm>
+        <SectionTitle
+          title="Profit & Loss"
+          description="Overview of monthly profit and loss"
+        />
       </Stack>
 
       {/* Table Section */}
@@ -163,51 +64,44 @@ const ProfitLoss = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell></TableCell>
-              <TableCell>Jan 2024</TableCell>
-              <TableCell>Feb 2024</TableCell>
-              <TableCell>Mar 2024</TableCell>
-              <TableCell>Apr 2024</TableCell>
-              <TableCell>May 2024</TableCell>
-              <TableCell>Jun 2023</TableCell>
+              <TableCell>Month</TableCell>
+              {saleFormattedData.map((sale) => (
+                <TableCell key={sale.month}>{sale.month}</TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
+            {/* Income Section */}
             <TableRow>
-              <TableCell component="th" scope="row" colSpan={7}>
+              <TableCell colSpan={saleFormattedData.length + 1}>
                 <Typography variant="h6">Income</Typography>
               </TableCell>
             </TableRow>
-            {Object.keys(data[0].income).map((key, idx) => (
-              <TableRow key={idx}>
-                <TableCell>
-                  {key.charAt(0).toUpperCase() + key.slice(1)}
-                </TableCell>
-                {data.map((monthData) => (
-                  <TableCell key={monthData.month}>
-                    {monthData.income[key]}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-
-            <TableRow>
-              <TableCell component="th" scope="row" colSpan={7}>
-                <Typography variant="h6">Expenses</Typography>
-              </TableCell>
-            </TableRow>
-            {Object.keys(data[0].expenses).map((key) => (
+            {Object.keys(saleFormattedData[0].income).map((key) => (
               <TableRow key={key}>
                 <TableCell>
                   {key.charAt(0).toUpperCase() + key.slice(1)}
                 </TableCell>
-                {data.map((monthData) => (
-                  <TableCell key={monthData.month}>
-                    {monthData.expenses[key]}
-                  </TableCell>
+                {saleFormattedData.map((sale) => (
+                  <TableCell key={sale.month}>{sale.income[key]}</TableCell>
                 ))}
               </TableRow>
             ))}
+
+            {/* Expenses Section */}
+            <TableRow>
+              <TableCell colSpan={saleFormattedData.length + 1}>
+                <Typography variant="h6">Expenses</Typography>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Expense Amount</TableCell>
+              {expenseFormattedData.map((expense) => (
+                <TableCell key={expense.month}>
+                  {expense.expenseAmount}
+                </TableCell>
+              ))}
+            </TableRow>
           </TableBody>
         </Table>
       </Box>

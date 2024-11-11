@@ -1,49 +1,15 @@
+import { Box, Stack, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import laptopImg from "../../../../assets/laptopPng.png";
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from "@mui/material";
-import { useState } from "react";
-
-const tableData = [
-  {
-    id: 1,
-    img: laptopImg,
-    name: "MSI",
-    price: "2000",
-  },
-  {
-    id: 2,
-    img: laptopImg,
-    name: "Lenovo",
-    price: 1500,
-  },
-  {
-    id: 3,
-    img: laptopImg,
-    name: "Dell",
-    price: 1800,
-  },
-  {
-    id: 4,
-    img: laptopImg,
-    name: "HP",
-    price: 1200,
-  },
-];
+import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
+import DPLoading from "../../../ui/DPLoading";
 
 const RecentProducts = () => {
-  const [searchParams, setSearchParams] = useState("");
+  const { data: productsData, isLoading } = useGetAllProductsQuery({
+    limit: 3,
+    sort: "-createdAt",
+  });
 
-  const handleChange = (e) => {
-    setSearchParams(e.target.value);
-  };
+  if (isLoading) return <DPLoading />;
 
   const columns = [
     {
@@ -58,7 +24,7 @@ const RecentProducts = () => {
                 fontSize: "20px",
               }}
             >
-              {row.id + 1}
+              {row.index + 1}
             </Typography>
           </Box>
         );
@@ -80,7 +46,11 @@ const RecentProducts = () => {
               width: "100%",
             }}
           >
-            <img src={row.img} alt="laptop" className="w-24 h-14 " />
+            <img
+              src={row.img}
+              alt="laptop"
+              className="w-24 h-14 object-contain"
+            />
           </Box>
         );
       },
@@ -124,11 +94,12 @@ const RecentProducts = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = productsData?.data?.result.map((data, idx) => {
     return {
-      id: data?.id,
+      index: idx,
+      id: data._id,
       name: data.name,
-      price: data.price,
+      price: data.pricingAndStock.price,
       img: data.img,
     };
   });
@@ -150,17 +121,6 @@ const RecentProducts = () => {
         <Typography variant="h5" component={"p"}>
           Recent Products
         </Typography>
-
-        <FormControl
-          sx={{
-            width: "150px",
-          }}
-        >
-          <InputLabel id="demo-simple-select-label">View all</InputLabel>
-          <Select value={searchParams} label="View all" onChange={handleChange}>
-            <MenuItem value={10}>Ten</MenuItem>
-          </Select>
-        </FormControl>
       </Stack>
 
       <Box>

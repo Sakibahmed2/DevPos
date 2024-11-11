@@ -17,36 +17,25 @@ import SectionTitle from "../../../../components/ui/SectionTitle";
 // icons
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import PaginationUi from "../../../../components/ui/PaginationUi";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    customerId: "C001",
-    customerName: "John Doe",
-    amount: 1000,
-    paid: 1000,
-    due: 0,
-    status: "Received",
-    paymentStatus: "Paid",
-  },
-  {
-    id: 2,
-    customerId: "C001",
-    customerName: "John Doe",
-    amount: 1000,
-    paid: 1000,
-    due: 0,
-    status: "Received",
-    paymentStatus: "Unpaid",
-  },
-];
+import { useGetAllSalesQuery } from "../../../../redux/api/admin/paymentApi";
+import DPLoading from "../../../../components/ui/DPLoading";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const CustomerReport = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
 
-  // const itemsPerPage = 3 ;
+  const { data: saleData, isLoading } = useGetAllSalesQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(saleData?.data?.result, page);
+
+  console.log(paginateData);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -121,10 +110,10 @@ const CustomerReport = () => {
         return (
           <Box>
             <Chip
-              label={row.status}
+              label={row.status === "Completed" ? "Received" : "Pending"}
               sx={{
                 color: "white",
-                bgcolor: row.status === "Received" ? "primary.main" : "red",
+                bgcolor: row.status === "Completed" ? "primary.main" : "red",
                 borderRadius: 1,
                 fontWeight: 600,
               }}
@@ -157,16 +146,16 @@ const CustomerReport = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      customerId: data.customerId,
+      id: data._id,
+      customerId: data.customerId || "N/A",
       customerName: data.customerName,
       amount: data.amount,
       paid: data.paid,
       due: data.due,
       status: data.status,
-      paymentStatus: data.paymentStatus,
+      paymentStatus: data.paymentTypeStatus,
     };
   });
 
@@ -205,6 +194,7 @@ const CustomerReport = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -226,7 +216,8 @@ const CustomerReport = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -255,7 +246,7 @@ const CustomerReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={saleData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
