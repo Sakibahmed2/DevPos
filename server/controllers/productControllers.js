@@ -35,7 +35,12 @@ const createProduct = async (req, res, next) => {
 const getAllProducts = async (req, res, next) => {
   try {
     const productQuery = new QueryBuilder(
-      Products.find().populate("createdBy", "name email img"),
+      Products.find({ isDeleted: false })
+        .populate("createdBy", ["name", "email", "img"])
+        .populate("productInfo.category", ["name"])
+        .populate("productInfo.brand", ["name"])
+        .populate("productInfo.unit", ["name"])
+        .populate("productInfo.subCategory", ["name"]),
       req.query
     )
       .search(["name", "productInfo.category", "productInfo.brand"])
@@ -63,10 +68,12 @@ const getAllProducts = async (req, res, next) => {
 const getSingleProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await Products.findById(id).populate(
-      "createdBy",
-      "name email"
-    );
+    const result = await Products.findById(id)
+      .populate("createdBy", ["name", "email", "img"])
+      .populate("productInfo.category", ["name"])
+      .populate("productInfo.brand", ["name"])
+      .populate("productInfo.unit", ["name"])
+      .populate("productInfo.subCategory", ["name"]);
 
     if (!result) {
       throw new AppError(404, "Product not found");
@@ -105,7 +112,7 @@ const updateProduct = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const result = await Products.findByIdAndDelete(id);
+    const result = await Products.findByIdAndUpdate(id, { isDeleted: true });
 
     sendResponse(res, {
       success: true,

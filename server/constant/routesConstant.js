@@ -18,6 +18,7 @@ import { productRouter } from "../routes/productRoutes.js";
 import { promoRouter } from "../routes/promoRoutes.js";
 import { purchaseRouter } from "../routes/purchaseRoutes.js";
 import { roleRouter } from "../routes/roleRoutes.js";
+import { salesReturnRouter } from "../routes/salesReturnRoutes.js";
 import { shiftsRouter } from "../routes/shiftsRoutes.js";
 import { stockTransferRouter } from "../routes/stockTransferRoutes.js";
 import { storeRouter } from "../routes/storeRoutes.js";
@@ -77,6 +78,10 @@ const routes = [
   {
     path: "/payments",
     routes: paymentRouter,
+  },
+  {
+    path: "/sale-return",
+    routes: salesReturnRouter,
   },
   {
     path: "/purchase",

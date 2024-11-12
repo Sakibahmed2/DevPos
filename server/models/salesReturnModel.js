@@ -1,18 +1,30 @@
-import { Schema } from "mongoose";
-import { salesReturnStatus } from "../constant/global";
+import mongoose, { Schema } from "mongoose";
 
-const salesReturnSchema = new Schema({
-  product: {
-    type: Schema.Types.ObjectId,
-    ref: "Sales",
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: [
-      salesReturnStatus.RECEIVED,
-      salesReturnStatus.PENDING,
-      salesReturnStatus.ORDERED,
+const salesReturnSchema = new Schema(
+  {
+    customerName: {
+      type: String,
+    },
+    products: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Products",
+      },
     ],
+    status: {
+      type: String,
+      enum: ["Pending", "Received", "Refunded"],
+      default: "Pending",
+    },
+    paymentTypeStatus: {
+      type: String,
+      enum: ["Paid", "Unpaid", "Partial"],
+      default: "Unpaid",
+    },
   },
-});
+  {
+    timestamps: true,
+  }
+);
+
+export const SalesReturn = mongoose.model("SalesReturn", salesReturnSchema);

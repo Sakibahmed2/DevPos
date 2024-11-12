@@ -43,7 +43,7 @@ const createPurchase = async (req, res, next) => {
 
     // Check if payment due
     if (purchaseData.paid < purchaseData.amount) {
-      purchaseData.due = purchaseData.amount - purchaseData.paid;
+      purchaseData.due = (purchaseData.amount - purchaseData.paid).toFixed(2);
       purchaseData.status =
         purchaseData.paid === 0 ? paymentStatus.ORDERED : paymentStatus.PENDING;
       purchaseData.paymentTypeStatus =
@@ -130,19 +130,17 @@ const updatePurchase = async (req, res, next) => {
 
     // Check if payment due
     if (purchaseData.paid < purchaseData.amount) {
-      purchaseData.due = purchaseData.amount - purchaseData.paid;
-      purchaseData.amount = purchaseData.amount;
+      purchaseData.due = (purchaseData.amount - purchaseData.paid).toFixed(2);
+      purchaseData.amount = purchase.amount;
       purchaseData.paid = purchaseData.paid + purchase.paid;
 
-      purchaseData.status =
-        purchaseData.paid === 0 ? paymentStatus.ORDERED : paymentStatus.PENDING;
+      purchaseData.status = paymentStatus.PENDING;
 
-      purchaseData.paymentTypeStatus =
-        purchaseData.paid === 0 ? paymentType.PARTIAL : paymentType.UNPAID;
+      purchaseData.paymentTypeStatus = paymentType.UNPAID;
     } else {
       purchaseData.due = 0;
       purchaseData.amount = purchase.amount;
-      purchaseData.paid = purchaseData.paid + purchase.paid;
+      purchaseData.paid = (purchaseData.paid + purchase.paid).toFixed(2);
       purchaseData.status = paymentStatus.COMPLETED;
       purchaseData.paymentTypeStatus = paymentType.PAID;
     }

@@ -143,7 +143,7 @@ const updateSale = async (req, res, next) => {
 
     // check if payment due
     if (saleData.amount > saleData.paid) {
-      saleData.due = saleData.amount - saleData.paid;
+      saleData.due = (saleData.amount - saleData.paid).toFixed(2);
       saleData.amount = sale.amount;
       saleData.paid = saleData.paid + sale.paid;
       saleData.status = "Pending";

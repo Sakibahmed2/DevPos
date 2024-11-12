@@ -3,10 +3,19 @@ import mongoose, { Schema } from "mongoose";
 const productInfo = {
   slug: { type: String, required: true },
   stockKeepingUnit: { type: String, required: true },
-  category: { type: String, required: true },
-  subCategory: { type: String, required: true },
-  brand: { type: String, required: true },
-  unit: { type: String, required: true },
+  category: {
+    type: Schema.Types.ObjectId,
+    ref: "Categories",
+  },
+  subCategory: {
+    type: Schema.Types.ObjectId,
+    ref: "SubCategories",
+  },
+  brand: {
+    type: Schema.Types.ObjectId,
+    ref: "Brands",
+  },
+  unit: { type: Schema.Types.ObjectId, ref: "Units" },
   sellingType: { type: String, required: true },
   barcodeSymbology: { type: String, required: true },
   itemCode: { type: String, required: true },
@@ -19,8 +28,6 @@ const productInfo = {
 const productPriceAndStock = {
   productType: {
     type: String,
-    enum: ["single", "variable"],
-    default: "single",
   },
   price: { type: Number, required: true },
   taxType: { type: String, required: true },
@@ -43,6 +50,7 @@ const productSchema = new Schema(
     productInfo: productInfo,
     pricingAndStock: productPriceAndStock,
     createdBy: createdBy,
+    isDeleted: { type: Boolean, default: false },
   },
   {
     timestamps: true,
