@@ -56,7 +56,6 @@ const CreateProduct = () => {
   const [createProduct] = useCreateProductMutation();
   const [productType, setProductType] = useState("single");
   const userInfo = getUserInfo();
-  console.log(productType);
 
   const { data: categoriesData, isLoading: categoriesLoading } =
     useGetAllCategoriesQuery({});

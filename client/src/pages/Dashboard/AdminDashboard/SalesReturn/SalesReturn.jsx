@@ -17,81 +17,68 @@ import PaginationUi from "../../../../components/ui/PaginationUi";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
+import { toast } from "sonner";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
-import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import laptopImg from "../../../../assets/laptopPng.png";
-import EditSalesModal from "../Sales/EditSalesModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteSaleReturnMutation,
+  useGetAllSaleReturnQuery,
+} from "../../../../redux/api/admin/salesReturnApi";
+import formatDate from "../../../../utils/formateDate";
+import { paginateFormateData } from "../../../../utils/pagination";
 import CreateSaleReturnModal from "./CreateSaleReturnModal";
 
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    status: "Received",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    status: "Ordered",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Partial",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 3,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    status: "Received",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 4,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    status: "Pending",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Unpaid",
-    date: "09 Sep 2024",
-  },
-];
-
 const SalesReturn = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
 
-  // const itemsPerPage = 3 ;
+  const { data: saleReturnData, isLoading } = useGetAllSaleReturnQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  const [deleteSaleReturn] = useDeleteSaleReturnMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const productsData = saleReturnData?.data?.result.reduce((acc, curr) => {
+    const saleReturnId = curr._id;
+    const customerName = curr.customerName;
+    const status = curr.status;
+    const paymentTypeStatus = curr.paymentTypeStatus;
+    const productsWithCustomer = curr?.products?.map((product) => ({
+      ...product,
+      customerName,
+      status,
+      paymentTypeStatus,
+      saleReturnId,
+    }));
+    return acc.concat(productsWithCustomer);
+  }, []);
+
+  const paginateData = paginateFormateData(productsData, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting sale return...");
+
+    try {
+      const res = await deleteSaleReturn(id).unwrap();
+
+      if (res?.success) {
+        toast.success("Sale return deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete sale return", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
-  };
-
-  const handleModal = (productId) => {
-    setOpen(true);
-    setProductId(productId);
   };
 
   const columns = [
@@ -165,7 +152,7 @@ const SalesReturn = () => {
                   bgcolor:
                     row.status === "Received"
                       ? "primary.main"
-                      : row.status === "Ordered"
+                      : row.status === "Refunded"
                       ? "orange"
                       : row.status === "Pending"
                       ? "red"
@@ -176,42 +163,6 @@ const SalesReturn = () => {
                 label={row.status}
               />
             }
-          </Box>
-        );
-      },
-    },
-    {
-      field: "total",
-      headerName: "Grand total",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.total}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "paid",
-      headerName: "Paid",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.paid}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "due",
-      headerName: "Due",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">${row.due}</Typography>
           </Box>
         );
       },
@@ -253,7 +204,6 @@ const SalesReturn = () => {
     {
       field: "id",
       headerName: "Action",
-      flex: 1,
       renderCell: ({ row }) => {
         return (
           <Stack
@@ -266,19 +216,8 @@ const SalesReturn = () => {
             }}
           >
             <Box
-              onClick={() => handleModal(row.id)}
               component={"button"}
-              sx={{
-                border: "1px solid gray",
-                borderRadius: 1,
-                p: "5px 3px",
-              }}
-            >
-              <img src={editIcons} alt="" className="w-5 h-5" />
-            </Box>
-
-            <Box
-              component={"button"}
+              onClick={() => handleDelete(row.saleReturnId)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -293,18 +232,16 @@ const SalesReturn = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
-      customerName: data.customerName,
+      id: data._id,
+      saleReturnId: data.saleReturnId,
+      productImg: data.img,
+      productName: data.name,
+      customerName: data.customerName || "N/A",
       status: data.status,
-      total: data.total,
-      paid: data.paid,
-      due: data.due,
-      payment: data.payment,
-      date: data.date,
+      payment: data.paymentTypeStatus,
+      date: formatDate(new Date(data.createdAt)),
     };
   });
 
@@ -357,6 +294,7 @@ const SalesReturn = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -378,7 +316,8 @@ const SalesReturn = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -407,14 +346,11 @@ const SalesReturn = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={productsData.length}
           currentPage={page}
           onPageChange={handlePageChange}
         />
       </Box>
-
-      {/* Edit warranty modal */}
-      <EditSalesModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add warranty modal */}
       <CreateSaleReturnModal open={createModal} setOpen={setCreateModal} />

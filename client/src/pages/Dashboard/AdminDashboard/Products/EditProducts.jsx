@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import DPFileUploader from "../../../../components/form/DPFileUploader";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
@@ -23,6 +23,11 @@ import {
 import convertImgToBase64 from "../../../../utils/convertImgToBase64";
 import DPLoading from "../../../../components/ui/DPLoading";
 import { toast } from "sonner";
+import { useGetAllBrandsQuery } from "../../../../redux/api/admin/brandApi";
+import { useGetAllUnitsQuery } from "../../../../redux/api/admin/unitsApi";
+import { useGetAllSubCategoriesQuery } from "../../../../redux/api/admin/subCategoriesApi";
+import { useGetAllCategoriesQuery } from "../../../../redux/api/admin/categoriesApi";
+import { convertDataForSelect } from "../../../../utils/convertDataForSelect";
 
 const EditProduct = () => {
   const [productType, setProductType] = useState("single");
@@ -34,9 +39,62 @@ const EditProduct = () => {
   } = useGetSingleProductQuery(id);
   const [updateProduct] = useUpdateProductMutation();
 
-  if (isLoading) {
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useGetAllCategoriesQuery({});
+
+  const { data: subCategoriesData, isLoading: subCategoriesLoading } =
+    useGetAllSubCategoriesQuery({});
+
+  const { data: brandData, isLoading: brandLoading } = useGetAllBrandsQuery({});
+
+  const { data: unitsData, isLoading: unitLoading } = useGetAllUnitsQuery({});
+
+  const navigate = useNavigate();
+
+  if (
+    categoriesLoading ||
+    subCategoriesLoading ||
+    brandLoading ||
+    unitLoading ||
+    isLoading
+  ) {
     return <DPLoading />;
   }
+
+  const categoriesDataForSelect = convertDataForSelect(
+    categoriesData?.data?.result
+  );
+  const subCategoriesDataForSelect = convertDataForSelect(
+    subCategoriesData?.data?.result
+  );
+  const brandDataForSelect = convertDataForSelect(brandData?.data?.result);
+  const unitsDataForSelect = convertDataForSelect(unitsData?.data?.result);
+
+  const defaultValues = {
+    name: productDetails.data?.name,
+    img: productDetails?.data?.img,
+    productInfo: {
+      slug: productDetails?.data?.productInfo?.slug,
+      stockKeepingUnit: productDetails?.data?.productInfo?.stockKeepingUnit,
+      category: productDetails?.data?.productInfo?.category?._id,
+      subCategory: productDetails?.data?.productInfo?.subCategory?._id,
+      brand: productDetails?.data?.productInfo?.brand?._id,
+      unit: productDetails?.data?.productInfo?.unit?._id,
+      sellingType: productDetails?.data?.productInfo?.sellingType,
+      barcodeSymbology: productDetails?.data?.productInfo?.barcodeSymbology,
+      itemCode: productDetails?.data?.productInfo?.itemCode,
+      description: productDetails?.data?.productInfo?.description,
+    },
+    pricingAndStock: {
+      productType: productDetails?.data?.pricingAndStock?.productType,
+      price: productDetails?.data?.pricingAndStock?.price,
+      taxType: productDetails?.data?.pricingAndStock?.taxType,
+      discountType: productDetails?.data?.pricingAndStock?.discountType,
+      discountValue: productDetails?.data?.pricingAndStock?.discountValue,
+      quantityAlert: productDetails?.data?.pricingAndStock?.quantityAlert,
+      quantity: productDetails?.data?.pricingAndStock?.quantity,
+    },
+  };
 
   const onSubmit = async (data) => {
     const toastId = toast.loading("Updating product");
@@ -78,6 +136,7 @@ const EditProduct = () => {
       }).unwrap();
       if (res?.success) {
         toast.success(res?.message, { id: toastId });
+        navigate("/admin/products");
         refetch();
       }
     } catch (err) {
@@ -99,7 +158,7 @@ const EditProduct = () => {
           }}
         >
           <Box>
-            <DPForm onSubmit={onSubmit} defaultValue={productDetails?.data}>
+            <DPForm onSubmit={onSubmit} defaultValue={defaultValues}>
               {/* Product information part */}
               <Box>
                 <Typography
@@ -146,8 +205,6 @@ const EditProduct = () => {
                       name={"productInfo.slug"}
                       label={"Slug"}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
@@ -163,8 +220,6 @@ const EditProduct = () => {
                       name={"productInfo.stockKeepingUnit"}
                       label={"Stock keeping unit"}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
                 </Grid2>
@@ -188,8 +243,7 @@ const EditProduct = () => {
                     <DPSelect
                       name={"productInfo.category"}
                       label={"Category"}
-                      items={["laptop", "mobile"]}
-                      size="medium"
+                      items={categoriesDataForSelect}
                     />
                   </Grid2>
 
@@ -204,7 +258,7 @@ const EditProduct = () => {
                     <DPSelect
                       name={"productInfo.subCategory"}
                       label={"Sub category"}
-                      items={["tablet", "accessories"]}
+                      items={subCategoriesDataForSelect}
                       size="medium"
                     />
                   </Grid2>
@@ -220,7 +274,7 @@ const EditProduct = () => {
                     <DPSelect
                       name={"productInfo.brand"}
                       label={"Brand"}
-                      items={["Apple", "Samsung"]}
+                      items={brandDataForSelect}
                       size="medium"
                     />
                   </Grid2>
@@ -245,7 +299,7 @@ const EditProduct = () => {
                     <DPSelect
                       name={"productInfo.unit"}
                       label={"Unit"}
-                      items={["piece", "kg"]}
+                      items={unitsDataForSelect}
                       size="medium"
                     />
                   </Grid2>
@@ -274,11 +328,9 @@ const EditProduct = () => {
                       lg: 3,
                     }}
                   >
-                    <DPSelect
+                    <DPInput
                       name={"productInfo.barcodeSymbology"}
                       label={"Barcode symbology"}
-                      items={["code128", "code39"]}
-                      size="medium"
                     />
                   </Grid2>
 
@@ -290,11 +342,9 @@ const EditProduct = () => {
                       lg: 3,
                     }}
                   >
-                    <DPSelect
+                    <DPInput
                       name={"productInfo.itemCode"}
                       label={"Item code"}
-                      items={["123456", "789123"]}
-                      size="medium"
                     />
                   </Grid2>
                 </Grid2>
@@ -311,8 +361,6 @@ const EditProduct = () => {
                     <DPInput
                       name={"productInfo.description"}
                       label={"Description"}
-                      fullWidth
-                      size="medium"
                       multiline
                       rows={6}
                     />
@@ -401,8 +449,6 @@ const EditProduct = () => {
                       name={"pricingAndStock.price"}
                       label={"Price"}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
@@ -418,8 +464,6 @@ const EditProduct = () => {
                       name={"pricingAndStock.taxType"}
                       label={"Tax type"}
                       items={["VAT", "GST"]}
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
                 </Grid2>
@@ -444,8 +488,6 @@ const EditProduct = () => {
                       name={"pricingAndStock.discountType"}
                       label={"Discount type"}
                       items={["percentage", "fixed"]}
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
@@ -457,13 +499,10 @@ const EditProduct = () => {
                     }}
                     item
                   >
-                    <DPSelect
+                    <DPInput
                       name={"pricingAndStock.discountValue"}
                       label={"Discount value (%) "}
-                      items={[10, 20]}
                       required
-                      fullWidth
-                      size="medium"
                     />
                   </Grid2>
 
