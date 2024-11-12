@@ -2,8 +2,21 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import employeeIcon from "../../../../assets/dashboard icons/finance/settings/employeeIcon.svg";
 import passwordIcon from "../../../../assets/dashboard icons/finance/settings/passwordIcon.svg";
 import logOutIcon from "../../../../assets/dashboard icons/finance/settings/logOutIcon.svg";
+import { useState } from "react";
+import ChangePasswordModal from "../../../../components/dashboard/finance/GeneralSettings/ChangePasswordModal";
+import { removeTokenFromLocalStorage } from "../../../../utils/local-storage";
+import { useNavigate } from "react-router-dom";
 
 const SecuritySetting = () => {
+  const [open, setOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    removeTokenFromLocalStorage();
+    navigate("/login");
+  };
+
   return (
     <Box>
       <Box
@@ -54,7 +67,7 @@ const SecuritySetting = () => {
             </Box>
           </Box>
 
-          <Button>Change password</Button>
+          <Button onClick={() => setOpen(true)}>Change password</Button>
         </Stack>
 
         <Stack
@@ -81,9 +94,13 @@ const SecuritySetting = () => {
             </Box>
           </Box>
 
-          <Button color="error">Logout</Button>
+          <Button color="error" onClick={() => handleLogout()}>
+            Logout
+          </Button>
         </Stack>
       </Stack>
+
+      <ChangePasswordModal open={open} setOpen={setOpen} />
     </Box>
   );
 };
