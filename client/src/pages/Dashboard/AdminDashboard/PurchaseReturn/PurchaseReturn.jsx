@@ -17,77 +17,71 @@ import PaginationUi from "../../../../components/ui/PaginationUi";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
+import { toast } from "sonner";
 import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import laptopImg from "../../../../assets/laptopPng.png";
-import CreateSaleReturnModal from "../SalesReturn/CreateSaleReturnModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeletePurchaseReturnMutation,
+  useGetAllPurchaseReturnQuery,
+} from "../../../../redux/api/admin/purchaseReturnApi";
+import formatDate from "../../../../utils/formateDate";
+import CreatePurchaseReturnModal from "./CreatePurchaseReturnModal";
 import EditPurchaseReturnModal from "./EditPurchaseReturnModal";
 
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    productName: "Laptop",
-    supplierName: "John Doe",
-    reference: "123456",
-    status: "Received",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    productName: "Laptop",
-    supplierName: "John Doe",
-    reference: "123456",
-    status: "Ordered",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Partial",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 3,
-    productImg: laptopImg,
-    productName: "Laptop",
-    supplierName: "John Doe",
-    reference: "123456",
-    status: "Received",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-    date: "09 Sep 2024",
-  },
-  {
-    id: 4,
-    productImg: laptopImg,
-    productName: "Laptop",
-    supplierName: "John Doe",
-    reference: "123456",
-    status: "Pending",
-    total: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Unpaid",
-    date: "09 Sep 2024",
-  },
-];
-
 const PurchaseReturn = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
 
-  // const itemsPerPage = 3 ;
+  const { data: purchaseReturnData, isLoading } = useGetAllPurchaseReturnQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+
+  const [deletePurchaseReturn] = useDeletePurchaseReturnMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const purchaseReturnProducts = purchaseReturnData?.data?.result.reduce(
+    (acc, curr) => {
+      const supplierName = curr?.supplierName;
+      const createdAt = curr?.createdAt;
+      const refNo = curr?.refNo;
+      const status = curr?.status;
+      const paymentTypeStatus = curr?.paymentTypeStatus;
+      const purchaseItemId = curr?._id;
+      const productsWithCustomer = curr?.products?.map((product) => ({
+        ...product,
+        supplierName,
+        createdAt,
+        refNo,
+        status,
+        paymentTypeStatus,
+        purchaseItemId,
+      }));
+      return acc.concat(productsWithCustomer);
+    },
+    []
+  );
+
+  const HandleDelete = async (id) => {
+    const toastId = toast.loading("Deleting purchase return...");
+    try {
+      const res = await deletePurchaseReturn(id).unwrap();
+      if (res?.success) {
+        toast.success("Purchase return deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete purchase return", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -114,7 +108,11 @@ const PurchaseReturn = () => {
               width: "100%",
             }}
           >
-            <img src={row.productImg} alt="laptop" className="h-8 w-12" />
+            <img
+              src={row.productImg}
+              alt="laptop"
+              className="h-8 w-12 object-contain"
+            />
           </Box>
         );
       },
@@ -181,7 +179,7 @@ const PurchaseReturn = () => {
                   bgcolor:
                     row.status === "Received"
                       ? "primary.main"
-                      : row.status === "Ordered"
+                      : row.status === "Refunded"
                       ? "orange"
                       : row.status === "Pending"
                       ? "red"
@@ -203,31 +201,7 @@ const PurchaseReturn = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.total}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "paid",
-      headerName: "Paid",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.paid}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "due",
-      headerName: "Due",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">${row.due}</Typography>
+            <Typography variant="p">${row.total}</Typography>
           </Box>
         );
       },
@@ -295,6 +269,7 @@ const PurchaseReturn = () => {
 
             <Box
               component={"button"}
+              onClick={() => HandleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -309,19 +284,19 @@ const PurchaseReturn = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = purchaseReturnProducts?.map((data) => {
+    const compositeKey = `${data._id}_${Math.random()}`;
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
-      supplierName: data.supplierName,
-      reference: data.reference,
+      id: data.purchaseItemId,
+      productImg: data.img,
+      productName: data.name,
+      supplierName: data.supplierName || "N/A",
+      reference: data.refNo,
       status: data.status,
-      total: data.total,
-      paid: data.paid,
-      due: data.due,
-      payment: data.payment,
-      date: data.date,
+      total: data.pricingAndStock.price,
+      payment: data.paymentTypeStatus,
+      date: formatDate(new Date(data.createdAt)),
+      compositeKey: compositeKey,
     };
   });
 
@@ -373,6 +348,7 @@ const PurchaseReturn = () => {
             }}
           >
             <TextField
+              onChange={(e) => setSearchTerm(e.target.value)}
               label="Search here"
               fullWidth
               slotProps={{
@@ -395,9 +371,10 @@ const PurchaseReturn = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
-            </FormControl>
+            </FormControl>{" "}
           </Box>
         </Stack>
 
@@ -418,13 +395,14 @@ const PurchaseReturn = () => {
             hideFooter
             checkboxSelection
             disableRowSelectionOnClick
+            getRowId={(row) => row.compositeKey}
           />
         </Box>
       </Box>
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={purchaseReturnProducts?.length}
           currentPage={page}
           onPageChange={handlePageChange}
         />
@@ -434,7 +412,7 @@ const PurchaseReturn = () => {
       <EditPurchaseReturnModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add warranty modal */}
-      <CreateSaleReturnModal open={createModal} setOpen={setCreateModal} />
+      <CreatePurchaseReturnModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };

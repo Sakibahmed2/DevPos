@@ -50,12 +50,14 @@ const SalesReturn = () => {
     const customerName = curr.customerName;
     const status = curr.status;
     const paymentTypeStatus = curr.paymentTypeStatus;
+    const createdAt = curr.createdAt;
     const productsWithCustomer = curr?.products?.map((product) => ({
       ...product,
       customerName,
       status,
       paymentTypeStatus,
       saleReturnId,
+      createdAt,
     }));
     return acc.concat(productsWithCustomer);
   }, []);
@@ -233,6 +235,7 @@ const SalesReturn = () => {
   ];
 
   const rows = paginateData.map((data) => {
+    const compositeKey = `${data._id}_${Math.random()}`;
     return {
       id: data._id,
       saleReturnId: data.saleReturnId,
@@ -242,6 +245,7 @@ const SalesReturn = () => {
       status: data.status,
       payment: data.paymentTypeStatus,
       date: formatDate(new Date(data.createdAt)),
+      compositeKey: compositeKey,
     };
   });
 
@@ -340,6 +344,7 @@ const SalesReturn = () => {
             hideFooter
             checkboxSelection
             disableRowSelectionOnClick
+            getRowId={(row) => row.compositeKey}
           />
         </Box>
       </Box>
