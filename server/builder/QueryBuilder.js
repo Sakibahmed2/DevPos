@@ -7,13 +7,20 @@ class QueryBuilder {
   search(searchableFields) {
     const searchTerm = this.query.searchTerm;
     if (searchTerm) {
+      // Map over searchable fields and apply regex only for strings
       this.moduleQuery = this.moduleQuery.find({
-        $or: searchableFields.map((field) => ({
-          [field]: {
-            $regex: searchTerm,
-            $options: "i",
-          },
-        })),
+        $or: searchableFields.map((field) => {
+          // Handle nested fields like "productInfo.category"
+          const fieldPath = field.includes(".") ? `${field}.name` : field;
+
+          // Use regex only on fields likely to be strings
+          return {
+            [fieldPath]: {
+              $regex: searchTerm,
+              $options: "i",
+            },
+          };
+        }),
       });
     }
     return this;
