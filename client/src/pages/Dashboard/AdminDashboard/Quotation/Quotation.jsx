@@ -21,57 +21,48 @@ import deleteIcon from "../../../../assets/dashboard icons/delete-icon.svg";
 import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
-import laptopImg from "../../../../assets/laptopPng.png";
-import CreateSaleReturnModal from "../SalesReturn/CreateSaleReturnModal";
+import DPLoading from "../../../../components/ui/DPLoading";
+import {
+  useDeleteQuotationMutation,
+  useGetAllQuotationQuery,
+} from "../../../../redux/api/admin/quotationApi";
+import { paginateFormateData } from "../../../../utils/pagination";
+import CreateQuotationModal from "./CreateQuotation";
 import EditQuotationModal from "./EditQuotationModal";
-
-const tableData = [
-  {
-    id: 1,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    reference: "REF-123",
-    status: "Sent",
-    total: 1000,
-  },
-  {
-    id: 2,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    reference: "REF-123",
-    status: "Pending",
-    total: 1000,
-  },
-  {
-    id: 3,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    reference: "REF-123",
-    status: "Sent",
-    total: 1000,
-  },
-  {
-    id: 4,
-    productImg: laptopImg,
-    productName: "Laptop",
-    customerName: "John Doe",
-    reference: "REF-123",
-    status: "Ordered",
-    total: 1000,
-  },
-];
+import { toast } from "sonner";
 
 const Quotation = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [page, setPage] = useState(0);
   const [open, setOpen] = useState(false);
   const [productId, setProductId] = useState(null);
   const [createModal, setCreateModal] = useState(false);
 
-  // const itemsPerPage = 3 ;
+  const { data: quotationData, isLoading } = useGetAllQuotationQuery({
+    searchTerm: searchTerm,
+    sort: sortBy,
+  });
+  const [deleteQuotation] = useDeleteQuotationMutation();
+
+  if (isLoading) return <DPLoading />;
+
+  const paginateData = paginateFormateData(quotationData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting quotation...");
+
+    try {
+      const res = await deleteQuotation(id).unwrap();
+
+      if (res?.success) {
+        toast.success("Quotation deleted successfully", { id: toastId });
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete quotation", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -83,36 +74,6 @@ const Quotation = () => {
   };
 
   const columns = [
-    {
-      field: "productImg",
-      headerName: "Products",
-      width: 90,
-      renderCell: ({ row }) => {
-        return (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-              width: "100%",
-            }}
-          >
-            <img src={row.productImg} alt="laptop" className="h-8 w-12" />
-          </Box>
-        );
-      },
-    },
-    {
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.productName}</Typography>
-          </Box>
-        );
-      },
-    },
     {
       field: "customerName",
       headerName: "Customer name",
@@ -174,7 +135,7 @@ const Quotation = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">{row.total}</Typography>
+            <Typography variant="p">${row.total.toFixed(2)}</Typography>
           </Box>
         );
       },
@@ -208,6 +169,7 @@ const Quotation = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,
@@ -222,15 +184,13 @@ const Quotation = () => {
     },
   ];
 
-  const rows = tableData.map((data) => {
+  const rows = paginateData.map((data) => {
     return {
-      id: data.id,
-      productImg: data.productImg,
-      productName: data.productName,
+      id: data._id,
       customerName: data.customerName,
       status: data.status,
       total: data.total,
-      reference: data.reference,
+      reference: data.refNo,
     };
   });
 
@@ -283,6 +243,7 @@ const Quotation = () => {
           >
             <TextField
               label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
               fullWidth
               slotProps={{
                 input: {
@@ -304,7 +265,8 @@ const Quotation = () => {
                 label="Sort by date"
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <MenuItem value={"date"}>date</MenuItem>
+                <MenuItem value={"createdAt"}>Oldest First</MenuItem>
+                <MenuItem value={"-createdAt"}>Newest First</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -333,7 +295,7 @@ const Quotation = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={quotationData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />
@@ -343,7 +305,7 @@ const Quotation = () => {
       <EditQuotationModal open={open} setOpen={setOpen} id={productId} />
 
       {/* Add warranty modal */}
-      <CreateSaleReturnModal open={createModal} setOpen={setCreateModal} />
+      <CreateQuotationModal open={createModal} setOpen={setCreateModal} />
     </Container>
   );
 };

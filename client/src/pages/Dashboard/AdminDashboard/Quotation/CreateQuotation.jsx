@@ -1,69 +1,57 @@
 /* eslint-disable react/prop-types */
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Chip, Stack, TextField, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DPForm from "../../../../components/form/DPForm";
 import DPInput from "../../../../components/form/DPInput";
 import DPSelect from "../../../../components/form/DPSelect";
 import DPModal from "../../../../components/modal/DPModal";
 import DPLoading from "../../../../components/ui/DPLoading";
-import {
-  useGetSingleQuotationQuery,
-  useUpdateQuotationMutation,
-} from "../../../../redux/api/admin/quotationApi";
+import { useGetAllProductsQuery } from "../../../../redux/api/admin/productApi";
+import { useCreateQuotationMutation } from "../../../../redux/api/admin/quotationApi";
 import { toast } from "sonner";
 
-const EditQuotationModal = ({ open, setOpen, id }) => {
-  const { data: singleQuotation, isLoading } = useGetSingleQuotationQuery(id);
-  const [updateQuotation] = useUpdateQuotationMutation();
+const defaultValues = {
+  customerName: "",
+  status: "Pending",
+  note: "",
+};
 
-  const [tax, setTax] = useState(singleQuotation?.data?.tax || 0);
-  const [discount, setDiscount] = useState(
-    singleQuotation?.data?.discount || 0
-  );
-  const [shipping, setShipping] = useState(
-    singleQuotation?.data?.shipping || 0
-  );
-
-  useEffect(() => {
-    if (singleQuotation) {
-      setTax(singleQuotation.data.tax || 0);
-      setDiscount(singleQuotation.data.discount || 0);
-      setShipping(singleQuotation.data.shipping || 0);
-    }
-  }, [singleQuotation]);
+const CreateQuotationModal = ({ open, setOpen }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [tax, setTax] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [shipping, setShipping] = useState("");
+  const { data: allProducts, isLoading } = useGetAllProductsQuery({
+    searchTerm: searchTerm,
+  });
+  const [createQuotation] = useCreateQuotationMutation();
 
   if (isLoading) return <DPLoading />;
 
-  const defaultValues = {
-    customerName: singleQuotation?.data?.customerName,
-    status: singleQuotation?.data?.status,
-    note: singleQuotation?.data?.note,
-    tax: singleQuotation?.data?.tax,
-  };
-
-  console.log({ tax, discount, shipping });
-
-  console.log(singleQuotation);
-  const totalPrice = singleQuotation?.data?.products.reduce(
-    (total, product) => {
-      return total + product.pricingAndStock.price;
-    },
-    0
-  );
+  const totalPrice = selectedProducts.reduce((total, product) => {
+    return total + product.price;
+  }, 0);
 
   const taxAmount = parseFloat((tax * totalPrice) / 100);
   const discountAmount = parseFloat((discount * totalPrice) / 100);
   const shippingCost = Number(shipping);
 
-  const total = totalPrice + taxAmount + shippingCost - discountAmount;
+  const total = (
+    totalPrice +
+    taxAmount +
+    shippingCost -
+    discountAmount
+  ).toFixed(2);
 
   const onSubmit = async (data) => {
-    const toastId = toast.loading("Updating quotation...");
+    const toastId = toast.loading("Creating quotation...");
 
     try {
-      const updatedData = {
+      const quotationData = {
         customerName: data.customerName,
+        products: selectedProducts.map((product) => product.id),
         tax: Number(tax),
         discount: Number(discount),
         shipping: Number(shipping),
@@ -72,15 +60,16 @@ const EditQuotationModal = ({ open, setOpen, id }) => {
         total: Number(total),
       };
 
-      const res = await updateQuotation({ id, data: updatedData }).unwrap();
+      const res = await createQuotation(quotationData).unwrap();
 
       if (res?.success) {
-        toast.success("Quotation updated successfully", { id: toastId });
+        toast.success("Quotation created successfully", { id: toastId });
+        setSelectedProducts([]);
         setOpen(false);
       }
     } catch (err) {
       console.log(err);
-      toast.error("Failed to update quotation", { id: toastId });
+      toast.error("Failed to create quotation", { id: toastId });
     }
   };
 
@@ -142,9 +131,43 @@ const EditQuotationModal = ({ open, setOpen, id }) => {
         );
       },
     },
+    {
+      field: "discount",
+      headerName: "Discount",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Typography variant="p">{row.discount}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "id",
+      headerName: "Action",
+      flex: 1,
+      renderCell: ({ row }) => {
+        return (
+          <Box>
+            <Chip
+              onClick={() => setSelectedProducts([...selectedProducts, row])}
+              label="Add"
+              variant="outlined"
+              sx={{
+                color: "primary.main",
+                borderColor: "primary.main",
+                borderRadius: 1,
+                cursor: "pointer",
+              }}
+            ></Chip>
+          </Box>
+        );
+      },
+    },
   ];
 
-  const rows = singleQuotation?.data?.products.map((data) => {
+  const rows = allProducts?.data?.result.map((data) => {
     return {
       id: data._id,
       productName: data.name,
@@ -158,7 +181,7 @@ const EditQuotationModal = ({ open, setOpen, id }) => {
   return (
     <Box>
       <DPModal
-        title="Edit quotation"
+        title="Create quotation"
         open={open}
         setOpen={setOpen}
         fullWidth
@@ -177,6 +200,12 @@ const EditQuotationModal = ({ open, setOpen, id }) => {
               width: "800px",
             }}
           >
+            <TextField
+              label="Search here"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              fullWidth
+            />
+
             <Box
               sx={{
                 borderBottom: "1px solid lightgray",
@@ -221,14 +250,10 @@ const EditQuotationModal = ({ open, setOpen, id }) => {
                   </Stack>
                   <Stack>
                     <Typography variant="p">Shipping: ${shipping}</Typography>
-                    <Typography variant="p">
-                      Total: ${total.toFixed(2)}
-                    </Typography>
+                    <Typography variant="p">Total: ${total}</Typography>
                   </Stack>
                 </Stack>
-                <Typography variant="h6">
-                  Grand total: ${total.toFixed(2)}
-                </Typography>
+                <Typography variant="h6">Grand total: ${total}</Typography>
               </Stack>
             </Box>
 
@@ -290,4 +315,4 @@ const EditQuotationModal = ({ open, setOpen, id }) => {
   );
 };
 
-export default EditQuotationModal;
+export default CreateQuotationModal;

@@ -36,8 +36,7 @@ const CreatePromoModal = ({ open, setOpen }) => {
         endDate: data.endDate,
         status: status,
       };
-      console.log(promoData);
-      const res = await createPromo(data).unwrap();
+      const res = await createPromo(promoData).unwrap();
       if (res.success) {
         toast.success(res.message, { id: toastId });
         setOpen(false);
