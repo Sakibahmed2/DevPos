@@ -29,6 +29,7 @@ export const tagTypes = {
   holidays: "holidays",
   payrolls: "payrolls",
   roles: "roles",
+  bankAccount: "bankAccount",
 };
 
 export const tagTypesList = [
@@ -62,4 +63,5 @@ export const tagTypesList = [
   tagTypes.holidays,
   tagTypes.payrolls,
   tagTypes.roles,
+  tagTypes.bankAccount,
 ];

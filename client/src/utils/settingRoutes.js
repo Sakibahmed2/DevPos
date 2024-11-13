@@ -51,3 +51,16 @@ export const systemSettingRoute = [
     label: "GDPR cookies",
   },
 ];
+
+export const financeSettingRoute = [
+  {
+    id: 1,
+    path: "/finance/financial-settings",
+    label: "Payment gateway",
+  },
+  {
+    id: 2,
+    path: "/finance/bank-account",
+    label: "Bank account",
+  },
+];

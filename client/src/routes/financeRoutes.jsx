@@ -15,6 +15,7 @@ import Employees from "../pages/Dashboard/FinanceDashboard/Employees/Employees";
 import ExpenseReport from "../pages/Dashboard/FinanceDashboard/ExpenseReport/ExpenseReport";
 import Expenses from "../pages/Dashboard/FinanceDashboard/Expenses/Expenses";
 import ExpensesCategory from "../pages/Dashboard/FinanceDashboard/ExpensesCategory/ExpensesCategory";
+import BankAccountSetting from "../pages/Dashboard/FinanceDashboard/FinancialSetting/BankAccountSetting";
 import FinancialSetting from "../pages/Dashboard/FinanceDashboard/FinancialSetting/FinancialSetting";
 import GeneralSettings from "../pages/Dashboard/FinanceDashboard/GeneralSettings/GeneralSettings";
 import NotificationSetting from "../pages/Dashboard/FinanceDashboard/GeneralSettings/NotificationSetting";
@@ -45,6 +46,7 @@ import CompanySettings from "../pages/Dashboard/FinanceDashboard/WebsiteSettings
 import LocalizationSettings from "../pages/Dashboard/FinanceDashboard/WebsiteSettings/LocalizationSettings";
 import WebsiteSettings from "../pages/Dashboard/FinanceDashboard/WebsiteSettings/WebsiteSettings";
 import {
+  financeSettingRoute,
   generaleSettingRoute,
   systemSettingRoute,
   websiteSettingRoute,
@@ -210,14 +212,6 @@ const financeRoutes = [
         path: "finance/notification-settings",
         element: <NotificationSetting />,
       },
-      {
-        path: "finance/financial-settings",
-        element: <FinancialSetting />,
-      },
-      {
-        path: "finance/other-settings",
-        element: <OtherSetting />,
-      },
     ],
   },
   {
@@ -259,6 +253,24 @@ const financeRoutes = [
         element: <GDPRSettings />,
       },
     ],
+  },
+  {
+    path: "/",
+    element: <SettingLayout pathLinks={financeSettingRoute} />,
+    children: [
+      {
+        path: "finance/financial-settings",
+        element: <FinancialSetting />,
+      },
+      {
+        path: "finance/bank-account",
+        element: <BankAccountSetting />,
+      },
+    ],
+  },
+  {
+    path: "finance/other-settings",
+    element: <OtherSetting />,
   },
 ];
 
