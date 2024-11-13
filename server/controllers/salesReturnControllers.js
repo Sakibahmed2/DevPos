@@ -12,6 +12,13 @@ const createSalesReturn = async (req, res, next) => {
       saleReturnData.paymentTypeStatus = "Partial";
     }
 
+    if (!saleReturnData.refNo) {
+      saleReturnData.refNo = `REF${Math.random()
+        .toString()
+        .substr(2, 6)
+        .toUpperCase()}`;
+    }
+
     const result = await SalesReturn.create(saleReturnData);
 
     sendResponse(res, {

@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 
-const salesReturnSchema = new Schema(
+const purchaseReturnSchema = new Schema(
   {
-    customerName: {
+    supplierName: {
       type: String,
     },
     products: [
@@ -13,7 +13,7 @@ const salesReturnSchema = new Schema(
     ],
     status: {
       type: String,
-      enum: ["Pending", "Received", "Refunded"],
+      enum: ["Received", "Refunded", "Pending"],
       default: "Pending",
     },
     paymentTypeStatus: {
@@ -21,7 +21,7 @@ const salesReturnSchema = new Schema(
       enum: ["Paid", "Unpaid", "Partial"],
       default: "Unpaid",
     },
-    note: {
+    refNo: {
       type: String,
     },
   },
@@ -30,4 +30,7 @@ const salesReturnSchema = new Schema(
   }
 );
 
-export const SalesReturn = mongoose.model("SalesReturn", salesReturnSchema);
+export const PurchaseReturn = mongoose.model(
+  "PurchaseReturn",
+  purchaseReturnSchema
+);

@@ -18,6 +18,7 @@ import { paymentRouter } from "../routes/paymentRoutes.js";
 import { payrollsRouter } from "../routes/payrollsRoutes.js";
 import { productRouter } from "../routes/productRoutes.js";
 import { promoRouter } from "../routes/promoRoutes.js";
+import { purchaseReturnRouter } from "../routes/purchaseReturnRoutes.js";
 import { purchaseRouter } from "../routes/purchaseRoutes.js";
 import { quotationRouter } from "../routes/quotationRoutes.js";
 import { roleRouter } from "../routes/roleRoutes.js";
@@ -93,6 +94,10 @@ const routes = [
   {
     path: "/purchase",
     routes: purchaseRouter,
+  },
+  {
+    path: "/purchase-return",
+    routes: purchaseReturnRouter,
   },
   {
     path: "/promo",
