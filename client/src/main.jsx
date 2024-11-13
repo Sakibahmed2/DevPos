@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
       <Provider store={store}>
-        <Toaster position="bottom-right" richColors />
+        <Toaster position="bottom-center" richColors />
         <GoogleOAuthProvider clientId={oAuthClientId}>
           <RouterProvider router={router} />
         </GoogleOAuthProvider>

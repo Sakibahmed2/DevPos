@@ -30,6 +30,7 @@ export const tagTypes = {
   payrolls: "payrolls",
   roles: "roles",
   bankAccount: "bankAccount",
+  banIp: "banIp",
 };
 
 export const tagTypesList = [
@@ -64,4 +65,5 @@ export const tagTypesList = [
   tagTypes.payrolls,
   tagTypes.roles,
   tagTypes.bankAccount,
+  tagTypes.banIp,
 ];

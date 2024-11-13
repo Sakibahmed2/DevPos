@@ -3,6 +3,7 @@ import AdminAttendance from "../pages/Dashboard/FinanceDashboard/AdminAttendance
 import AdminLeaves from "../pages/Dashboard/FinanceDashboard/AdminLeaves/AdminLeaves";
 import AppSetting from "../pages/Dashboard/FinanceDashboard/AppSetting/AppSetting";
 import Attendance from "../pages/Dashboard/FinanceDashboard/Attendance/Attendance";
+import BanIPAddress from "../pages/Dashboard/FinanceDashboard/BankIPAddress/BanIPAddress";
 import CustomerReport from "../pages/Dashboard/FinanceDashboard/CustomerReport/CustomerReport";
 import Customers from "../pages/Dashboard/FinanceDashboard/Customers/Customers";
 import DeleteAccountRequest from "../pages/Dashboard/FinanceDashboard/DeleteAccountRequest/DeleteAccountRequest";
@@ -25,7 +26,6 @@ import IncomeReport from "../pages/Dashboard/FinanceDashboard/IncomeReport/Incom
 import InventoryReport from "../pages/Dashboard/FinanceDashboard/InventoryReport/InventoryReport";
 import InvoiceReport from "../pages/Dashboard/FinanceDashboard/InvoiceReport/InvoiceReport";
 import LeaveTypes from "../pages/Dashboard/FinanceDashboard/LeaveTypes/LeaveTypes";
-import OtherSetting from "../pages/Dashboard/FinanceDashboard/OtherSetting/OtherSetting";
 import Payrolls from "../pages/Dashboard/FinanceDashboard/Payrolls/Payrolls";
 import Payslip from "../pages/Dashboard/FinanceDashboard/Payrolls/Payslip";
 import ProfitLoss from "../pages/Dashboard/FinanceDashboard/ProfitLoss/ProfitLoss";
@@ -270,7 +270,7 @@ const financeRoutes = [
   },
   {
     path: "finance/other-settings",
-    element: <OtherSetting />,
+    element: <BanIPAddress />,
   },
 ];
 
