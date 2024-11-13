@@ -1,5 +1,6 @@
 import { attendanceRouter } from "../routes/attendanceRoutes.js";
 import { authRouter } from "../routes/authRoutes.js";
+import { banIpRouter } from "../routes/banIpRoutes.js";
 import { bankAccountRouter } from "../routes/bankAccountRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
@@ -161,6 +162,10 @@ const routes = [
   {
     path: "/bank-accounts",
     routes: bankAccountRouter,
+  },
+  {
+    path: "/ban-ip-addresses",
+    routes: banIpRouter,
   },
 ];
 
