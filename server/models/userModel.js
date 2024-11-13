@@ -1,11 +1,35 @@
 import mongoose, { Schema } from "mongoose";
 import { activeStatus } from "../constant/global.js";
 
+const address = {
+  country: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  state: {
+    type: String,
+  },
+  postalCode: {
+    type: String,
+  },
+};
+
 const userSchema = new Schema(
   {
-    name: {
+    username: {
       type: String,
       required: true,
+    },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    img: {
+      type: String,
     },
     email: {
       type: String,
@@ -17,9 +41,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    img: {
-      type: String,
-    },
+    address: address,
     phone: {
       type: String,
     },

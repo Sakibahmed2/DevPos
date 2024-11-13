@@ -1,5 +1,6 @@
 import { attendanceRouter } from "../routes/attendanceRoutes.js";
 import { authRouter } from "../routes/authRoutes.js";
+import { bankAccountRouter } from "../routes/bankAccountRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
 import { customerRouter } from "../routes/customerRoutes.js";
@@ -156,6 +157,10 @@ const routes = [
   {
     path: "/roles",
     routes: roleRouter,
+  },
+  {
+    path: "/bank-accounts",
+    routes: bankAccountRouter,
   },
 ];
 
