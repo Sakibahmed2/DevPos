@@ -4,6 +4,7 @@ import { banIpRouter } from "../routes/banIpRoutes.js";
 import { bankAccountRouter } from "../routes/bankAccountRoutes.js";
 import { brandRouter } from "../routes/brandRoutes.js";
 import { categoriesRouter } from "../routes/categoriesRoutes.js";
+import { companyRouter } from "../routes/companyRoutes.js";
 import { customerRouter } from "../routes/customerRoutes.js";
 import { departmentsRouter } from "../routes/departmentsRoutes.js";
 import { designationRouter } from "../routes/designationRoutes.js";
@@ -176,6 +177,10 @@ const routes = [
   {
     path: "/ban-ip-addresses",
     routes: banIpRouter,
+  },
+  {
+    path: "/company",
+    routes: companyRouter,
   },
 ];
 
