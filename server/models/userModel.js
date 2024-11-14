@@ -18,7 +18,7 @@ const address = {
 
 const userSchema = new Schema(
   {
-    username: {
+    name: {
       type: String,
       required: true,
     },
@@ -56,6 +56,13 @@ const userSchema = new Schema(
     role: {
       type: String,
       default: "user",
+    },
+    deleteAccount: {
+      type: Boolean,
+      default: false,
+    },
+    accountDeleteRequestDate: {
+      type: Date,
     },
   },
   {

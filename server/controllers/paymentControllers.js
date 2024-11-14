@@ -84,7 +84,7 @@ const getAllSales = async (req, res, next) => {
         .populate("biller", "name email")
         .populate(
           "products",
-          "name img pricingAndStock.price pricingAndStock.quantity productInfo.category productInfo.stockKeepingUnit productInfo.brand"
+          "name img pricingAndStock.price pricingAndStock.quantity productInfo.category.name productInfo.stockKeepingUnit productInfo.brand.name"
         ),
       req.query
     )

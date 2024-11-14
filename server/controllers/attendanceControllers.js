@@ -1,7 +1,7 @@
-import sendResponse from "../utils/sendResponse.js";
-import { calculateWorkHours } from "../utils/calculateTimeDifference.js";
-import { Attendance } from "../models/attendanceModel.js";
 import QueryBuilder from "../builder/QueryBuilder.js";
+import { Attendance } from "../models/attendanceModel.js";
+import { calculateWorkHours } from "../utils/calculateTimeDifference.js";
+import sendResponse from "../utils/sendResponse.js";
 
 const createAttendance = async (req, res, next) => {
   try {
