@@ -28,42 +28,6 @@ import { paginateFormateData } from "../../../../utils/pagination";
 import CreatePurchasesModal from "./CreatePurchasesModal";
 import EditPurchaseModal from "./EditPurchasesModal";
 
-const tableData = [
-  {
-    id: 1,
-    supplierName: "John Doe",
-    reference: "123456",
-    date: "09 Sep 2024",
-    status: "Completed",
-    grandTotal: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Paid",
-  },
-  {
-    id: 2,
-    supplierName: "John Doe",
-    reference: "123456",
-    date: "09 Sep 2024",
-    status: "Pending",
-    grandTotal: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Unpaid",
-  },
-  {
-    id: 3,
-    supplierName: "John Doe",
-    reference: "123456",
-    date: "09 Sep 2024",
-    status: "Ordered",
-    grandTotal: 1000,
-    paid: 1000,
-    due: 0,
-    payment: "Partial",
-  },
-];
-
 const Purchases = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("");
@@ -383,7 +347,7 @@ const Purchases = () => {
 
       <Box>
         <PaginationUi
-          totalItems={tableData.length}
+          totalItems={purchaseData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

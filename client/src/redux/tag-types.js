@@ -31,6 +31,7 @@ export const tagTypes = {
   holidays: "holidays",
   payrolls: "payrolls",
   roles: "roles",
+  company: "company",
   bankAccount: "bankAccount",
   banIp: "banIp",
 };
@@ -68,6 +69,7 @@ export const tagTypesList = [
   tagTypes.holidays,
   tagTypes.payrolls,
   tagTypes.roles,
+  tagTypes.company,
   tagTypes.bankAccount,
   tagTypes.banIp,
 ];

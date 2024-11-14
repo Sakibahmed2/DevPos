@@ -99,7 +99,11 @@ const SalesReturn = () => {
               width: "100%",
             }}
           >
-            <img src={row.productImg} alt="laptop" className="h-8 w-12" />
+            <img
+              src={row.productImg}
+              alt="laptop"
+              className="h-8 w-12 object-contain"
+            />
           </Box>
         );
       },

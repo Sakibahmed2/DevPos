@@ -90,7 +90,9 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
               }}
             >
               <Box>
-                <Typography variant="p">Hi, {userInfo.name}</Typography>
+                <Typography variant="p">
+                  Hi, {singleUser?.data?.firstName}
+                </Typography>
                 <Typography
                   component={"h1"}
                   variant={"h5"}

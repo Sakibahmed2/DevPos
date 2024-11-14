@@ -30,6 +30,7 @@ import {
 import formatDate from "../../../../utils/formateDate";
 import CreatePurchaseReturnModal from "./CreatePurchaseReturnModal";
 import EditPurchaseReturnModal from "./EditPurchaseReturnModal";
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const PurchaseReturn = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -69,6 +70,8 @@ const PurchaseReturn = () => {
     },
     []
   );
+
+  const paginatedData = paginateFormateData(purchaseReturnProducts, page);
 
   const HandleDelete = async (id) => {
     const toastId = toast.loading("Deleting purchase return...");
@@ -284,7 +287,7 @@ const PurchaseReturn = () => {
     },
   ];
 
-  const rows = purchaseReturnProducts?.map((data) => {
+  const rows = paginatedData?.map((data) => {
     const compositeKey = `${data._id}_${Math.random()}`;
     return {
       id: data.purchaseItemId,
