@@ -89,30 +89,6 @@ const SalesReport = () => {
       },
     },
     {
-      field: "category",
-      headerName: "Category",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.category}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "brand",
-      headerName: "brand",
-      flex: 1,
-      renderCell: ({ row }) => {
-        return (
-          <Box>
-            <Typography variant="p">{row.brand}</Typography>
-          </Box>
-        );
-      },
-    },
-    {
       field: "soldQty",
       headerName: "Sold Qty",
       flex: 1,
@@ -156,8 +132,6 @@ const SalesReport = () => {
       productImg: data.img,
       productName: data.name,
       stockKeepingUnit: data.productInfo.stockKeepingUnit,
-      category: data.productInfo.category,
-      brand: data.productInfo.brand,
       soldQty: data.soldQuantity,
       soldAmount: data.soldQuantity * data.pricingAndStock.price,
       inStockQty: data.pricingAndStock.quantity - data.soldQuantity,

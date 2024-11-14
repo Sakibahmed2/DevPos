@@ -109,7 +109,7 @@ const Brands = () => {
             <img
               src={row.brandLogo}
               alt="laptop"
-              className="object-contain h-8 w-12"
+              className="object-contain w-12 rounded-full"
             />
           </Box>
         );

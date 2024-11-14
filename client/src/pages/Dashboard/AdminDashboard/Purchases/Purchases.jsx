@@ -22,11 +22,15 @@ import editIcons from "../../../../assets/dashboard icons/edit-icon.svg";
 import plusIcon from "../../../../assets/dashboard icons/plusIcon.svg";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
 import DPLoading from "../../../../components/ui/DPLoading";
-import { useGetAllPurchaseQuery } from "../../../../redux/api/admin/purchaseApi";
+import {
+  useDeletePurchaseMutation,
+  useGetAllPurchaseQuery,
+} from "../../../../redux/api/admin/purchaseApi";
 import formatDate from "../../../../utils/formateDate";
 import { paginateFormateData } from "../../../../utils/pagination";
 import CreatePurchasesModal from "./CreatePurchasesModal";
 import EditPurchaseModal from "./EditPurchasesModal";
+import { toast } from "sonner";
 
 const Purchases = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,9 +45,24 @@ const Purchases = () => {
     sort: sortBy,
   });
 
+  const [deletePurchase] = useDeletePurchaseMutation();
+
   if (isLoading) return <DPLoading />;
 
   const paginateData = paginateFormateData(purchaseData?.data?.result, page);
+
+  const handleDelete = async (id) => {
+    const toastId = toast.loading("Deleting purchase...");
+    try {
+      const res = await deletePurchase(id).unwrap();
+      if (res.success) {
+        toast.success("Purchase deleted successfully", { id: toastId });
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to delete purchase", { id: toastId });
+    }
+  };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -218,6 +237,7 @@ const Purchases = () => {
 
             <Box
               component={"button"}
+              onClick={() => handleDelete(row.id)}
               sx={{
                 border: "1px solid gray",
                 borderRadius: 1,

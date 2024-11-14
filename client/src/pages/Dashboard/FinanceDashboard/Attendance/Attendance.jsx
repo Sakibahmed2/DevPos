@@ -3,7 +3,6 @@ import {
   Chip,
   Container,
   FormControl,
-  Grid2,
   InputLabel,
   LinearProgress,
   MenuItem,
@@ -17,42 +16,14 @@ import { useState } from "react";
 import SectionTitle from "../../../../components/ui/SectionTitle";
 
 // icons
+import dayjs from "dayjs";
 import searchIcon from "../../../../assets/dashboard icons/search.svg";
+import DPLoading from "../../../../components/ui/DPLoading";
 import PaginationUi from "../../../../components/ui/PaginationUi";
 import { useGetAllAttendanceQuery } from "../../../../redux/api/finance/attendanceApi";
-import DPLoading from "../../../../components/ui/DPLoading";
-import { paginateFormateData } from "../../../../utils/pagination";
 import formatDate from "../../../../utils/formateDate";
 import formatTime from "../../../../utils/formateTime";
-import dayjs from "dayjs";
-
-// table data
-const tableData = [
-  {
-    id: 1,
-    date: "25 May 2023",
-    checkIn: "09:15 AM",
-    checkOut: "06:00 PM",
-    production: "8h 45m",
-    breakTime: "1h 15m",
-    overTime: "0h 50m",
-    progress: 50,
-    totalWorkHour: "9h 30m",
-    status: "Present",
-  },
-  {
-    id: 2,
-    date: "25 May 2023",
-    checkIn: "",
-    checkOut: "",
-    production: "",
-    breakTime: "",
-    overTime: "",
-    progress: 80,
-    totalWorkHour: "",
-    status: "Absent",
-  },
-];
+import { paginateFormateData } from "../../../../utils/pagination";
 
 const Attendance = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -213,7 +184,7 @@ const Attendance = () => {
   return (
     <Container>
       {/* Attendance statistics */}
-      <Box
+      {/* <Box
         sx={{
           border: "1px solid gray",
           borderRadius: 4,
@@ -443,7 +414,7 @@ const Attendance = () => {
             </Box>
           </Grid2>
         </Grid2>
-      </Box>
+      </Box> */}
 
       {/* Attendance table */}
       <Box
@@ -536,7 +507,7 @@ const Attendance = () => {
 
         <Box>
           <PaginationUi
-            totalItems={tableData.length}
+            totalItems={allAttendance?.data?.meta?.total}
             currentPage={page}
             onPageChange={handlePageChange}
           />

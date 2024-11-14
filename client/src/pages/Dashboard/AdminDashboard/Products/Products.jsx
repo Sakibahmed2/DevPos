@@ -50,6 +50,8 @@ const ProductsPage = () => {
   // Get paginated data based on current page
   const paginatedData = paginateFormateData(productsData?.data?.result, page);
 
+  console.log(paginatedData);
+
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
@@ -181,8 +183,10 @@ const ProductsPage = () => {
               gap: 1,
             }}
           >
-            <Avatar alt="Remy Sharp" src={row.createdBy.img} />
-            <Typography variant="p">{row.createdBy.name}</Typography>
+            <Avatar alt="Remy Sharp" src={row?.createdBy?.img} />
+            <Typography variant="p">
+              {row?.createdBy?.name || " N/A "}
+            </Typography>
           </Box>
         );
       },

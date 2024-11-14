@@ -62,12 +62,13 @@ const Categories = () => {
     try {
       const res = await deleteCategory(id).unwrap();
 
-      if (res.success) {
-        toast.success(res.message, toastId);
+      if (res?.success) {
+        toast.success(res.message, { id: toastId });
         refetch();
       }
     } catch (err) {
       console.log(err);
+      toast.error("Failed to delete category", { id: toastId });
     }
   };
 

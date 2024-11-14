@@ -38,11 +38,7 @@ const InventoryReport = () => {
     return acc.concat(curr.products);
   }, []);
 
-  console.log(allProducts);
-
   const paginateData = paginateFormateData(productsData?.data?.result, page);
-
-  console.log(paginateData);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -147,9 +143,9 @@ const InventoryReport = () => {
       productImg: data.img,
       productName: data.name,
       stockKeepingUnit: data.productInfo.stockKeepingUnit,
-      category: data.productInfo.category,
-      brand: data.productInfo.brand,
-      unit: data.productInfo.unit,
+      category: data.productInfo.category.name,
+      brand: data.productInfo.brand.name,
+      unit: data.productInfo.unit.name,
       inStockQty:
         data.pricingAndStock.quantity -
         allProducts.filter((product) => product._id === data._id).length,
@@ -243,7 +239,7 @@ const InventoryReport = () => {
 
       <Box>
         <PaginationUi
-          totalItems={saleData?.data?.meta?.total}
+          totalItems={productsData?.data?.meta?.total}
           currentPage={page}
           onPageChange={handlePageChange}
         />

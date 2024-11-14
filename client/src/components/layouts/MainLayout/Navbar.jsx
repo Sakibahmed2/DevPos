@@ -16,12 +16,17 @@ import {
 
 // icons
 import { useState } from "react";
-import { useGetSingleUsersQuery } from "../../../redux/api/auth/authApi";
+import { useNavigate } from "react-router-dom";
+import logOutIcon from "../../../assets/dashboard icons/finance/settings/logOutRed.svg";
+import {
+  useGetSingleUsersQuery,
+  useUpdateUserMutation,
+} from "../../../redux/api/auth/authApi";
 import { getUserInfo } from "../../../utils/getUserInfo";
 import { removeTokenFromLocalStorage } from "../../../utils/local-storage";
 import DPClock from "../../ui/DPClock";
 import DPLoading from "../../ui/DPLoading";
-import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -29,6 +34,7 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
   const navigate = useNavigate();
 
   const { data: singleUser, isLoading } = useGetSingleUsersQuery(userInfo.id);
+  const [updateUser] = useUpdateUserMutation();
 
   if (isLoading) return <DPLoading />;
 
@@ -44,6 +50,30 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
     removeTokenFromLocalStorage();
     handleCloseUserMenu();
     navigate("/login");
+  };
+
+  const handleDeleteAccount = async () => {
+    const toastId = toast.loading("Requesting for delete account...");
+
+    try {
+      const res = await updateUser({
+        id: userInfo.id,
+        data: {
+          deleteAccount: true,
+          accountDeleteRequestDate: new Date().toISOString(),
+        },
+      }).unwrap();
+
+      if (res?.success) {
+        toast.success("Request for deleted account successfully", {
+          id: toastId,
+        });
+        handleLogout();
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Failed to delete account", { id: toastId });
+    }
   };
 
   return (
@@ -91,7 +121,7 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
             >
               <Box>
                 <Typography variant="p">
-                  Hi, {singleUser?.data?.firstName}
+                  Hi, {singleUser?.data?.firstName || singleUser?.data?.name}
                 </Typography>
                 <Typography
                   component={"h1"}
@@ -199,10 +229,21 @@ const Navbar = ({ handleDrawerToggle, drawerWidth }) => {
                     open={Boolean(anchorElUser)}
                     onClose={handleCloseUserMenu}
                   >
-                    <MenuItem onClick={handleLogout}>
-                      <Typography sx={{ textAlign: "center", color: "red" }}>
-                        Logout
-                      </Typography>
+                    <MenuItem onClick={() => handleDeleteAccount()}>
+                      <Stack direction={"row"} gap={1} alignItems={"center"}>
+                        <Typography sx={{ textAlign: "center" }}>
+                          Delete account
+                        </Typography>
+                      </Stack>
+                    </MenuItem>
+
+                    <MenuItem onClick={handleLogout} sx={{ mt: 1 }}>
+                      <Stack direction={"row"} gap={2}>
+                        <Typography sx={{ textAlign: "center", color: "red" }}>
+                          Logout
+                        </Typography>
+                        <img src={logOutIcon} alt="" className=" rounded-md " />
+                      </Stack>
                     </MenuItem>
                   </Menu>
                 </Box>

@@ -110,7 +110,7 @@ const Invoices = () => {
       renderCell: ({ row }) => {
         return (
           <Box>
-            <Typography variant="p">${row.due}</Typography>
+            <Typography variant="p">${row.due.toFixed(2)}</Typography>
           </Box>
         );
       },

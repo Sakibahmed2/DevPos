@@ -157,7 +157,7 @@ const PrintBarcode = () => {
             <Chip
               onClick={() => setProductId(row.id)}
               component={"button"}
-              label="Add"
+              label="Generate"
               variant="outlined"
               sx={{
                 color: "black",

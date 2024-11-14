@@ -57,6 +57,8 @@ const SubCategory = () => {
     limit
   );
 
+  console.log(paginateData);
+
   const handleDelete = async (id) => {
     const toastId = toast.loading("Deleting category...");
     try {
@@ -191,7 +193,7 @@ const SubCategory = () => {
       parentCategory: data.parentCategory.name,
       categoryCode: data.code,
       description: data.description,
-      createdBy: data.createdBy.name,
+      createdBy: data.createdBy?.name || "N/A",
     };
   });
   return (

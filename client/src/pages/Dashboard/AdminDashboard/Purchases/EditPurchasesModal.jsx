@@ -157,7 +157,6 @@ const EditPurchaseModal = ({ open, setOpen, id }) => {
 
           <Box
             sx={{
-              mt: 5,
               mb: 2,
             }}
           ></Box>
