@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon config/mongoose.js",
-    "start": "node config/mongoose.js"
+    "dev": "nodemon src/config/mongoose.js",
+    "start": "node src/config/mongoose.js"
   },
   "keywords": [],
   "author": "",
